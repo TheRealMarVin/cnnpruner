@@ -296,10 +296,11 @@ def prune(model, layer_index, filter_index):
     conv.weight.data = new_weights.cuda()
     conv.weight._grad = None
 
-    bias_numpy = conv.bias.data.cpu().detach()
-    new_bias_numpy = np.delete(bias_numpy, [filter_index], 0)
-    conv.bias.data = new_bias_numpy.cuda()
-    conv.bias._grad = None
+    if conv.bias is not None:
+        bias_numpy = conv.bias.data.cpu().detach()
+        new_bias_numpy = np.delete(bias_numpy, [filter_index], 0)
+        conv.bias.data = new_bias_numpy.cuda()
+        conv.bias._grad = None
 
     if not next_conv is None:
         next_conv.in_channels = next_conv.in_channels - 1
@@ -383,19 +384,19 @@ def common_code_for_q3(train_path, test_path, model, ):
     model.cuda()
 
     use_gpu = True
-    n_epoch = 20
-    n_epoch_retrain = 3
+    n_epoch = 25
+    n_epoch_retrain = 5
     batch_size = 64
 
     optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
     criterion = torch.nn.CrossEntropyLoss()
     scheduler = StepLR(optimizer, step_size=15, gamma=0.5)
     #
-    # history = train(model, optimizer, train_dataset, n_epoch, batch_size, use_gpu=use_gpu, criterion=criterion, scheduler=scheduler)
-    # history.display()
-    #
-    # test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
-    # print('Test:\n\tScore: {}'.format(test_score))
+    history = train(model, optimizer, train_dataset, n_epoch, batch_size, use_gpu=use_gpu, criterion=criterion, scheduler=scheduler)
+    history.display()
+
+    test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
+    print('Test:\n\tScore: {}'.format(test_score))
 
     ###
     prunner = FilterPrunner(model)
@@ -444,8 +445,9 @@ def common_code_for_q3(train_path, test_path, model, ):
         print('Test:\n\tpost prune Score: {}'.format(test_score))
         # force_clear_grad(model)
         print("Fine tuning to recover from prunning iteration.")
-        train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu, criterion=None,
+        history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu, criterion=None,
               scheduler=scheduler, prunner=None)
+        history.display()
 
     ###
 
@@ -547,6 +549,7 @@ def exec_q3(train_path, test_path):
     #     separate_train_test("C:/dev/TP2_remise/cub-200-imagesx/images", train_path, test_path)
 
     # exec_q3a(train_path, test_path)
+    # exec_q3b(train_path, test_path)
     exec_poc(train_path, test_path)
     # exec_q3c(train_path, test_path)
     # exec_q3d(train_path, test_path)
