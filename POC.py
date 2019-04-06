@@ -35,36 +35,6 @@ def make_dir(file_path):
         os.makedirs(file_path)
 
 
-"""
-Cette fonction sépare les images de CUB200 en un jeu d'entraînement et de test.
-
-dataset_path: Path où se trouve les images de CUB200
-train_path: path où sauvegarder le jeu d'entraînement
-test_path: path où sauvegarder le jeu de test
-"""
-
-
-def separate_train_test(dataset_path, train_path, test_path):
-    class_index = 1
-    for classname in sorted(os.listdir(dataset_path)):
-        if classname.startswith('.'):
-            continue
-        make_dir(os.path.join(train_path, classname))
-        make_dir(os.path.join(test_path, classname))
-        i = 0
-        for file in sorted(os.listdir(os.path.join(dataset_path, classname))):
-            if file.startswith('.'):
-                continue
-            file_path = os.path.join(dataset_path, classname, file)
-            if i < 15:
-                copyfile(file_path, os.path.join(test_path, classname, file))
-            else:
-                copyfile(file_path, os.path.join(train_path, classname, file))
-            i += 1
-
-        class_index += 1
-
-
 # fonction de train qui n'override pas la transform
 def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, scheduler=None, criterion=None, prunner=None, retain_graph=None):
     history = History()
@@ -176,7 +146,10 @@ class FilterPrunner:
             if len(module._modules.items()) > 0:
                 for sub_layer, sub_module in module._modules.items():
                     if sub_module is not None and sub_layer != "downsample":
-                        x = self._inner_forward(x, sub_module, sub_layer)
+                        desired_layer = sub_layer
+                        if len(layer) > 0:
+                            desired_layer = layer + "." + desired_layer
+                        x = self._inner_forward(x, sub_module, desired_layer)
             else:
                 x = module(x)
 
@@ -189,8 +162,8 @@ class FilterPrunner:
         self.activation_to_layer = {}
 
         self.activation_index = 0
-        for layer, (name, module) in enumerate(self.model._modules.items()):
-            x = self._inner_forward(x, module, layer)
+        for name, module in self.model._modules.items():
+            x = self._inner_forward(x, module, name)
 
         return x
 
@@ -392,8 +365,8 @@ def common_code_for_q3(train_path, test_path, model, ):
     criterion = torch.nn.CrossEntropyLoss()
     scheduler = StepLR(optimizer, step_size=15, gamma=0.5)
     #
-    history = train(model, optimizer, train_dataset, n_epoch, batch_size, use_gpu=use_gpu, criterion=criterion, scheduler=scheduler)
-    history.display()
+    # history = train(model, optimizer, train_dataset, n_epoch, batch_size, use_gpu=use_gpu, criterion=criterion, scheduler=scheduler)
+    # history.display()
 
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test:\n\tScore: {}'.format(test_score))
@@ -545,11 +518,8 @@ def exec_q3b(train_path, test_path):
 
 
 def exec_q3(train_path, test_path):
-    # if not path.exists(train_path) or not path.exists(test_path):
-    #     separate_train_test("C:/dev/TP2_remise/cub-200-imagesx/images", train_path, test_path)
-
     # exec_q3a(train_path, test_path)
-    # exec_q3b(train_path, test_path)
+    exec_q3b(train_path, test_path)
     exec_poc(train_path, test_path)
     # exec_q3c(train_path, test_path)
     # exec_q3d(train_path, test_path)
