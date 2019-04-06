@@ -303,21 +303,22 @@ def prune(model, layer_index, filter_index):
     elif isinstance(next_layer, torch.nn.modules.BatchNorm2d):
         # print("nb features: ", next_layer.num_features)
         #TODO on network that doesn't converge it could reach 0... at this point we might want to remove it completely... maybe
-        next_layer.num_features = next_layer.num_features - 1
-        old_batch_weights = next_layer.weight.detach()
-        new_batch_weights = np.delete(old_batch_weights, [filter_index], 0)
-        next_layer.weight.data = new_batch_weights
-        next_layer.weight._grad = None
-        if next_layer.track_running_stats:
-            next_layer.register_buffer('running_mean', torch.zeros(next_layer.num_features))
-            next_layer.register_buffer('running_var', torch.ones(next_layer.num_features))
-            next_layer.register_buffer('num_batches_tracked', torch.tensor(0, dtype=torch.long))
-        else:
-            next_layer.register_parameter('running_mean', None)
-            next_layer.register_parameter('running_var', None)
-            next_layer.register_parameter('num_batches_tracked', None)
-        next_layer.reset_running_stats()
-        next_layer.reset_parameters()
+        if next_layer.num_features > 10:
+            next_layer.num_features = next_layer.num_features - 1
+            old_batch_weights = next_layer.weight.detach()
+            new_batch_weights = np.delete(old_batch_weights, [filter_index], 0)
+            next_layer.weight.data = new_batch_weights
+            next_layer.weight._grad = None
+            if next_layer.track_running_stats:
+                next_layer.register_buffer('running_mean', torch.zeros(next_layer.num_features))
+                next_layer.register_buffer('running_var', torch.ones(next_layer.num_features))
+                next_layer.register_buffer('num_batches_tracked', torch.tensor(0, dtype=torch.long))
+            else:
+                next_layer.register_parameter('running_mean', None)
+                next_layer.register_parameter('running_var', None)
+                next_layer.register_parameter('num_batches_tracked', None)
+            next_layer.reset_running_stats()
+            next_layer.reset_parameters()
 
     return model
 
@@ -383,9 +384,9 @@ def common_code_for_q3(train_path, test_path, model, ):
     model.cuda()
 
     use_gpu = True
-    n_epoch = 25
-    n_epoch_retrain = 5
-    batch_size = 64
+    n_epoch = 5
+    n_epoch_retrain = 2
+    batch_size = 128
 
     optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
     criterion = torch.nn.CrossEntropyLoss()
@@ -401,10 +402,11 @@ def common_code_for_q3(train_path, test_path, model, ):
     prunner = FilterPrunner(model)
     # number_of_filters = total_num_filters(model)
     number_of_filters = total_num_filters(model)
-    num_filters_to_prune_per_iteration = 512
+    num_filters_to_prune_per_iteration = 256
     iterations = int(float(number_of_filters) / num_filters_to_prune_per_iteration)
-    iterations = int(iterations * 2.0 / 3)
-    print("Number of prunning iterations to reduce 67% filters", iterations)
+    ratio = 2.0/3
+    iterations = int(iterations * ratio)
+    print("{} iterations to reduce {:2.2f}% filters".format(iterations, ratio))
 
     for param in model.parameters():
         param.requires_grad = True
