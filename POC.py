@@ -2,8 +2,6 @@ import os
 import random
 from heapq import nsmallest
 from operator import itemgetter
-from os import path
-from shutil import copyfile
 
 import numpy as np
 import torch
@@ -17,10 +15,10 @@ from deeplib.history import History
 from deeplib.training import do_epoch, validate
 from matplotlib import pyplot as plt
 from torch import nn
-from torch.optim.lr_scheduler import ReduceLROnPlateau, StepLR
+from torch.optim.lr_scheduler import  StepLR
 from torch.utils.data import SequentialSampler
 from torchvision import models
-from torchvision.datasets import ImageFolder, CIFAR10
+from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms, ToTensor
 
 """
@@ -223,45 +221,50 @@ class FilterPrunner:
                 filters_to_prune.append((l, i))
 
         return filters_to_prune
-
-
 ###
 
 
 
-def find_layer_and_next(module, layer_index, in_desired_layer=None):
+def find_layer_and_next(module, layer_name, in_desired_layer=None):
     desired_layer = in_desired_layer
-    next_conf_layer = None
-    next_linear_layer = None
+    next_desired_layer = None
+
+    splitted = layer_name.split(".")
+    if len(splitted) > 0:
+        sub = splitted[1:]
+        next_layer_name = '.'.join(sub)
+    elif len(splitted) == 0:
+        next_layer_name = splitted[0]
+
     for name, curr_module in module.named_children():
         if desired_layer is None \
-                and name == layer_index \
+                and name == layer_name \
                 and isinstance(curr_module, torch.nn.modules.conv.Conv2d):
             desired_layer = curr_module
         else:
             if desired_layer is not None:
                 if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-                    next_conf_layer = curr_module
+                    next_desired_layer = curr_module
                     break
                 elif isinstance(curr_module, torch.nn.modules.Linear):
-                    next_linear_layer = curr_module
+                    next_desired_layer = curr_module
                     break
-
-            res_desired, res_next, res_lin = find_layer_and_next(curr_module, layer_index, desired_layer)
+                elif isinstance(curr_module, torch.nn.modules.BatchNorm2d):
+                    next_desired_layer = curr_module
+                    break
+            res_desired, res_next= find_layer_and_next(curr_module, next_layer_name, desired_layer)
             if desired_layer is None and res_desired is not None:
                 desired_layer = res_desired
-            if next_conf_layer is None and res_next is not None:
-                next_conf_layer = res_next
-            if next_linear_layer is None and res_lin is not None:
-                next_linear_layer = res_lin
+            if next_desired_layer is None and res_next is not None:
+                next_desired_layer = res_next
 
-            if desired_layer is not None and (next_conf_layer is not None or next_linear_layer is not None):
-                return res_desired, res_next, next_linear_layer
-    return desired_layer, next_conf_layer, next_linear_layer
+            if desired_layer is not None and next_desired_layer is not None:
+                return desired_layer, next_desired_layer
+    return desired_layer, next_desired_layer
 
-#TODO
+#TODO on devrait les faire en batch ca irait pas mal plus vite
 def prune(model, layer_index, filter_index):
-    conv, next_conv, next_linear = find_layer_and_next(model, layer_index)
+    conv, next_layer = find_layer_and_next(model, layer_index)
 
     conv.out_channels = conv.out_channels - 1
     old_weights = conv.weight.data.cpu().detach()
@@ -275,23 +278,46 @@ def prune(model, layer_index, filter_index):
         conv.bias.data = new_bias_numpy.cuda()
         conv.bias._grad = None
 
-    if not next_conv is None:
-        next_conv.in_channels = next_conv.in_channels - 1
-        old_weights = next_conv.weight.data.cpu()
+    if isinstance(next_layer, torch.nn.modules.conv.Conv2d):
+        next_layer.in_channels = next_layer.in_channels - 1
+        old_weights = next_layer.weight.data.cpu()
         new_weights = np.delete(old_weights, [filter_index], 1)
-        next_conv.weight.data = new_weights.cuda()
-        next_conv.weight._grad = None
+        next_layer.weight.data = new_weights.cuda()
+        next_layer.weight._grad = None
 
-    if next_linear is not None:
-        lin_in_feat = next_linear.in_features
-        conv_outChannels = conv.out_channels
-        elem_per_channel = (lin_in_feat//conv_outChannels)
+    elif isinstance(next_layer, torch.nn.modules.Linear):
+        lin_in_feat = next_layer.in_features
+        conv_out_channels = conv.out_channels
+
+        elem_per_channel = (lin_in_feat//conv_out_channels)
         new_lin_in_feat = lin_in_feat - elem_per_channel
-        old_lin_weights = next_linear.weight.detach()
-        lin_new_weigths = np.delete(old_lin_weights, [x + filter_index * elem_per_channel for x  in range(elem_per_channel)], 1)
-        next_linear.weight.data = lin_new_weigths
-        next_linear.in_features = new_lin_in_feat
-        next_linear.weight._grad = None
+        old_lin_weights = next_layer.weight.detach()
+        lin_new_weigths = np.delete(old_lin_weights, [x + filter_index * elem_per_channel for x in range(elem_per_channel)], 1)
+        #weight scaling because removing nodes is basically like a form of dropout
+        factor = 1 - (elem_per_channel / lin_in_feat)
+        lin_new_weigths.mul_(factor)
+        next_layer.weight.data = lin_new_weigths
+        next_layer.in_features = new_lin_in_feat
+        next_layer.weight._grad = None
+
+    elif isinstance(next_layer, torch.nn.modules.BatchNorm2d):
+        # print("nb features: ", next_layer.num_features)
+        #TODO on network that doesn't converge it could reach 0... at this point we might want to remove it completely... maybe
+        next_layer.num_features = next_layer.num_features - 1
+        old_batch_weights = next_layer.weight.detach()
+        new_batch_weights = np.delete(old_batch_weights, [filter_index], 0)
+        next_layer.weight.data = new_batch_weights
+        next_layer.weight._grad = None
+        if next_layer.track_running_stats:
+            next_layer.register_buffer('running_mean', torch.zeros(next_layer.num_features))
+            next_layer.register_buffer('running_var', torch.ones(next_layer.num_features))
+            next_layer.register_buffer('num_batches_tracked', torch.tensor(0, dtype=torch.long))
+        else:
+            next_layer.register_parameter('running_mean', None)
+            next_layer.register_parameter('running_var', None)
+            next_layer.register_parameter('num_batches_tracked', None)
+        next_layer.reset_running_stats()
+        next_layer.reset_parameters()
 
     return model
 
