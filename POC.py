@@ -2,6 +2,7 @@ import os
 import random
 from heapq import nsmallest
 from operator import itemgetter
+from shutil import copyfile
 
 import numpy as np
 import torch
@@ -34,7 +35,8 @@ def make_dir(file_path):
 
 
 # fonction de train qui n'override pas la transform
-def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, scheduler=None, criterion=None, prunner=None, retain_graph=None):
+def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, scheduler=None,
+          criterion=None, prunner=None, retain_graph=None, best_result_save_path=None):
     history = History()
 
     if criterion is None:
@@ -49,6 +51,7 @@ def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, schedule
 
     train_loader, val_loader = train_valid_loaders(dataset, batch_size=batch_size)
 
+    highest_score = 0.0
     for i in range(n_epoch):
         start = time.time()
         do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, prunner=prunner, retain_graph=retain_graph)
@@ -57,6 +60,17 @@ def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, schedule
         train_acc, train_loss = validate(model, train_loader, use_gpu)
         val_acc, val_loss = validate(model, val_loader, use_gpu)
         history.save(train_acc, val_acc, train_loss, val_loss, optimizer.param_groups[0]['lr'])
+
+        if best_result_save_path is not None \
+                and val_acc > highest_score:
+            highest_score = val_acc
+            if os.path.isfile(best_result_save_path):
+                copyfile(best_result_save_path, best_result_save_path + ".old")
+
+            basedir = os.path.dirname(best_result_save_path)
+            if not os.path.exists(basedir):
+                os.makedirs(basedir)
+            torch.save(model.state_dict(), best_result_save_path)
         print(
             'Epoch {} - Train acc: {:.2f} - Val acc: {:.2f} - Train loss: {:.4f} - Val loss: {:.4f} - Training time: {:.2f}s'.format(
                 i,
@@ -262,6 +276,7 @@ def find_layer_and_next(module, layer_name, in_desired_layer=None):
                 return desired_layer, next_desired_layer
     return desired_layer, next_desired_layer
 
+
 #TODO on devrait les faire en batch ca irait pas mal plus vite
 def prune(model, layer_index, filter_index):
     conv, next_layer = find_layer_and_next(model, layer_index)
@@ -347,35 +362,14 @@ def total_num_filters(modules):
             if isinstance(modules, torch.nn.modules.conv.Conv2d):
                 filters = filters + modules.out_channels
     return filters
-
-# def force_clear_grad(modules):
-#     if len(modules._modules.items()) > 0:
-#         for name, sub_module in modules._modules.items():
-#             if sub_module is not None:
-#                 force_clear_grad(sub_module)
-#     else:
-#         modules.weight._grad = None
 ###
 
-def common_code_for_q3(train_path, test_path, model, ):
+
+def common_code_for_q3(model, best_result_save_path=None, retrain_if_weight_loaded=False):
     test_transform = transforms.Compose([transforms.Resize((224, 224)),
                                          transforms.ToTensor(),
                                          transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
-    # training1_transform = transforms.Compose([transforms.Resize((224, 224)),
-    #                                           transforms.RandomHorizontalFlip(),
-    #                                           transforms.RandomGrayscale(p=0.1),
-    #                                           transforms.ToTensor(),
-    #                                           transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
-    #
-    # training2_transform = transforms.Compose([transforms.Resize((224, 224)),
-    #                                           transforms.RandomHorizontalFlip(),
-    #                                           transforms.RandomGrayscale(p=0.1),
-    #                                           transforms.ToTensor(),
-    #                                           transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
-
-    # train_dataset = ImageFolder(train_path, training1_transform)
-    # train2_dataset = ImageFolder(train_path, training2_transform)
     train_dataset = CIFAR10("C:/dev/data/cifar10/", train=True, transform=test_transform, download=True)
     test_dataset = CIFAR10("C:/dev/data/cifar10/", train=False, transform=test_transform, download=True)
 
@@ -384,7 +378,7 @@ def common_code_for_q3(train_path, test_path, model, ):
     model.cuda()
 
     use_gpu = True
-    n_epoch = 5
+    n_epoch = 15
     n_epoch_retrain = 2
     batch_size = 128
 
@@ -392,8 +386,17 @@ def common_code_for_q3(train_path, test_path, model, ):
     criterion = torch.nn.CrossEntropyLoss()
     scheduler = StepLR(optimizer, step_size=15, gamma=0.5)
     #
-    # history = train(model, optimizer, train_dataset, n_epoch, batch_size, use_gpu=use_gpu, criterion=criterion, scheduler=scheduler)
-    # history.display()
+    should_train = True
+    if best_result_save_path is not None:
+        if os.path.isfile(best_result_save_path):
+            model.load_state_dict(torch.load(best_result_save_path))
+            if not retrain_if_weight_loaded:
+                should_train = False
+    if should_train:
+        history = train(model, optimizer, train_dataset, n_epoch,
+                        batch_size, use_gpu=use_gpu, criterion=criterion,
+                        scheduler=scheduler, best_result_save_path=best_result_save_path)
+        history.display()
 
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test:\n\tScore: {}'.format(test_score))
@@ -517,15 +520,15 @@ def alexnetski(pretrained=False, **kwargs):
     return model
 ###
 
-def exec_poc(train_path, test_path):
+def exec_poc():
     print("Proof of concept")
     model = alexnetski(pretrained=True)
     model.cuda()
 
-    common_code_for_q3(train_path, test_path, model)
+    common_code_for_q3(model, best_result_save_path="../saved/alex/alexnet.pth")
 
 
-def exec_q3b(train_path, test_path):
+def exec_q3b():
     print("question 3b")
 
     model = models.resnet18(pretrained=True)
@@ -542,13 +545,13 @@ def exec_q3b(train_path, test_path):
 
     model.cuda()
 
-    common_code_for_q3(train_path, test_path, model)
+    common_code_for_q3(model, best_result_save_path="../saved/resnet/resnet18.pth")
 
 
 def exec_q3(train_path, test_path):
     # exec_q3a(train_path, test_path)
-    exec_q3b(train_path, test_path)
-    exec_poc(train_path, test_path)
+    exec_q3b()
+    exec_poc()
     # exec_q3c(train_path, test_path)
     # exec_q3d(train_path, test_path)
 
