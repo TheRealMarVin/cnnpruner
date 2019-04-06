@@ -22,19 +22,9 @@ from torchvision import models
 from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms, ToTensor
 
-"""
-Pour que ce code fonctionne vous devez avoir deeplib d'instaleler. La version utilisé est celle 
-fournis par les labs. Si elle n'est pas installer elle est fournis en fichiers compressé dans
-l'archive, mais vous devrez l'installer vous même.
-"""
+from models.AlexNetSki import alexnetski
 
 
-def make_dir(file_path):
-    if not os.path.exists(file_path):
-        os.makedirs(file_path)
-
-
-# fonction de train qui n'override pas la transform
 def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, scheduler=None,
           criterion=None, prunner=None, retain_graph=None, best_result_save_path=None):
     history = History()
@@ -73,11 +63,7 @@ def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, schedule
             torch.save(model.state_dict(), best_result_save_path)
         print(
             'Epoch {} - Train acc: {:.2f} - Val acc: {:.2f} - Train loss: {:.4f} - Val loss: {:.4f} - Training time: {:.2f}s'.format(
-                i,
-                train_acc,
-                val_acc,
-                train_loss,
-                val_loss, end - start))
+                i, train_acc, val_acc, train_loss, val_loss, end - start))
 
     return history
 
@@ -336,15 +322,7 @@ def prune(model, layer_index, filter_index):
             next_layer.reset_parameters()
 
     return model
-
-
 ###
-def total_num_filters2(model):
-    filters = 0
-    for name, module in model._modules.items():
-        if isinstance(module, torch.nn.modules.conv.Conv2d):
-            filters = filters + module.out_channels
-    return filters
 
 
 def total_num_filters(modules):
@@ -365,7 +343,7 @@ def total_num_filters(modules):
 ###
 
 
-def common_code_for_q3(model, best_result_save_path=None, retrain_if_weight_loaded=False):
+def common_code_for_q3(model, pruned_save_path=None, best_result_save_path=None, retrain_if_weight_loaded=False):
     test_transform = transforms.Compose([transforms.Resize((224, 224)),
                                          transforms.ToTensor(),
                                          transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
@@ -402,8 +380,7 @@ def common_code_for_q3(model, best_result_save_path=None, retrain_if_weight_load
     print('Test:\n\tScore: {}'.format(test_score))
 
     ###
-    prunner = FilterPrunner(model)
-    # number_of_filters = total_num_filters(model)
+    pruner = FilterPrunner(model)
     number_of_filters = total_num_filters(model)
     num_filters_to_prune_per_iteration = 256
     iterations = int(float(number_of_filters) / num_filters_to_prune_per_iteration)
@@ -414,40 +391,42 @@ def common_code_for_q3(model, best_result_save_path=None, retrain_if_weight_load
     for param in model.parameters():
         param.requires_grad = True
 
-    for _ in range(iterations):
-        print("Ranking filters.. ")
-        prunner.reset()
+    for iteration_idx in range(iterations):
+        print("Perform pruning iteration: {}".format(iteration_idx))
+        pruner.reset()
 
         train(model, optimizer, train_dataset, 1, batch_size, use_gpu=use_gpu, criterion=criterion,
-              scheduler=scheduler, prunner=prunner)
+              scheduler=scheduler, prunner=pruner)
 
-        prunner.normalize_layer()
+        pruner.normalize_layer()
 
-        prune_targets = prunner.plan_prunning(num_filters_to_prune_per_iteration)
+        prune_targets = pruner.plan_prunning(num_filters_to_prune_per_iteration)
         layers_prunned = {}
         for layer_index, filter_index in prune_targets:
             if layer_index not in layers_prunned:
                 layers_prunned[layer_index] = 0
             layers_prunned[layer_index] = layers_prunned[layer_index] + 1
 
-        print("Layers that will be prunned", layers_prunned)
-        print("Prunning filters.. ")
+        print("Layers that will be pruned", layers_prunned)
+        print("Pruning filters.. ")
         model = model.cpu()
         for layer_index, filter_index in prune_targets:
             model = prune(model, layer_index, filter_index)
 
         model = model.cuda()
-        # model = nn.Sequential(*list(model.children()))
-        # model = model.cuda()
 
         optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
-        prunner.reset()
+        pruner.reset()
 
-        message = str(100 * float(total_num_filters(model)) / number_of_filters) + "%"
-        print("Filters prunned", str(message))
-        test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
-        print('Test:\n\tpost prune Score: {}'.format(test_score))
-        # force_clear_grad(model)
+        print("Filters pruned {}%".format(100 * float(total_num_filters(model)) / number_of_filters))
+        new_test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
+        print('Test:\n\tpost prune Score: {}'.format(new_test_score))
+
+        basedir = os.path.dirname(pruned_save_path)
+        if not os.path.exists(basedir):
+            os.makedirs(basedir)
+        torch.save(model, pruned_save_path)
+
         print("Fine tuning to recover from prunning iteration.")
         history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu, criterion=None,
               scheduler=scheduler, prunner=None)
@@ -459,73 +438,13 @@ def common_code_for_q3(model, best_result_save_path=None, retrain_if_weight_load
     print('Test Fin :\n\tScore: {}'.format(test_score))
 
 
-# def exec_q3a(train_path, test_path):
-#     print("question 3a")
-#
-#     #TODO essayer num class = 200 pour voir ca ferait surement plus de sense
-#     model = models.resnet18(pretrained=False, num_classes=200)
-#     model.cuda()
-#
-#     common_code_for_q3(train_path, test_path, model)
-
-###
-class AlexNetSki(nn.Module):
-
-    def __init__(self, num_classes=1000):
-        super(AlexNetSki, self).__init__()
-        self.features = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(64, 192, kernel_size=5, padding=2),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(192, 384, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(384, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-        )
-        self.classifier = nn.Sequential(
-            nn.Dropout(),
-            nn.Linear(256 * 6 * 6, 4096),
-            nn.ReLU(inplace=True),
-            nn.Dropout(),
-            nn.Linear(4096, 4096),
-            nn.ReLU(inplace=True),
-            nn.Linear(4096, num_classes),
-        )
-
-    def forward(self, x):
-        x = self.features(x)
-        x = x.view(x.size(0), -1)
-        # x = x.view(x.size(0), 256 * 6 * 6)
-        x = self.classifier(x)
-        return x
-
-
-def alexnetski(pretrained=False, **kwargs):
-    r"""AlexNet model architecture from the
-    `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = AlexNetSki(**kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['alexnet']))
-
-    return model
-###
-
 def exec_poc():
     print("Proof of concept")
     model = alexnetski(pretrained=True)
     model.cuda()
 
-    common_code_for_q3(model, best_result_save_path="../saved/alex/alexnet.pth")
+    common_code_for_q3(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
+                       best_result_save_path="../saved/alex/alexnet.pth")
 
 
 def exec_q3b():
@@ -545,16 +464,14 @@ def exec_q3b():
 
     model.cuda()
 
-    common_code_for_q3(model, best_result_save_path="../saved/resnet/resnet18.pth")
+    common_code_for_q3(model, pruned_save_path="../saved/resnet/Prunedresnet.pth,",
+                       best_result_save_path="../saved/resnet/resnet18.pth")
 
 
-def exec_q3(train_path, test_path):
-    # exec_q3a(train_path, test_path)
+def exec_q3():
     exec_q3b()
     exec_poc()
-    # exec_q3c(train_path, test_path)
-    # exec_q3d(train_path, test_path)
 
 
 if __name__ == '__main__':
-    exec_q3("C:/dev/TP2_remise/cub200_train", "C:/dev/TP2_remise/cub200_test")
+    exec_q3()
