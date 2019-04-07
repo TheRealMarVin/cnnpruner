@@ -131,27 +131,23 @@ class FilterPrunner:
         self.filter_ranks = {}
         self.activation_index = 0
 
-    def _inner_forward(self, x, module, layer):
+    def _register_hook(self, x, module, layer):
         if isinstance(module, torch.nn.modules.conv.Conv2d):
-            x = module(x)
+            x.requires_grad = True
             x.register_hook(self.compute_rank)
             self.activations.append(x)
             self.activation_to_layer[self.activation_index] = layer
             self.activation_index += 1
-        elif isinstance(module, torch.nn.modules.Linear):
-            x = module(x.view(x.size(0), -1))
         else:
+            # TODO je peux surement éviter d'utiliser le _modules... ou pas
             if len(module._modules.items()) > 0:
                 for sub_layer, sub_module in module._modules.items():
-                    if sub_module is not None and sub_layer != "downsample":
+                    if sub_module is not None:
                         desired_layer = sub_layer
                         if len(layer) > 0:
                             desired_layer = layer + "." + desired_layer
-                        x = self._inner_forward(x, sub_module, desired_layer)
-            else:
-                x = module(x)
+                        self._register_hook(x, sub_module, desired_layer)
 
-        return x
 
     def forward(self, x):
         self.activations = []
@@ -160,8 +156,11 @@ class FilterPrunner:
         self.activation_to_layer = {}
 
         self.activation_index = 0
+
+        #TODO sacrer ca dans la fonction c'est laid!
         for name, module in self.model._modules.items():
-            x = self._inner_forward(x, module, name)
+            self._register_hook(x, module, name)
+        x = self.model(x)
 
         return x
 
@@ -356,7 +355,7 @@ def common_code_for_q3(model, pruned_save_path=None, best_result_save_path=None,
     model.cuda()
 
     use_gpu = True
-    n_epoch = 15
+    n_epoch = 1
     n_epoch_retrain = 2
     batch_size = 128
 
@@ -386,7 +385,7 @@ def common_code_for_q3(model, pruned_save_path=None, best_result_save_path=None,
     iterations = int(float(number_of_filters) / num_filters_to_prune_per_iteration)
     ratio = 2.0/3
     iterations = int(iterations * ratio)
-    print("{} iterations to reduce {:2.2f}% filters".format(iterations, ratio))
+    print("{} iterations to reduce {:2.2f}% filters".format(iterations, ratio*100))
 
     for param in model.parameters():
         param.requires_grad = True
@@ -470,7 +469,7 @@ def exec_q3b():
 
 def exec_q3():
     exec_q3b()
-    exec_poc()
+    # exec_poc()
 
 
 if __name__ == '__main__':
