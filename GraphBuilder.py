@@ -1,9 +1,6 @@
 import torch
 import re
 
-def find_root(graph):
-    return ""
-
 def generate_graph(model, args):
     edges = []
 
@@ -14,6 +11,7 @@ def generate_graph(model, args):
 
     model_name = model._get_name()
 
+    root = None
     def add_edge_by_id(vid1, vid2, label=None):
         edges.append((vid1, vid2, label))
 
@@ -27,10 +25,14 @@ def generate_graph(model, args):
         for target_torch_node in torch_graph.nodes():
             curr_name = refornat_path(model_name, torch_node.scopeName())
             target_name = refornat_path(model_name, target_torch_node.scopeName())
-            if len(curr_name) > 0 and len(target_name) > 0:
-                print("Line {}: \n\ttorch_first: {} \n\ttorch_next: {}".format(torch_node.inputs(), curr_name, target_name))
-                add_edge_by_id(curr_name, target_name, shape)
-    return edges
+            target_inputs = [i.unique() for i in target_torch_node.inputs()]
+            if set(outputs) & set(target_inputs):
+                if root is None:
+                    root = curr_name #TODO this may be absolutely wrong
+                if len(curr_name) > 0 and len(target_name) > 0:
+                    print("Line {}: \n\tcurr: {} \n\tnext: {}".format(target_inputs, curr_name, target_name))
+                    add_edge_by_id(curr_name, target_name, shape)
+    return edges, root
 
 
 def refornat_path(model_name, entry):
