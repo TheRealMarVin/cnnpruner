@@ -266,6 +266,7 @@ def find_layer_and_next(module, layer_name, in_desired_layer=None):
 def prune(model, layer_index, filter_index):
     conv, next_layer = find_layer_and_next(model, layer_index)
 
+    # TODO try not using cpu
     conv.out_channels = conv.out_channels - 1
     old_weights = conv.weight.data.cpu().detach()
     new_weights = np.delete(old_weights, [filter_index], 0)
@@ -273,12 +274,14 @@ def prune(model, layer_index, filter_index):
     conv.weight._grad = None
 
     if conv.bias is not None:
+        # TODO try not using cpu
         bias_numpy = conv.bias.data.cpu().detach()
         new_bias_numpy = np.delete(bias_numpy, [filter_index], 0)
         conv.bias.data = new_bias_numpy.cuda()
         conv.bias._grad = None
 
     if isinstance(next_layer, torch.nn.modules.conv.Conv2d):
+        # TODO try not using cpu
         next_layer.in_channels = next_layer.in_channels - 1
         old_weights = next_layer.weight.data.cpu()
         new_weights = np.delete(old_weights, [filter_index], 1)
@@ -308,6 +311,14 @@ def prune(model, layer_index, filter_index):
             old_batch_weights = next_layer.weight.detach()
             new_batch_weights = np.delete(old_batch_weights, [filter_index], 0)
             next_layer.weight.data = new_batch_weights
+
+            if next_layer.bias is not None:
+                # TODO try not using cpu
+                bias_numpy = next_layer.bias.data.cpu().detach()
+                new_bn_bias_numpy = np.delete(bias_numpy, [filter_index], 0)
+                next_layer.bias.data = new_bn_bias_numpy.cuda()
+                next_layer.bias._grad = None
+
             next_layer.weight._grad = None
             if next_layer.track_running_stats:
                 next_layer.register_buffer('running_mean', torch.zeros(next_layer.num_features))
