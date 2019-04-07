@@ -8,6 +8,7 @@ import numpy as np
 import torch
 import time
 
+import torchvision
 from torch.utils import model_zoo
 from torchvision.models.alexnet import model_urls
 
@@ -271,6 +272,7 @@ def prune(model, layer_index, filter_index):
     old_weights = conv.weight.data.cpu().detach()
     new_weights = np.delete(old_weights, [filter_index], 0)
     conv.weight.data = new_weights.cuda()
+    print("old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
     conv.weight._grad = None
 
     if conv.bias is not None:
@@ -286,6 +288,7 @@ def prune(model, layer_index, filter_index):
         old_weights = next_layer.weight.data.cpu()
         new_weights = np.delete(old_weights, [filter_index], 1)
         next_layer.weight.data = new_weights.cuda()
+        print("old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
         next_layer.weight._grad = None
 
     elif isinstance(next_layer, torch.nn.modules.Linear):
@@ -473,6 +476,10 @@ def exec_q3b():
     model.layer4.requires_grad = False
 
     model.cuda()
+
+    traced_net = torch.jit.trace(torchvision.models.resnet18(),
+                                 torch.rand(1, 3, 224, 224))
+    traced_net.save("resnet18_trace.pt")
 
     common_code_for_q3(model, pruned_save_path="../saved/resnet/Prunedresnet.pth,",
                        best_result_save_path="../saved/resnet/resnet18.pth")
