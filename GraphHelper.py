@@ -1,6 +1,23 @@
 import torch
 import re
 
+
+def get_childs(graph_edges, parent_name):
+    if parent_name in graph_edges:
+        return graph_edges[parent_name]
+    return None
+
+
+def get_parents(graph_edges, child_name):
+    result = []
+    for parent_name, values in graph_edges.items():
+        for name, _ in values:
+            if name == child_name:
+                result.append(parent_name)
+                break
+    return result
+
+
 def generate_graph(model, args):
     edges = {}
 
@@ -10,11 +27,6 @@ def generate_graph(model, args):
     torch_graph = trace.graph()
 
     model_name = model._get_name()
-
-
-    # def add_edge_by_id(vid1, vid2, label=None):
-    #     edges.append((vid1, vid2, label))
-
     root = None
     for torch_node in torch_graph.nodes():
         outputs = [o.unique() for o in torch_node.outputs()]
@@ -23,17 +35,16 @@ def generate_graph(model, args):
         shape = get_shape(torch_node)
 
         # Add edges
-        curr_name = refornat_path(model_name, torch_node.scopeName())
+        curr_name = reformat_path(model_name, torch_node.scopeName())
         sub_layers = []
         for target_torch_node in torch_graph.nodes():
-            target_name = refornat_path(model_name, target_torch_node.scopeName())
+            target_name = reformat_path(model_name, target_torch_node.scopeName())
             target_inputs = [i.unique() for i in target_torch_node.inputs()]
             if set(outputs) & set(target_inputs):
                 if root is None:
                     root = curr_name #TODO this may be absolutely wrong
                 if len(curr_name) > 0 and len(target_name) > 0:
-                    print("Line {}: \n\tcurr: {} \n\tnext: {}".format(target_inputs, curr_name, target_name))
-                    #add_edge_by_id(curr_name, target_name, shape)
+                    # print("Line {}: \n\tcurr: {} \n\tnext: {}".format(target_inputs, curr_name, target_name))
                     sub_layers.append((target_name, shape))
 
         if len(sub_layers) > 0:
@@ -41,7 +52,7 @@ def generate_graph(model, args):
     return edges, root
 
 
-def refornat_path(model_name, entry):
+def reformat_path(model_name, entry):
     if len(entry) == 0:
         return ""
     result = entry

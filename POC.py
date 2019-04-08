@@ -12,6 +12,7 @@ import torchvision
 from torch.utils import model_zoo
 from torchvision.models.alexnet import model_urls
 
+from GraphHelper import generate_graph, get_childs, get_parents
 from deeplib.datasets import train_valid_loaders
 from deeplib.history import History
 from deeplib.training import do_epoch, validate
@@ -477,15 +478,17 @@ def exec_q3b():
 
     model.cuda()
 
-    traced_net = torch.jit.trace(torchvision.models.resnet18(),
-                                 torch.rand(1, 3, 224, 224))
-    traced_net.save("resnet18_trace.pt")
+
 
     common_code_for_q3(model, pruned_save_path="../saved/resnet/Prunedresnet.pth,",
                        best_result_save_path="../saved/resnet/resnet18.pth")
 
 
 def exec_q3():
+    # model = models.resnet18(pretrained=True)
+    # edges, root = generate_graph(model, torch.zeros([1, 3, 224, 224]))
+    # a = get_childs(edges, "bn1")
+    # b = get_parents(edges, "layer1.0.conv1")
     exec_q3b()
     # exec_poc()
 
