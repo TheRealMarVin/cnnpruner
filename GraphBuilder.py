@@ -2,7 +2,7 @@ import torch
 import re
 
 def generate_graph(model, args):
-    edges = []
+    edges = {}
 
     # Run the Pytorch graph to get a trace and generate a graph from it
     trace, out = torch.jit.get_trace_graph(model, args)
@@ -11,10 +11,11 @@ def generate_graph(model, args):
 
     model_name = model._get_name()
 
-    root = None
-    def add_edge_by_id(vid1, vid2, label=None):
-        edges.append((vid1, vid2, label))
 
+    # def add_edge_by_id(vid1, vid2, label=None):
+    #     edges.append((vid1, vid2, label))
+
+    root = None
     for torch_node in torch_graph.nodes():
         outputs = [o.unique() for o in torch_node.outputs()]
 
@@ -22,8 +23,9 @@ def generate_graph(model, args):
         shape = get_shape(torch_node)
 
         # Add edges
+        curr_name = refornat_path(model_name, torch_node.scopeName())
+        sub_layers = []
         for target_torch_node in torch_graph.nodes():
-            curr_name = refornat_path(model_name, torch_node.scopeName())
             target_name = refornat_path(model_name, target_torch_node.scopeName())
             target_inputs = [i.unique() for i in target_torch_node.inputs()]
             if set(outputs) & set(target_inputs):
@@ -31,7 +33,11 @@ def generate_graph(model, args):
                     root = curr_name #TODO this may be absolutely wrong
                 if len(curr_name) > 0 and len(target_name) > 0:
                     print("Line {}: \n\tcurr: {} \n\tnext: {}".format(target_inputs, curr_name, target_name))
-                    add_edge_by_id(curr_name, target_name, shape)
+                    #add_edge_by_id(curr_name, target_name, shape)
+                    sub_layers.append((target_name, shape))
+
+        if len(sub_layers) > 0:
+            edges[curr_name] = sub_layers
     return edges, root
 
 
