@@ -41,12 +41,10 @@ def generate_graph(model, args):
         sub_layers = []
         for target_torch_node in torch_graph.nodes():
             target_inputs = [i.unique() for i in target_torch_node.inputs()]
-            target_output = [o.unique() for o in target_torch_node.outputs()]
+            target_outputs = [o.unique() for o in target_torch_node.outputs()]
             target_name = reformat_path(model_name, target_torch_node.scopeName())
 
-            # if "downsample" in target_name or "downsample" in curr_name:
             intersect = set(outputs) & set(target_inputs)
-            # print("Line i{} - o{} + &{}: \n\tcurr: {} \n\tnext: {}".format(target_inputs, outputs, intersect, curr_name, target_name))
             if intersect and shape is not None:
                 if curr_name == "":
                     curr_name = str(inputs)
@@ -54,8 +52,8 @@ def generate_graph(model, args):
                     target_name = str(target_inputs)
                 if root is None:
                     root = curr_name #TODO this may be absolutely wrong
-                # print("Line {} - {} + {}: \n\tcurr: {} \n\tnext: {}".format(target_inputs, outputs, intersect, curr_name, target_name))
                 print("Line: \n\tcurr: {} \n\tnext: {}\n\tshape:{}".format(curr_name, target_name, shape))
+                # print("Line: ci{} co{} ti{} to{}\n\tcurr: {} \n\tnext: {}\n\tshape:{}".format(inputs, outputs, target_inputs, target_outputs, curr_name, target_name, shape))
                 sub_layers.append((target_name, shape))
 
         if len(sub_layers) > 0:

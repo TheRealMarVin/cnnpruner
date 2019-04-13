@@ -6,11 +6,12 @@ import numpy as np
 import torch
 import time
 
+from torch.autograd import Variable
 from torch.utils import model_zoo
 
 from deeplib.datasets import train_valid_loaders
 from deeplib.history import History
-from deeplib.training import do_epoch, validate
+from deeplib.training import validate
 from matplotlib import pyplot as plt
 from torch.utils.data import SequentialSampler
 from torchvision.transforms import ToTensor
@@ -57,6 +58,34 @@ def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, schedule
                 i, train_acc, val_acc, train_loss, val_loss, end - start))
 
     return history
+
+
+def do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, prunner=None, retain_graph=None):
+    model.train()
+    if scheduler:
+        scheduler.step()
+    for batch in train_loader:
+
+        inputs, targets = batch
+        if use_gpu:
+            inputs = inputs.cuda()
+            targets = targets.cuda()
+
+        inputs = Variable(inputs)
+        targets = Variable(targets)
+        optimizer.zero_grad()
+
+        if prunner is not None:
+            output = prunner.forward(inputs)
+            output2 = model(inputs)
+            print(output)
+            print(output2)
+        else:
+            output = model(inputs)
+
+        loss = criterion(output, targets)
+        loss.backward(retain_graph=retain_graph)
+        optimizer.step()
 
 
 # fonction de test qui n'override pas la transform

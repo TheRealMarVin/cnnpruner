@@ -12,16 +12,19 @@ from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
 from CustomDeepLib import train, test
+from GraphHelper import generate_graph, get_parents
 from models.AlexNetSki import alexnetski
 
 
-
-
 ###
-class FilterPrunner:
-    def __init__(self, model):
+class FilterPruner:
+    def __init__(self, model, sample_run):
         self.model = model
         self.reset()
+        model.cpu()
+        self.graph, self.root = generate_graph(model, sample_run)
+        model.cuda()
+
 
     def reset(self):
         self.activations = []
@@ -29,40 +32,129 @@ class FilterPrunner:
         self.grad_index = 0
         self.activation_to_layer = {}
         self.filter_ranks = {}
+        self.forward_res = {}
         self.activation_index = 0
+        # self.delayed_layer_parse = []
 
-    def _register_hook(self, x, module, layer):
-        if isinstance(module, torch.nn.modules.conv.Conv2d):
-            x.requires_grad = True
+    # def _register_hook(self, x, module, layer):
+    #     if isinstance(module, torch.nn.modules.conv.Conv2d):
+    #         # x.requires_grad = True
+    #         x.register_hook(self.compute_rank)
+    #         self.activations.append(x)
+    #         self.activation_to_layer[self.activation_index] = layer
+    #         self.activation_index += 1
+    #     else:
+    #         # TODO je peux surement éviter d'utiliser le _modules... ou pas
+    #         if len(module._modules.items()) > 0:
+    #             for sub_layer, sub_module in module._modules.items():
+    #                 if sub_module is not None:
+    #                     desired_layer = sub_layer
+    #                     if len(layer) > 0:
+    #                         desired_layer = layer + "." + desired_layer
+    #                     self._register_hook(x, sub_module, desired_layer)
+
+    def parse(self, node_name):
+        print("PARESE node_name:" , node_name)
+        if node_name == "[139, 130]":
+            x = 0
+        parents = get_parents(self.graph, node_name)
+
+        nb_parent = len(parents)
+        if nb_parent == 0:
+            x = self.forward_res[""]
+        elif nb_parent == 1:
+            x = self.forward_res[parents[0]]
+        else:
+            # TODO
+            """
+            we might have an issue with model like inception... but let skip it! 
+            I am not here to solve world hunger.
+            """
+            for i, curr_parent in enumerate(parents):
+                if not curr_parent in self.forward_res:
+                    return None
+                if i == 0:
+                    x = self.forward_res[curr_parent]
+                else:
+                    x = x + self.forward_res[curr_parent]
+
+        curr_module = self.get_node_in_model(self.model, node_name)
+        if node_name in self.forward_res:
+            self.forward_res[node_name] = curr_module(x)
+        else:
+            self.forward_res[node_name] = curr_module(x)
+
+        if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
+            # x.requires_grad = True
             x.register_hook(self.compute_rank)
             self.activations.append(x)
-            self.activation_to_layer[self.activation_index] = layer
+            self.activation_to_layer[self.activation_index] = node_name
             self.activation_index += 1
+
+        res = None
+        next_nodes = self.graph[node_name]
+        if len(next_nodes) == 0:
+            res = x
         else:
-            # TODO je peux surement éviter d'utiliser le _modules... ou pas
-            if len(module._modules.items()) > 0:
-                for sub_layer, sub_module in module._modules.items():
-                    if sub_module is not None:
-                        desired_layer = sub_layer
-                        if len(layer) > 0:
-                            desired_layer = layer + "." + desired_layer
-                        self._register_hook(x, sub_module, desired_layer)
+            # execute next
+            for sub_grah in self.graph[node_name]:
+                name, _ = sub_grah
+                # curr_module = self.get_node_in_model(self.model, name)
+                self.parse(name)
+        return res
 
-
+    # This is super slow because of the way I parse the execution tree, but it works
     def forward(self, x):
         self.activations = []
         self.gradients = []
         self.grad_index = 0
         self.activation_to_layer = {}
+        self.forward_res = {}
 
         self.activation_index = 0
 
-        #TODO sacrer ca dans la fonction c'est laid!
-        for name, module in self.model._modules.items():
-            self._register_hook(x, module, name)
-        x = self.model(x)
+        self.layer_to_parse = self.graph.keys()
 
+        self.forward_res[""] = x
+
+        x.requires_grad = True
+        x = self.parse(self.root)
+
+
+        #TODO sacrer ca dans la fonction c'est laid!
+        # x = self.model(x)
+        # for name, module in self.model._modules.items():
+        #     self._register_hook(x, module, name)
+
+        # For now we only support single output
         return x
+
+    def get_node_in_model(self, module, full_name):
+        res = None
+        splitted_name = full_name.split(".")
+        name = None
+        desired_path = None
+        if len(splitted_name) > 1:
+            desired_path = splitted_name[0]
+            name = ".".join(splitted_name[1:])
+        elif len(splitted_name) == 1:
+            name = splitted_name[0]
+        else:
+            return res
+
+        # TODO I think we could do better by using dictionary properly
+        for sub_layer, sub_module in module._modules.items():
+            if sub_layer == name:
+                res = sub_module
+                break
+            elif sub_layer == desired_path and \
+                    sub_module is not None and \
+                    len(sub_module._modules.items()) > 0:
+                res = self.get_node_in_model(sub_module, name)
+                if res is not None:
+                    break
+
+        return res
 
     def compute_rank(self, grad):
         activation_index = len(self.activations) - self.grad_index - 1
@@ -86,7 +178,9 @@ class FilterPrunner:
     def sort_filters(self, num):
         data = []
         for i in sorted(self.filter_ranks.keys()):
+            print("i : ", i)
             for j in range(self.filter_ranks[i].size(0)):
+                print("j : ", j)
                 data.append((self.activation_to_layer[i], j, self.filter_ranks[i][j]))
 
         return nsmallest(num, data, itemgetter(2))
@@ -255,7 +349,9 @@ def total_num_filters(modules):
 ###
 
 
-def common_code_for_q3(model, pruned_save_path=None, best_result_save_path=None, retrain_if_weight_loaded=False):
+def common_code_for_q3(model, pruned_save_path=None,
+                       best_result_save_path=None, retrain_if_weight_loaded=False,
+                       sample_run=None):
     test_transform = transforms.Compose([transforms.Resize((224, 224)),
                                          transforms.ToTensor(),
                                          transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
@@ -292,7 +388,7 @@ def common_code_for_q3(model, pruned_save_path=None, best_result_save_path=None,
     print('Test:\n\tScore: {}'.format(test_score))
 
     ###
-    pruner = FilterPrunner(model)
+    pruner = FilterPruner(model, sample_run)
     number_of_filters = total_num_filters(model)
     num_filters_to_prune_per_iteration = 256
     iterations = int(float(number_of_filters) / num_filters_to_prune_per_iteration)
@@ -356,7 +452,8 @@ def exec_poc():
     model.cuda()
 
     common_code_for_q3(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
-                       best_result_save_path="../saved/alex/alexnet.pth")
+                       best_result_save_path="../saved/alex/alexnet.pth",
+                       sample_run=torch.zeros([1, 3, 224, 224]))
 
 
 def exec_q3b():
@@ -376,16 +473,15 @@ def exec_q3b():
 
     model.cuda()
 
-
-
     common_code_for_q3(model, pruned_save_path="../saved/resnet/Prunedresnet.pth,",
-                       best_result_save_path="../saved/resnet/resnet18.pth")
+                       best_result_save_path="../saved/resnet/resnet18.pth",
+                       sample_run=torch.zeros([1, 3, 224, 224]))
 
 
 def exec_q3():
     # model = models.resnet18(pretrained=True)
     # edges, root = generate_graph(model, torch.zeros([1, 3, 224, 224]))
-    # a = get_childs(edges, "bn1")
+    # # a = get_childs(edges, "bn1")
     # b = get_parents(edges, "layer1.0.conv1")
     exec_q3b()
     # exec_poc()
