@@ -22,7 +22,9 @@ class FilterPruner:
         self.model = model
         self.reset()
         model.cpu()
-        self.graph, self.root = generate_graph(model, sample_run)
+        self.graph, self.name_dic, self.root = generate_graph(model, sample_run)
+        self.connection_count = {}
+        # get__input_connection_count_per_entry(self.graph, self.root, self.connection_count)
         model.cuda()
 
 
@@ -78,7 +80,7 @@ class FilterPruner:
                 else:
                     x = x + self.forward_res[curr_parent]
 
-        curr_module = self.get_node_in_model(self.model, node_name)
+        curr_module = self.get_node_in_model(self.model, self.name_dic[node_name])
         if node_name in self.forward_res:
             self.forward_res[node_name] = curr_module(x)
         else:
@@ -115,7 +117,7 @@ class FilterPruner:
 
         self.layer_to_parse = self.graph.keys()
 
-        self.forward_res[""] = x
+        self.forward_res[self.root] = x
 
         x.requires_grad = True
         x = self.parse(self.root)
