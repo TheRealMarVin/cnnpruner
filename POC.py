@@ -12,7 +12,7 @@ from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
 from CustomDeepLib import train, test
-from GraphHelper import generate_graph, get_parents
+from GraphHelper import generate_graph, get__input_connection_count_per_entry
 from models.AlexNetSki import alexnetski
 
 
@@ -20,10 +20,18 @@ from models.AlexNetSki import alexnetski
 class FilterPruner:
     def __init__(self, model, sample_run):
         self.model = model
+        self.activations = []
+        self.gradients = []
+        self.grad_index = 0
+        self.activation_to_layer = {}
+        self.filter_ranks = {}
+        self.forward_res = {}
+        self.activation_index = 0
+        self.connection_count = {}
         self.reset()
         model.cpu()
         self.graph, self.name_dic, self.root = generate_graph(model, sample_run)
-        self.connection_count = {}
+
         # get__input_connection_count_per_entry(self.graph, self.root, self.connection_count)
         model.cuda()
 
@@ -36,6 +44,7 @@ class FilterPruner:
         self.filter_ranks = {}
         self.forward_res = {}
         self.activation_index = 0
+        self.connection_count = {}
         # self.delayed_layer_parse = []
 
     # def _register_hook(self, x, module, layer):
@@ -55,54 +64,67 @@ class FilterPruner:
     #                         desired_layer = layer + "." + desired_layer
     #                     self._register_hook(x, sub_module, desired_layer)
 
-    def parse(self, node_name):
-        print("PARESE node_name:" , node_name)
-        if node_name == "[139, 130]":
-            x = 0
-        parents = get_parents(self.graph, node_name)
+    def parse(self, node_id):
+        print("PARSE node_name:", node_id)
 
-        nb_parent = len(parents)
-        if nb_parent == 0:
-            x = self.forward_res[""]
-        elif nb_parent == 1:
-            x = self.forward_res[parents[0]]
+        # parents = get_parents(self.graph, node_id)
+
+        # nb_parent = len(parents)
+        # if nb_parent == 0:
+        #     x = self.forward_res[""]
+        # elif nb_parent == 1:
+        #     x = self.forward_res[parents[0]]
+        # else:
+        #     # TODO
+        #     """
+        #     we might have an issue with model like inception... but let skip it!
+        #     I am not here to solve world hunger.
+        #     """
+        #     for i, curr_parent in enumerate(parents):
+        #         if not curr_parent in self.forward_res:
+        #             return None
+        #         if i == 0:
+        #             x = self.forward_res[curr_parent]
+        #         else:
+        #             x = x + self.forward_res[curr_parent]
+
+        node_name = self.name_dic[node_id]
+        if self.connection_count[node_id] > 0:
+            return None
+
+        curr_module = self.get_node_in_model(self.model, node_name)
+        if curr_module is None:
+            print("is none... should add x together")
+            out = self.forward_res[node_id]
         else:
-            # TODO
-            """
-            we might have an issue with model like inception... but let skip it! 
-            I am not here to solve world hunger.
-            """
-            for i, curr_parent in enumerate(parents):
-                if not curr_parent in self.forward_res:
-                    return None
-                if i == 0:
-                    x = self.forward_res[curr_parent]
-                else:
-                    x = x + self.forward_res[curr_parent]
+            x = self.forward_res[node_id]
+            if isinstance(curr_module, torch.nn.modules.Linear):
+                x = x.view(x.size(0), -1)
+            out = curr_module(x)
 
-        curr_module = self.get_node_in_model(self.model, self.name_dic[node_name])
-        if node_name in self.forward_res:
-            self.forward_res[node_name] = curr_module(x)
-        else:
-            self.forward_res[node_name] = curr_module(x)
 
-        if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-            # x.requires_grad = True
-            x.register_hook(self.compute_rank)
-            self.activations.append(x)
-            self.activation_to_layer[self.activation_index] = node_name
-            self.activation_index += 1
+            if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
+                x.register_hook(self.compute_rank)
+                self.activations.append(x)
+                self.activation_to_layer[self.activation_index] = node_id
+                self.activation_index += 1
 
         res = None
-        next_nodes = self.graph[node_name]
+        next_nodes = self.graph[node_id]
         if len(next_nodes) == 0:
-            res = x
+            res = out
         else:
             # execute next
-            for sub_grah in self.graph[node_name]:
-                name, _ = sub_grah
+            for next_id in self.graph[node_id].split(","):
+                next_id
+                self.connection_count[next_id] -= 1
+                if next_id in self.forward_res:
+                    self.forward_res[next_id] += out
+                else:
+                    self.forward_res[next_id] = out
+
                 # curr_module = self.get_node_in_model(self.model, name)
-                self.parse(name)
+                res = self.parse(next_id)
         return res
 
     # This is super slow because of the way I parse the execution tree, but it works
@@ -115,20 +137,15 @@ class FilterPruner:
 
         self.activation_index = 0
 
+        get__input_connection_count_per_entry(self.graph, self.root, self.connection_count)
         self.layer_to_parse = self.graph.keys()
 
-        self.forward_res[self.root] = x
+        self.connection_count[self.root] = 0    # for the root we have everything we need
+        self.forward_res[self.root] = x         # for root we also have the proper input
 
         x.requires_grad = True
         x = self.parse(self.root)
 
-
-        #TODO sacrer ca dans la fonction c'est laid!
-        # x = self.model(x)
-        # for name, module in self.model._modules.items():
-        #     self._register_hook(x, module, name)
-
-        # For now we only support single output
         return x
 
     def get_node_in_model(self, module, full_name):

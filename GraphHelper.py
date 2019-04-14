@@ -83,7 +83,7 @@ def get__input_connection_count_per_entry(graph_edges, node, res):
 
 def generate_graph(model, args):
     execution_graph = {}
-    # execution_shapes = {}
+    execution_shapes = {}
     id_name_dict = {}
 
     # Run the Pytorch graph to get a trace and generate a graph from it
@@ -93,23 +93,38 @@ def generate_graph(model, args):
 
     model_name = model._get_name()
     root = None
-    for torch_node in torch_graph.nodes():
+
+    max_counter = 0
+    for _ in torch_graph.nodes():
+        max_counter += 1
+
+    for index, torch_node in enumerate(torch_graph.nodes()):
         inputs = [o.unique() for o in torch_node.inputs()]
         outputs = [o.unique() for o in torch_node.outputs()]
 
-        # Get output shape
         shape = get_shape(torch_node)
-
-        # Add edges
         curr_name = reformat_path(model_name, torch_node.scopeName())
-        # sub_layers = []
+
+        if index == max_counter - 1:
+            # print("LAST: ", index, "curr_name:",curr_name)
+            ",".join(str(x) for x in outputs)
+            execution_graph[intersect_as_string] = []
+            id_name_dict[intersect_as_string] = curr_name
+            execution_shapes[intersect_as_string] = shape
+            break
+
         for target_torch_node in torch_graph.nodes():
             target_inputs = [i.unique() for i in target_torch_node.inputs()]
             target_outputs = [o.unique() for o in target_torch_node.outputs()]
             # target_name = reformat_path(model_name, target_torch_node.scopeName())
 
+
             intersect = set(outputs) & set(target_inputs)
-            if intersect and shape is not None:
+            # if curr_name == "fc":
+            #     print("FC o: {} i: {} intersect: {}".format(outputs, target_inputs, intersect))
+            #     a = 0
+            # if intersect and shape is not None:
+            if intersect:
                 if curr_name == "":
                     curr_name = ",".join(str(x) for x in inputs)
                 # if target_name == "":
@@ -124,22 +139,40 @@ def generate_graph(model, args):
                 else:
                     execution_graph[intersect_as_string] = target_outputs
                 id_name_dict[intersect_as_string] = curr_name
+                execution_shapes[intersect_as_string] = shape
 
-    execution_graph = clean_execution_graph(execution_graph)
+    execution_graph = clean_execution_graph(execution_graph, execution_shapes, id_name_dict)
     return execution_graph, id_name_dict, root
 
-def clean_execution_graph(execution_graph):
+
+# TODO could be more streamlined
+def clean_execution_graph(execution_graph, execution_shapes, id_name_dict):
     cleaned_graph = {}
     for k, v in execution_graph.items():
+        cleaned_graph[k] = []
+
+    for k, v in execution_graph.items():
+        temp_list = []
         for i in v:
             if str(i) in execution_graph:
-                if k not in cleaned_graph:
-                    cleaned_graph[k] = [i]
-                else:
-                    cleaned_graph[k].append(i)
+                temp_list.append(i)
 
+        cleaned_graph[k] = ",".join(str(x) for x in temp_list)
+    # for k, v in cleaned_graph.items():
+    #     cleaned_graph[k] = ",".join(str(x) for x in cleaned_graph[k])
+
+    to_delete = []
     for k, v in cleaned_graph.items():
-        cleaned_graph[k] = ",".join(str(x) for x in cleaned_graph[k])
+        if v in execution_shapes:
+            while execution_shapes[v] is None:
+                to_delete.append(v)
+                v = cleaned_graph[v]
+            cleaned_graph[k] = v
+
+    for key in to_delete:
+        cleaned_graph.pop(key, None)
+        id_name_dict.pop(key, None)
+
     return cleaned_graph
 
 def reformat_path(model_name, entry):
