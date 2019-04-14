@@ -139,29 +139,21 @@ class FilterPruner:
             v = v / torch.sqrt(torch.sum(v * v))
             self.filter_ranks[i] = v
 
-    #TODO ca c'est pas bon, c'est inspiré d'un truc trouvé sur le web, mais moi je veux tous les indices dans le bon ordre
     def plan_prunning(self, num_filters_to_prune):
         filters_to_prune = self.sort_filters(num_filters_to_prune)
 
-        # After each of the k filters are prunned,
-        # the filter index of the next filters change since the model is smaller.
+        # TODO here we should see what would happen if a layer is fully removed
         filters_to_prune_per_layer = {}
         for (l, f, _) in filters_to_prune:
-            if l not in filters_to_prune_per_layer:
-                filters_to_prune_per_layer[l] = []
-            filters_to_prune_per_layer[l].append(f)
+            model_name = self.name_dic[l]
+            if model_name not in filters_to_prune_per_layer:
+                filters_to_prune_per_layer[model_name] = []
+            filters_to_prune_per_layer[model_name].append(f)
 
         for l in filters_to_prune_per_layer:
             filters_to_prune_per_layer[l] = sorted(filters_to_prune_per_layer[l])
-            for i in range(len(filters_to_prune_per_layer[l])):
-                filters_to_prune_per_layer[l][i] = filters_to_prune_per_layer[l][i] - i
 
-        filters_to_prune = []
-        for l in filters_to_prune_per_layer:
-            for i in filters_to_prune_per_layer[l]:
-                filters_to_prune.append((l, i))
-
-        return filters_to_prune
+        return filters_to_prune_per_layer
 ###
 
 
