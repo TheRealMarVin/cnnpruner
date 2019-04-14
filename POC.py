@@ -9,11 +9,11 @@ from torch import nn
 from torch.optim.lr_scheduler import  StepLR
 from torchvision import models
 from torchvision.datasets import CIFAR10
-from torchvision.models import alexnet
 from torchvision.transforms import transforms
 
 from CustomDeepLib import train, test
-from GraphHelper import generate_graph, get__input_connection_count_per_entry, get_node_in_model
+from ExecutionGraphHelper import generate_graph, get__input_connection_count_per_entry
+from ModelHelper import get_node_in_model
 from models.AlexNetSki import alexnetski
 
 
@@ -48,7 +48,7 @@ class FilterPruner:
         self.connection_count = {}
 
     def parse(self, node_id):
-        print("PARSE node_name:", node_id)
+        # print("PARSE node_name:", node_id)
 
         node_name = self.name_dic[node_id]
         if self.connection_count[node_id] > 0:
@@ -56,7 +56,7 @@ class FilterPruner:
 
         curr_module = get_node_in_model(self.model, node_name)
         if curr_module is None:
-            print("is none... should add x together")
+            # print("is none... should add x together")
             out = self.forward_res[node_id]
         else:
             x = self.forward_res[node_id]
@@ -80,7 +80,7 @@ class FilterPruner:
                 next_id
                 self.connection_count[next_id] -= 1
                 if next_id in self.forward_res:
-                    self.forward_res[next_id] += out
+                    self.forward_res[next_id] = self.forward_res[next_id] + out
                 else:
                     self.forward_res[next_id] = out
 
@@ -105,7 +105,6 @@ class FilterPruner:
 
         x.requires_grad = True
         x = self.parse(self.root)
-
         return x
 
     def compute_rank(self, grad):
@@ -117,7 +116,6 @@ class FilterPruner:
 
         # Normalize the rank by the filter dimensions
         # values = values / (activation.size(0) * activation.size(2) * activation.size(3))
-
         if activation_index not in self.filter_ranks:
             self.filter_ranks[activation_index] = torch.FloatTensor(activation.size(1)).zero_().cuda()
 
@@ -130,9 +128,7 @@ class FilterPruner:
     def sort_filters(self, num):
         data = []
         for i in sorted(self.filter_ranks.keys()):
-            print("i : ", i)
             for j in range(self.filter_ranks[i].size(0)):
-                print("j : ", j)
                 data.append((self.activation_to_layer[i], j, self.filter_ranks[i][j]))
 
         return nsmallest(num, data, itemgetter(2))
@@ -316,7 +312,7 @@ def common_code_for_q3(model, pruned_save_path=None,
     model.cuda()
 
     use_gpu = True
-    n_epoch = 1
+    n_epoch = 10
     n_epoch_retrain = 2
     batch_size = 128
 
