@@ -45,17 +45,21 @@ def generate_graph(model, args):
 
         shape = get_shape(torch_node)
         curr_name = reformat_path(model_name, torch_node.scopeName())
+        op = torch_node.kind()
 
         if index == max_counter - 1:
             ",".join(str(x) for x in outputs)
             execution_graph[intersect_as_string] = []
+            if curr_name in id_name_dict.values() and op == "onnx::Gemm":
+                new_name = try_correct_broken_name(op, shape, curr_name, model)
+                if new_name is not None:
+                    curr_name = new_name
+            # print("TATA: ", curr_name)
             id_name_dict[intersect_as_string] = curr_name
             execution_shapes[intersect_as_string] = shape
             break
 
-        op = torch_node.kind()
-
-        print("curr_name: ", curr_name, " \top: ", op)
+        # print("curr_name: ", curr_name, " \top: ", op)
         for target_torch_node in torch_graph.nodes():
             target_inputs = [i.unique() for i in target_torch_node.inputs()]
             target_outputs = [o.unique() for o in target_torch_node.outputs()]
@@ -77,20 +81,45 @@ def generate_graph(model, args):
                 else:
                     execution_graph[intersect_as_string] = target_outputs
 
-                if curr_name in id_name_dict.values():
-                    a = 0
-                    try_correct_broken_name(torch_node.kind(), shape, curr_name, model)
+                if curr_name in id_name_dict.values() and op == "onnx::Gemm":
+                    new_name = try_correct_broken_name(op, shape, curr_name, model)
+                    if new_name is not None:
+                        curr_name = new_name
                 id_name_dict[intersect_as_string] = curr_name
                 execution_shapes[intersect_as_string] = shape
 
     execution_graph = clean_execution_graph(execution_graph, execution_shapes, id_name_dict)
     return execution_graph, id_name_dict, root
 
-"""
-this is to fix issues in alexnet that seems to be related to some node combination
-"""
-def try_correct_broken_name(onnx_kind, shape, name, model):
-    pass
+
+def try_correct_broken_name(onnx_kind, shape, name, module):
+    # this is to fix issues in alexnet that seems to be related to some node combination
+
+    splitted_name = name.split(".")
+    desired_path = None
+    if len(splitted_name) > 1:
+        desired_path = splitted_name[0]
+        name = ".".join(splitted_name[1:])
+    elif len(splitted_name) == 1:
+        name = splitted_name[0]
+    else:
+        return name
+
+    res = None
+    pick_next = False
+    for sub_layer, sub_module in module._modules.items():
+        if pick_next:
+            return sub_layer
+        if sub_layer == name:
+            pick_next = True
+        elif sub_layer == desired_path and \
+                sub_module is not None and \
+                len(sub_module._modules.items()) > 0:
+            res = try_correct_broken_name(onnx_kind, shape, name, sub_module)
+            if res is not None:
+                res = sub_layer + "." + res
+                break
+    return res
 
 
 def get_node_in_model(module, full_name):
@@ -117,6 +146,7 @@ def get_node_in_model(module, full_name):
                 break
 
     return res
+
 
 # TODO could be more streamlined
 def clean_execution_graph(execution_graph, execution_shapes, id_name_dict):

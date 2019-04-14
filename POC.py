@@ -400,7 +400,7 @@ def common_code_for_q3(model, pruned_save_path=None,
 
 def exec_poc():
     print("Proof of concept")
-    model = alexnet(pretrained=True)
+    model = alexnetski(pretrained=True)
     model.cuda()
 
     common_code_for_q3(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
