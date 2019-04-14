@@ -9,10 +9,11 @@ from torch import nn
 from torch.optim.lr_scheduler import  StepLR
 from torchvision import models
 from torchvision.datasets import CIFAR10
+from torchvision.models import alexnet
 from torchvision.transforms import transforms
 
 from CustomDeepLib import train, test
-from GraphHelper import generate_graph, get__input_connection_count_per_entry
+from GraphHelper import generate_graph, get__input_connection_count_per_entry, get_node_in_model
 from models.AlexNetSki import alexnetski
 
 
@@ -53,7 +54,7 @@ class FilterPruner:
         if self.connection_count[node_id] > 0:
             return None
 
-        curr_module = self.get_node_in_model(self.model, node_name)
+        curr_module = get_node_in_model(self.model, node_name)
         if curr_module is None:
             print("is none... should add x together")
             out = self.forward_res[node_id]
@@ -83,7 +84,6 @@ class FilterPruner:
                 else:
                     self.forward_res[next_id] = out
 
-                # curr_module = self.get_node_in_model(self.model, name)
                 res = self.parse(next_id)
         return res
 
@@ -107,33 +107,6 @@ class FilterPruner:
         x = self.parse(self.root)
 
         return x
-
-    def get_node_in_model(self, module, full_name):
-        res = None
-        splitted_name = full_name.split(".")
-        name = None
-        desired_path = None
-        if len(splitted_name) > 1:
-            desired_path = splitted_name[0]
-            name = ".".join(splitted_name[1:])
-        elif len(splitted_name) == 1:
-            name = splitted_name[0]
-        else:
-            return res
-
-        # TODO I think we could do better by using dictionary properly
-        for sub_layer, sub_module in module._modules.items():
-            if sub_layer == name:
-                res = sub_module
-                break
-            elif sub_layer == desired_path and \
-                    sub_module is not None and \
-                    len(sub_module._modules.items()) > 0:
-                res = self.get_node_in_model(sub_module, name)
-                if res is not None:
-                    break
-
-        return res
 
     def compute_rank(self, grad):
         activation_index = len(self.activations) - self.grad_index - 1
@@ -427,7 +400,7 @@ def common_code_for_q3(model, pruned_save_path=None,
 
 def exec_poc():
     print("Proof of concept")
-    model = alexnetski(pretrained=True)
+    model = alexnet(pretrained=True)
     model.cuda()
 
     common_code_for_q3(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
