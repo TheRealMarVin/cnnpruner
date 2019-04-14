@@ -45,48 +45,9 @@ class FilterPruner:
         self.forward_res = {}
         self.activation_index = 0
         self.connection_count = {}
-        # self.delayed_layer_parse = []
-
-    # def _register_hook(self, x, module, layer):
-    #     if isinstance(module, torch.nn.modules.conv.Conv2d):
-    #         # x.requires_grad = True
-    #         x.register_hook(self.compute_rank)
-    #         self.activations.append(x)
-    #         self.activation_to_layer[self.activation_index] = layer
-    #         self.activation_index += 1
-    #     else:
-    #         # TODO je peux surement éviter d'utiliser le _modules... ou pas
-    #         if len(module._modules.items()) > 0:
-    #             for sub_layer, sub_module in module._modules.items():
-    #                 if sub_module is not None:
-    #                     desired_layer = sub_layer
-    #                     if len(layer) > 0:
-    #                         desired_layer = layer + "." + desired_layer
-    #                     self._register_hook(x, sub_module, desired_layer)
 
     def parse(self, node_id):
         print("PARSE node_name:", node_id)
-
-        # parents = get_parents(self.graph, node_id)
-
-        # nb_parent = len(parents)
-        # if nb_parent == 0:
-        #     x = self.forward_res[""]
-        # elif nb_parent == 1:
-        #     x = self.forward_res[parents[0]]
-        # else:
-        #     # TODO
-        #     """
-        #     we might have an issue with model like inception... but let skip it!
-        #     I am not here to solve world hunger.
-        #     """
-        #     for i, curr_parent in enumerate(parents):
-        #         if not curr_parent in self.forward_res:
-        #             return None
-        #         if i == 0:
-        #             x = self.forward_res[curr_parent]
-        #         else:
-        #             x = x + self.forward_res[curr_parent]
 
         node_name = self.name_dic[node_id]
         if self.connection_count[node_id] > 0:
@@ -101,7 +62,6 @@ class FilterPruner:
             if isinstance(curr_module, torch.nn.modules.Linear):
                 x = x.view(x.size(0), -1)
             out = curr_module(x)
-
 
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
                 x.register_hook(self.compute_rank)
@@ -498,12 +458,8 @@ def exec_q3b():
 
 
 def exec_q3():
-    # model = models.resnet18(pretrained=True)
-    # edges, root = generate_graph(model, torch.zeros([1, 3, 224, 224]))
-    # # a = get_childs(edges, "bn1")
-    # b = get_parents(edges, "layer1.0.conv1")
-    exec_q3b()
-    # exec_poc()
+    # exec_q3b()
+    exec_poc()
 
 
 if __name__ == '__main__':

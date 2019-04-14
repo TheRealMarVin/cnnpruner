@@ -124,6 +124,7 @@ def generate_graph(model, args):
             #     print("FC o: {} i: {} intersect: {}".format(outputs, target_inputs, intersect))
             #     a = 0
             # if intersect and shape is not None:
+            print("Line: \n\tcurr: {} \n\tnext: {}\n\tshape:{}".format(curr_name, str(target_outputs), shape))
             if intersect:
                 if curr_name == "":
                     curr_name = ",".join(str(x) for x in inputs)
