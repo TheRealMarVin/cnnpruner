@@ -64,6 +64,7 @@ def do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, prun
     model.train()
     if scheduler:
         scheduler.step()
+
     for batch in train_loader:
 
         inputs, targets = batch
@@ -77,17 +78,6 @@ def do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, prun
 
         if prunner is not None:
             output = prunner.forward(inputs)
-            output2 = model(inputs)
-            output3 = model(inputs)
-            print(output.data[0])
-            print(output2.data[0])
-            print(output3.data[0])
-            print(output.data[1])
-            print(output2.data[1])
-            print(output3.data[1])
-            print(output.data[2])
-            print(output2.data[2])
-            print(output3.data[2])
         else:
             output = model(inputs)
 
