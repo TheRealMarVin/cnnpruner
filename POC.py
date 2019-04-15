@@ -13,7 +13,8 @@ from torchvision.transforms import transforms
 
 from CustomDeepLib import train, test
 from ExecutionGraphHelper import generate_graph, get__input_connection_count_per_entry
-from ModelHelper import get_node_in_model
+from FileHelper import load_obj, save_obj
+from ModelHelper import get_node_in_model, total_num_filters
 from models.AlexNetSki import alexnetski
 
 
@@ -142,156 +143,281 @@ class FilterPruner:
     def plan_prunning(self, num_filters_to_prune):
         filters_to_prune = self.sort_filters(num_filters_to_prune)
 
-        # TODO here we should see what would happen if a layer is fully removed
         filters_to_prune_per_layer = {}
         for (l, f, _) in filters_to_prune:
-            model_name = self.name_dic[l]
-            if model_name not in filters_to_prune_per_layer:
-                filters_to_prune_per_layer[model_name] = []
-            filters_to_prune_per_layer[model_name].append(f)
+            if l not in filters_to_prune_per_layer:
+                filters_to_prune_per_layer[l] = []
+            filters_to_prune_per_layer[l].append(f)
 
         for l in filters_to_prune_per_layer:
             filters_to_prune_per_layer[l] = sorted(filters_to_prune_per_layer[l])
 
         return filters_to_prune_per_layer
-###
 
+    # TODO here we should see what would happen if a layer is fully removed. this is quite annoying
+    def prune(self, pruning_dic):
+        for layer_id, filters_to_remove in pruning_dic.items():
+            layer = get_node_in_model(self.model, self.name_dic[layer_id])
 
+            if layer is not None:
+                initial_filter_count = 0
+                if isinstance(layer, torch.nn.modules.conv.Conv2d):
+                    initial_filter_count = self._prune_conv_output_filters(layer, filters_to_remove)
 
-def find_layer_and_next(module, layer_name, in_desired_layer=None):
-    desired_layer = in_desired_layer
-    next_desired_layer = None
+                if len(filters_to_remove) > 0:
+                    self._apply_pruning_effect(layer_id, filters_to_remove, initial_filter_count)
+            b = 0
+            # model = self.prune(model, layer_name, filter_index)
+        pass
 
-    splitted = layer_name.split(".")
-    if len(splitted) > 0:
-        sub = splitted[1:]
-        next_layer_name = '.'.join(sub)
-    elif len(splitted) == 0:
-        next_layer_name = splitted[0]
+    def _apply_pruning_effect(self, layer_id, removed_filter, initial_filter_count):
+        next_id = self.graph[layer_id]
+        if next_id not in self.name_dic:
+            for sub_node_id in next_id.split(","):
+                self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count)
+            print("end of effect after loop")
+            return
+        layer = get_node_in_model(self.model, self.name_dic[next_id])
 
-    for name, curr_module in module.named_children():
-        if desired_layer is None \
-                and name == layer_name \
-                and isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-            desired_layer = curr_module
+        has_more = True
+        if isinstance(layer, torch.nn.modules.conv.Conv2d):
+            self._prune_conv_input_filters(layer, removed_filter, initial_filter_count)
+            has_more = False
+        elif isinstance(layer, torch.nn.modules.Linear):
+            self._prune_input_linear(layer, removed_filter, initial_filter_count)
+            has_more = False
+        elif isinstance(layer, torch.nn.modules.BatchNorm2d):
+            self._prune_conv_input_batchnorm(layer, removed_filter, initial_filter_count)
+
+        if has_more:
+            self._apply_pruning_effect(next_id, removed_filter, initial_filter_count)
         else:
-            if desired_layer is not None:
-                if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-                    next_desired_layer = curr_module
-                    break
-                elif isinstance(curr_module, torch.nn.modules.Linear):
-                    next_desired_layer = curr_module
-                    break
-                elif isinstance(curr_module, torch.nn.modules.BatchNorm2d):
-                    next_desired_layer = curr_module
-                    break
-            res_desired, res_next= find_layer_and_next(curr_module, next_layer_name, desired_layer)
-            if desired_layer is None and res_desired is not None:
-                desired_layer = res_desired
-            if next_desired_layer is None and res_next is not None:
-                next_desired_layer = res_next
+            print("{} has no more".format(self.name_dic[next_id]))
 
-            if desired_layer is not None and next_desired_layer is not None:
-                return desired_layer, next_desired_layer
-    return desired_layer, next_desired_layer
-
-
-#TODO on devrait les faire en batch ca irait pas mal plus vite
-def prune(model, layer_index, filter_index):
-    conv, next_layer = find_layer_and_next(model, layer_index)
-
-    # TODO try not using cpu
-    conv.out_channels = conv.out_channels - 1
-    old_weights = conv.weight.data.cpu().detach()
-    new_weights = np.delete(old_weights, [filter_index], 0)
-    conv.weight.data = new_weights.cuda()
-    print("old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
-    conv.weight._grad = None
-
-    if conv.bias is not None:
+    def _prune_conv_output_filters(self, conv, filters_to_remove):
         # TODO try not using cpu
-        bias_numpy = conv.bias.data.cpu().detach()
-        new_bias_numpy = np.delete(bias_numpy, [filter_index], 0)
-        conv.bias.data = new_bias_numpy.cuda()
-        conv.bias._grad = None
+        initial_filter_count = conv.out_channels
+        conv.out_channels = conv.out_channels - len(filters_to_remove)
+        old_weights = conv.weight.data.cpu().detach()
+        # TODO make sure there is no overflow
+        new_weights = np.delete(old_weights, filters_to_remove, 0)
+        conv.weight.data = new_weights.cuda()
+        print("conv  _ our _ old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
+        conv.weight._grad = None
 
-    if isinstance(next_layer, torch.nn.modules.conv.Conv2d):
+        if conv.bias is not None:
+            # TODO try not using cpu
+            bias_numpy = conv.bias.data.cpu().detach()
+            # TODO make sure there is no overflow
+            new_bias_numpy = np.delete(bias_numpy, filters_to_remove, 0)
+            conv.bias.data = new_bias_numpy.cuda()
+            conv.bias._grad = None
+
+        return initial_filter_count
+
+    def _prune_conv_input_filters(self, conv, removed_filter, _):
         # TODO try not using cpu
-        next_layer.in_channels = next_layer.in_channels - 1
-        old_weights = next_layer.weight.data.cpu()
-        new_weights = np.delete(old_weights, [filter_index], 1)
-        next_layer.weight.data = new_weights.cuda()
-        print("old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
-        next_layer.weight._grad = None
+        conv.in_channels = conv.in_channels - len(removed_filter)
+        old_weights = conv.weight.data.cpu()
+        # TODO make sure there is no overflow
+        new_weights = np.delete(old_weights, removed_filter, 1)
+        conv.weight.data = new_weights.cuda()
+        print("conc _ in _ old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
+        conv.weight._grad = None
 
-    elif isinstance(next_layer, torch.nn.modules.Linear):
-        lin_in_feat = next_layer.in_features
-        conv_out_channels = conv.out_channels
+    def _prune_conv_input_batchnorm(self, batchnorm, removed_filter, _):
+        batchnorm.num_features = batchnorm.num_features - len(removed_filter)
+        old_batch_weights = batchnorm.weight.detach()
+        new_batch_weights = np.delete(old_batch_weights, removed_filter, 0)
+        batchnorm.weight.data = new_batch_weights
 
-        elem_per_channel = (lin_in_feat//conv_out_channels)
-        new_lin_in_feat = lin_in_feat - elem_per_channel
-        old_lin_weights = next_layer.weight.detach()
-        lin_new_weigths = np.delete(old_lin_weights, [x + filter_index * elem_per_channel for x in range(elem_per_channel)], 1)
-        #weight scaling because removing nodes is basically like a form of dropout
+        if batchnorm.bias is not None:
+            # TODO try not using cpu
+            bias_numpy = batchnorm.bias.data.cpu().detach()
+            new_bn_bias_numpy = np.delete(bias_numpy, removed_filter, 0)
+            batchnorm.bias.data = new_bn_bias_numpy.cuda()
+            batchnorm.bias._grad = None
+
+        batchnorm.weight._grad = None
+        if batchnorm.track_running_stats:
+            batchnorm.register_buffer('running_mean', torch.zeros(batchnorm.num_features))
+            batchnorm.register_buffer('running_var', torch.ones(batchnorm.num_features))
+            batchnorm.register_buffer('num_batches_tracked', torch.tensor(0, dtype=torch.long))
+        else:
+            batchnorm.register_parameter('running_mean', None)
+            batchnorm.register_parameter('running_var', None)
+            batchnorm.register_parameter('num_batches_tracked', None)
+        batchnorm.reset_running_stats()
+        batchnorm.reset_parameters()
+
+    def _prune_input_linear(self, linear, removed_filter, initial_filter_count):
+        lin_in_feat = linear.in_features
+        elem_per_channel = (lin_in_feat // initial_filter_count)
+
+        sub_array = [x for x in range(elem_per_channel)]
+        weight_to_delete = []
+        for filter_index in removed_filter:
+            translation = filter_index * elem_per_channel
+            weight_to_delete.extend(np.add(translation, sub_array))
+
+        new_lin_in_feat = lin_in_feat - (elem_per_channel * len(removed_filter))
+        old_lin_weights = linear.weight.detach()
+        lin_new_weigths = np.delete(old_lin_weights, weight_to_delete, 1)
+        # weight scaling because removing nodes is basically like a form of dropout
         factor = 1 - (elem_per_channel / lin_in_feat)
         lin_new_weigths.mul_(factor)
-        next_layer.weight.data = lin_new_weigths
-        next_layer.in_features = new_lin_in_feat
-        next_layer.weight._grad = None
+        linear.weight.data = lin_new_weigths
+        linear.in_features = new_lin_in_feat
+        linear.weight._grad = None
 
-    elif isinstance(next_layer, torch.nn.modules.BatchNorm2d):
-        # print("nb features: ", next_layer.num_features)
-        #TODO on network that doesn't converge it could reach 0... at this point we might want to remove it completely... maybe
-        if next_layer.num_features > 10:
-            next_layer.num_features = next_layer.num_features - 1
-            old_batch_weights = next_layer.weight.detach()
-            new_batch_weights = np.delete(old_batch_weights, [filter_index], 0)
-            next_layer.weight.data = new_batch_weights
+    def display_pruning_log(self, pruning_dic):
+        layers_pruned = {}
+        for layer_index, filter_index in pruning_dic.items():
+            layer_name = self.name_dic[layer_index]
+            if layer_name not in layers_pruned:
+                layers_pruned[layer_name] = 0
+                layers_pruned[layer_name] = len(pruning_dic[layer_index])
 
-            if next_layer.bias is not None:
-                # TODO try not using cpu
-                bias_numpy = next_layer.bias.data.cpu().detach()
-                new_bn_bias_numpy = np.delete(bias_numpy, [filter_index], 0)
-                next_layer.bias.data = new_bn_bias_numpy.cuda()
-                next_layer.bias._grad = None
-
-            next_layer.weight._grad = None
-            if next_layer.track_running_stats:
-                next_layer.register_buffer('running_mean', torch.zeros(next_layer.num_features))
-                next_layer.register_buffer('running_var', torch.ones(next_layer.num_features))
-                next_layer.register_buffer('num_batches_tracked', torch.tensor(0, dtype=torch.long))
-            else:
-                next_layer.register_parameter('running_mean', None)
-                next_layer.register_parameter('running_var', None)
-                next_layer.register_parameter('num_batches_tracked', None)
-            next_layer.reset_running_stats()
-            next_layer.reset_parameters()
-
-    return model
+        print("Layers that will be pruned", layers_pruned)
 ###
 
 
-def total_num_filters(modules):
-    filters = 0
+# #TODO remove
+# def find_layer_and_next(module, layer_name, in_desired_layer=None):
+#     desired_layer = in_desired_layer
+#     next_desired_layer = None
+#
+#     splitted = layer_name.split(".")
+#     if len(splitted) > 0:
+#         sub = splitted[1:]
+#         next_layer_name = '.'.join(sub)
+#     elif len(splitted) == 0:
+#         next_layer_name = splitted[0]
+#
+#     for name, curr_module in module.named_children():
+#         if desired_layer is None \
+#                 and name == layer_name \
+#                 and isinstance(curr_module, torch.nn.modules.conv.Conv2d):
+#             desired_layer = curr_module
+#         else:
+#             if desired_layer is not None:
+#                 if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
+#                     next_desired_layer = curr_module
+#                     break
+#                 elif isinstance(curr_module, torch.nn.modules.Linear):
+#                     next_desired_layer = curr_module
+#                     break
+#                 elif isinstance(curr_module, torch.nn.modules.BatchNorm2d):
+#                     next_desired_layer = curr_module
+#                     break
+#             res_desired, res_next= find_layer_and_next(curr_module, next_layer_name, desired_layer)
+#             if desired_layer is None and res_desired is not None:
+#                 desired_layer = res_desired
+#             if next_desired_layer is None and res_next is not None:
+#                 next_desired_layer = res_next
+#
+#             if desired_layer is not None and next_desired_layer is not None:
+#                 return desired_layer, next_desired_layer
+#     return desired_layer, next_desired_layer
+#
+# #TODO remove
+# #TODO on devrait les faire en batch ca irait pas mal plus vite
+# def prune(model, layer_index, filter_index):
+#     conv, next_layer = find_layer_and_next(model, layer_index)
+#
+#     # TODO try not using cpu
+#     conv.out_channels = conv.out_channels - 1
+#     old_weights = conv.weight.data.cpu().detach()
+#     new_weights = np.delete(old_weights, [filter_index], 0)
+#     conv.weight.data = new_weights.cuda()
+#     print("old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
+#     conv.weight._grad = None
+#
+#     if conv.bias is not None:
+#         # TODO try not using cpu
+#         bias_numpy = conv.bias.data.cpu().detach()
+#         new_bias_numpy = np.delete(bias_numpy, [filter_index], 0)
+#         conv.bias.data = new_bias_numpy.cuda()
+#         conv.bias._grad = None
+#
+#     if isinstance(next_layer, torch.nn.modules.conv.Conv2d):
+#         # TODO try not using cpu
+#         next_layer.in_channels = next_layer.in_channels - 1
+#         old_weights = next_layer.weight.data.cpu()
+#         new_weights = np.delete(old_weights, [filter_index], 1)
+#         next_layer.weight.data = new_weights.cuda()
+#         print("old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
+#         next_layer.weight._grad = None
+#
+#     elif isinstance(next_layer, torch.nn.modules.Linear):
+#         lin_in_feat = next_layer.in_features
+#         conv_out_channels = conv.out_channels
+#
+#         elem_per_channel = (lin_in_feat//conv_out_channels)
+#         new_lin_in_feat = lin_in_feat - elem_per_channel
+#         old_lin_weights = next_layer.weight.detach()
+#         lin_new_weigths = np.delete(old_lin_weights, [x + filter_index * elem_per_channel for x in range(elem_per_channel)], 1)
+#         #weight scaling because removing nodes is basically like a form of dropout
+#         factor = 1 - (elem_per_channel / lin_in_feat)
+#         lin_new_weigths.mul_(factor)
+#         next_layer.weight.data = lin_new_weigths
+#         next_layer.in_features = new_lin_in_feat
+#         next_layer.weight._grad = None
+#
+#     elif isinstance(next_layer, torch.nn.modules.BatchNorm2d):
+#         # print("nb features: ", next_layer.num_features)
+#         #TODO on network that doesn't converge it could reach 0... at this point we might want to remove it completely... maybe
+#         if next_layer.num_features > 10:
+#             next_layer.num_features = next_layer.num_features - 1
+#             old_batch_weights = next_layer.weight.detach()
+#             new_batch_weights = np.delete(old_batch_weights, [filter_index], 0)
+#             next_layer.weight.data = new_batch_weights
+#
+#             if next_layer.bias is not None:
+#                 # TODO try not using cpu
+#                 bias_numpy = next_layer.bias.data.cpu().detach()
+#                 new_bn_bias_numpy = np.delete(bias_numpy, [filter_index], 0)
+#                 next_layer.bias.data = new_bn_bias_numpy.cuda()
+#                 next_layer.bias._grad = None
+#
+#             next_layer.weight._grad = None
+#             if next_layer.track_running_stats:
+#                 next_layer.register_buffer('running_mean', torch.zeros(next_layer.num_features))
+#                 next_layer.register_buffer('running_var', torch.ones(next_layer.num_features))
+#                 next_layer.register_buffer('num_batches_tracked', torch.tensor(0, dtype=torch.long))
+#             else:
+#                 next_layer.register_parameter('running_mean', None)
+#                 next_layer.register_parameter('running_var', None)
+#                 next_layer.register_parameter('num_batches_tracked', None)
+#             next_layer.reset_running_stats()
+#             next_layer.reset_parameters()
+#
+#     return model
+# ###
 
-    if isinstance(modules, torch.nn.modules.conv.Conv2d):
-        filters = filters + modules.out_channels
-    else:
-        if len(modules._modules.items()) > 0:
-            for name, sub_module in modules._modules.items():
-                if sub_module is not None:
-                    filters = filters + total_num_filters(sub_module)
 
-        else:
-            if isinstance(modules, torch.nn.modules.conv.Conv2d):
-                filters = filters + modules.out_channels
-    return filters
+# def total_num_filters(modules):
+#     filters = 0
+#
+#     if isinstance(modules, torch.nn.modules.conv.Conv2d):
+#         filters = filters + modules.out_channels
+#     else:
+#         if len(modules._modules.items()) > 0:
+#             for name, sub_module in modules._modules.items():
+#                 if sub_module is not None:
+#                     filters = filters + total_num_filters(sub_module)
+#
+#         else:
+#             if isinstance(modules, torch.nn.modules.conv.Conv2d):
+#                 filters = filters + modules.out_channels
+#     return filters
 ###
 
 
-def common_code_for_q3(model, pruned_save_path=None,
-                       best_result_save_path=None, retrain_if_weight_loaded=False,
-                       sample_run=None):
+def common_training_code(model, pruned_save_path=None,
+                         best_result_save_path=None, retrain_if_weight_loaded=False,
+                         sample_run=None,
+                         reuse_cut_filter=False):
     test_transform = transforms.Compose([transforms.Resize((224, 224)),
                                          transforms.ToTensor(),
                                          transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
@@ -343,23 +469,27 @@ def common_code_for_q3(model, pruned_save_path=None,
         print("Perform pruning iteration: {}".format(iteration_idx))
         pruner.reset()
 
-        train(model, optimizer, train_dataset, 1, batch_size, use_gpu=use_gpu, criterion=criterion,
-              scheduler=scheduler, prunner=pruner)
+        prune_targets = None
+        if reuse_cut_filter:
+            prune_targets = load_obj("filters_dic")
 
-        pruner.normalize_layer()
+        if prune_targets is None:
+            train(model, optimizer, train_dataset, 1, batch_size, use_gpu=use_gpu, criterion=criterion,
+                  scheduler=scheduler, prunner=pruner)
 
-        prune_targets = pruner.plan_prunning(num_filters_to_prune_per_iteration)
-        layers_prunned = {}
-        for layer_index, filter_index in prune_targets:
-            if layer_index not in layers_prunned:
-                layers_prunned[layer_index] = 0
-            layers_prunned[layer_index] = layers_prunned[layer_index] + 1
+            pruner.normalize_layer()
 
-        print("Layers that will be pruned", layers_prunned)
+            prune_targets = pruner.plan_prunning(num_filters_to_prune_per_iteration)
+            if reuse_cut_filter:
+                save_obj(prune_targets, "filters_dic")
+
+        pruner.display_pruning_log(prune_targets)
+
         print("Pruning filters.. ")
         model = model.cpu()
-        for layer_index, filter_index in prune_targets:
-            model = prune(model, layer_index, filter_index)
+        pruner.prune(prune_targets)
+        # for layer_index, filter_index in prune_targets:
+        #     model = prune(model, layer_index, filter_index)
 
         model = model.cuda()
 
@@ -391,9 +521,11 @@ def exec_poc():
     model = alexnetski(pretrained=True)
     model.cuda()
 
-    common_code_for_q3(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
-                       best_result_save_path="../saved/alex/alexnet.pth",
-                       sample_run=torch.zeros([1, 3, 224, 224]))
+    # TODO reuse_cut_filter must be false
+    common_training_code(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
+                         best_result_save_path="../saved/alex/alexnet.pth",
+                         sample_run=torch.zeros([1, 3, 224, 224]),
+                         reuse_cut_filter=True)
 
 
 def exec_q3b():
@@ -413,9 +545,11 @@ def exec_q3b():
 
     model.cuda()
 
-    common_code_for_q3(model, pruned_save_path="../saved/resnet/Prunedresnet.pth,",
-                       best_result_save_path="../saved/resnet/resnet18.pth",
-                       sample_run=torch.zeros([1, 3, 224, 224]))
+    #TODO reuse_cut_filter must be false
+    common_training_code(model, pruned_save_path="../saved/resnet/Prunedresnet.pth,",
+                         best_result_save_path="../saved/resnet/resnet18.pth",
+                         sample_run=torch.zeros([1, 3, 224, 224]),
+                         reuse_cut_filter=True)
 
 
 def exec_q3():
