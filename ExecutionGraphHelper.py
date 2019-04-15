@@ -67,7 +67,7 @@ def generate_graph(model, args):
             intersect = set(outputs) & set(target_inputs)
 
             # print("Line: \n\tcurr: {} \n\tnext: {}\n\tshape:{}".format(curr_name, str(target_outputs), shape))
-            if intersect:
+            if intersect and op != "onnx::Shape":
                 if curr_name == "":
                     curr_name = ",".join(str(x) for x in inputs)
 
@@ -85,6 +85,7 @@ def generate_graph(model, args):
                     new_name = try_correct_broken_name(op, shape, curr_name, model)
                     if new_name is not None:
                         curr_name = new_name
+                # print("curr_name: ", curr_name, " \top: ", op + " \tintersect: " + intersect_as_string + " \tTarget: " + str(target_outputs))
                 id_name_dict[intersect_as_string] = curr_name
                 execution_shapes[intersect_as_string] = shape
 
@@ -139,12 +140,16 @@ def clean_execution_graph(execution_graph, execution_shapes, id_name_dict):
     #     cleaned_graph[k] = ",".join(str(x) for x in cleaned_graph[k])
 
     to_delete = []
+
     for k, v in cleaned_graph.items():
         if v in execution_shapes:
             while execution_shapes[v] is None:
-                to_delete.append(v)
+                if v not in to_delete:
+                    to_delete.append(v)
                 v = cleaned_graph[v]
             cleaned_graph[k] = v
+        elif k not in to_delete and v != "":
+            to_delete.append(k)
 
     for key in to_delete:
         cleaned_graph.pop(key, None)

@@ -202,7 +202,7 @@ class FilterPruner:
         # TODO make sure there is no overflow
         new_weights = np.delete(old_weights, filters_to_remove, 0)
         conv.weight.data = new_weights.cuda()
-        print("conv  _ our _ old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
+        # print("conv  _ our _ old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
         conv.weight._grad = None
 
         if conv.bias is not None:
@@ -222,7 +222,7 @@ class FilterPruner:
         # TODO make sure there is no overflow
         new_weights = np.delete(old_weights, removed_filter, 1)
         conv.weight.data = new_weights.cuda()
-        print("conc _ in _ old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
+        # print("conc _ in _ old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
         conv.weight._grad = None
 
     def _prune_conv_input_batchnorm(self, batchnorm, removed_filter, _):
