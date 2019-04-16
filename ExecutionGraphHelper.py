@@ -67,6 +67,8 @@ def generate_graph(model, args):
             intersect = set(outputs) & set(target_inputs)
 
             # print("Line: \n\tcurr: {} \n\tnext: {}\n\tshape:{}".format(curr_name, str(target_outputs), shape))
+            #Shape is used when passing from a shape to linear. But there is also a straight pas so we skip this
+            #path
             if intersect and op != "onnx::Shape":
                 if curr_name == "":
                     curr_name = ",".join(str(x) for x in inputs)
@@ -81,11 +83,13 @@ def generate_graph(model, args):
                 else:
                     execution_graph[intersect_as_string] = target_outputs
 
+                # in onnx Gemm is used instead of linear and in case of alexent the name of the
+                # operation will be the previous one
                 if curr_name in id_name_dict.values() and op == "onnx::Gemm":
                     new_name = try_correct_broken_name(op, shape, curr_name, model)
                     if new_name is not None:
                         curr_name = new_name
-                # print("curr_name: ", curr_name, " \top: ", op + " \tintersect: " + intersect_as_string + " \tTarget: " + str(target_outputs))
+                print("curr_name: ", curr_name, " \top: ", op + " \tintersect: " + intersect_as_string + " \tTarget: " + str(target_outputs))
                 id_name_dict[intersect_as_string] = curr_name
                 execution_shapes[intersect_as_string] = shape
 
@@ -145,11 +149,16 @@ def clean_execution_graph(execution_graph, execution_shapes, id_name_dict):
         if v in execution_shapes:
             while execution_shapes[v] is None:
                 if v not in to_delete:
+                    # print("want to delete: {}".format(v))
                     to_delete.append(v)
                 v = cleaned_graph[v]
             cleaned_graph[k] = v
         elif k not in to_delete and v != "":
-            to_delete.append(k)
+            split = v.split(",")
+            for e in split:
+                if e not in to_delete and execution_shapes[e] is None and e != "":
+                    # print("pouit want to delete: {}".format(k))
+                    to_delete.append(k)
 
     for key in to_delete:
         cleaned_graph.pop(key, None)

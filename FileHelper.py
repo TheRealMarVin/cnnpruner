@@ -15,7 +15,7 @@ def save_obj(obj, name):
 def load_obj(name):
     path_and_file = 'obj/' + name + '.pkl'
     path, _ = os.path.split(path_and_file)
-    if not os.path.exists(path):
+    if not os.path.exists(path) or not os.path.isfile(name):
         return None
 
     with open(path_and_file, 'rb') as f:

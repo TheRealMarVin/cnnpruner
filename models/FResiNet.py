@@ -1,3 +1,5 @@
+import math
+
 from torch import nn
 
 
@@ -12,11 +14,11 @@ class FResiNet(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.layer1 = self._make_layer(block, 64, layers[0])
-        # self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         # self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         # self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AvgPool2d(7, stride=1)
-        self.fc = nn.Linear(64 * block.expansion, num_classes) #remplacer le chiffre par le nombre de filtre du dernier layer
+        self.fc = nn.Linear(128 * block.expansion * 22 * 22, num_classes) #remplacer le chiffre par le nombre de filtre du dernier layer
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -51,8 +53,8 @@ class FResiNet(nn.Module):
 
         x = self.layer1(x)
         x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
+        # x = self.layer3(x)
+        # x = self.layer4(x)
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)

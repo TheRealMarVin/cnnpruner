@@ -9,6 +9,7 @@ from torch import nn
 from torch.optim.lr_scheduler import  StepLR
 from torchvision import models
 from torchvision.datasets import CIFAR10
+from torchvision.models.resnet import BasicBlock
 from torchvision.transforms import transforms
 
 from CustomDeepLib import train, test
@@ -19,6 +20,9 @@ from models.AlexNetSki import alexnetski
 
 
 ###
+from models.FResiNet import FResiNet
+
+
 class FilterPruner:
     def __init__(self, model, sample_run):
         self.model = model
@@ -49,7 +53,7 @@ class FilterPruner:
         self.connection_count = {}
 
     def parse(self, node_id):
-        # print("PARSE node_name:", node_id)
+        # print("PARSE node_name: {}".format(node_id))
 
         node_name = self.name_dic[node_id]
         if self.connection_count[node_id] > 0:
@@ -63,11 +67,17 @@ class FilterPruner:
             x = self.forward_res[node_id]
             if isinstance(curr_module, torch.nn.modules.Linear):
                 x = x.view(x.size(0), -1)
+
+            # if node_id == "246":
+            #     a = 0
             out = curr_module(x)
+            # print("\t module name: {} \tbefore shape: {}\tafter shape:{}".format(node_name, x.shape, out.shape))
+            # if node_id == "232":
+            #     a = 0
 
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-                x.register_hook(self.compute_rank)
-                self.activations.append(x)
+                out.register_hook(self.compute_rank)
+                self.activations.append(out)
                 self.activation_to_layer[self.activation_index] = node_id
                 self.activation_index += 1
 
@@ -78,9 +88,11 @@ class FilterPruner:
         else:
             # execute next
             for next_id in self.graph[node_id].split(","):
-                next_id
+                # next_id
                 self.connection_count[next_id] -= 1
                 if next_id in self.forward_res:
+                    # print("AAA adding weights")
+                    # self.forward_res[next_id].require_grad = True
                     self.forward_res[next_id] = self.forward_res[next_id] + out
                 else:
                     self.forward_res[next_id] = out
@@ -109,7 +121,12 @@ class FilterPruner:
         return x
 
     def compute_rank(self, grad):
+
         activation_index = len(self.activations) - self.grad_index - 1
+        ###
+        atl = self.activation_to_layer[activation_index]
+        # print("Activation index: {} \tcorrespond to layer:{}".format(activation_index, atl))
+        ###
         activation = self.activations[activation_index]
         # values = torch.sum((activation * grad), dim = 2).sum(dim=2).sum(dim=3)[0, :, 0, 0].data
         ag_dot = activation * grad
@@ -119,6 +136,8 @@ class FilterPruner:
         # values = values / (activation.size(0) * activation.size(2) * activation.size(3))
         if activation_index not in self.filter_ranks:
             self.filter_ranks[activation_index] = torch.FloatTensor(activation.size(1)).zero_().cuda()
+            # print("ninja ai:{}".format(activation_index))
+        # print("tortue")
 
         normalized = torch.mul(torch.sum(ag_dot, dim=2).sum(dim=2),
                                1 / (activation.size(0) * activation.size(2) * activation.size(3)))
@@ -430,7 +449,7 @@ def common_training_code(model, pruned_save_path=None,
     model.cuda()
 
     use_gpu = True
-    n_epoch = 10
+    n_epoch = 1
     n_epoch_retrain = 2
     batch_size = 128
 
@@ -456,7 +475,7 @@ def common_training_code(model, pruned_save_path=None,
     ###
     pruner = FilterPruner(model, sample_run)
     number_of_filters = total_num_filters(model)
-    num_filters_to_prune_per_iteration = 256
+    num_filters_to_prune_per_iteration = 256 #TODO calculer automatiquement
     iterations = int(float(number_of_filters) / num_filters_to_prune_per_iteration)
     ratio = 2.0/3
     iterations = int(iterations * ratio)
@@ -474,7 +493,7 @@ def common_training_code(model, pruned_save_path=None,
             prune_targets = load_obj("filters_dic")
 
         if prune_targets is None:
-            train(model, optimizer, train_dataset, 1, batch_size, use_gpu=use_gpu, criterion=criterion,
+            train(model, optimizer, train_dataset, 1, 16, use_gpu=use_gpu, criterion=criterion,
                   scheduler=scheduler, prunner=pruner)
 
             pruner.normalize_layer()
@@ -527,6 +546,18 @@ def exec_poc():
                          sample_run=torch.zeros([1, 3, 224, 224]),
                          reuse_cut_filter=True)
 
+def exec_poc2():
+    print("Proof of concept")
+    model = FResiNet(BasicBlock, [2, 2])
+    model.cuda()
+
+    # TODO reuse_cut_filter must be false
+    common_training_code(model, pruned_save_path="../saved/fresinet/PrunedFresinet.pth",
+                         # best_result_save_path=None,
+                         best_result_save_path="../saved/fresinet/fresinet.pth",
+                         sample_run=torch.zeros([1, 3, 224, 224]),
+                         reuse_cut_filter=True)
+
 
 def exec_q3b():
     print("question 3b")
@@ -554,7 +585,8 @@ def exec_q3b():
 
 def exec_q3():
     # exec_q3b()
-    exec_poc()
+    # exec_poc()
+    exec_poc2()
 
 
 if __name__ == '__main__':
