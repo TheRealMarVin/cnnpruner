@@ -78,7 +78,7 @@ class FilterPruner:
             #     a = 0
 
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-                print("name: {}\t\tnode_id: {}\tactivation_index: {}".format(node_name, node_id, self.activation_index))
+                # print("name: {}\t\tnode_id: {}\tactivation_index: {}".format(node_name, node_id, self.activation_index))
                 # out.register_hook(self.compute_rank)
                 self.conv_layer[node_id] = curr_module
                 self.activations[node_id] = out
