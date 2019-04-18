@@ -18,7 +18,7 @@ from FileHelper import load_obj, save_obj
 from ModelHelper import get_node_in_model, total_num_filters
 from models.AlexNetSki import alexnetski
 
-
+# TODO check this one!!! https://towardsdatascience.com/how-to-visualize-convolutional-features-in-40-lines-of-code-70b7d87b0030
 ###
 from models.FResiNet import FResiNet
 
@@ -126,13 +126,17 @@ class FilterPruner:
         return x
 
     def extract_grad(self, out):
-        for k, node_name in self.activation_to_layer.items():
-            curr_module = self.conv_layer[node_name]
-            grad = curr_module.weight.grad
-            activation = curr_module.weight
-            pdist = nn.PairwiseDistance(p=2)
-            out = pdist(activation, grad)
-            self.filter_ranks[node_name] = out
+        with torch.no_grad():
+            for k, node_name in self.activation_to_layer.items():
+                curr_module = self.conv_layer[node_name]
+                grad = curr_module.weight.grad
+                activation = curr_module.weight
+                pdist = nn.PairwiseDistance(p=2)
+                out = pdist(activation, grad)
+                if node_name not in self.filter_ranks:
+                    self.filter_ranks[node_name] = out
+                else:
+                    self.filter_ranks[node_name] = self.filter_ranks[node_name] + out
 
 
     # def compute_rank(self, grad):
