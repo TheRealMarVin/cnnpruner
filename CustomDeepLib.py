@@ -83,6 +83,8 @@ def do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, prun
 
         loss = criterion(output, targets)
         loss.backward(retain_graph=retain_graph)
+        if prunner is not None:
+            prunner.extract_grad(output)
         optimizer.step()
 
 

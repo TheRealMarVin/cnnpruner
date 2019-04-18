@@ -26,13 +26,14 @@ from models.FResiNet import FResiNet
 class FilterPruner:
     def __init__(self, model, sample_run):
         self.model = model
-        self.activations = []
+        self.activations = {}
         self.gradients = []
-        self.grad_index = 0
-        self.activation_to_layer = {}
+        self.grad_index = 0 # TODO remove
+        self.conv_layer = {}
+        self.activation_to_layer = {} # TODO remove
         self.filter_ranks = {}
         self.forward_res = {}
-        self.activation_index = 0
+        self.activation_index = 0 # TODO remove
         self.connection_count = {}
         self.reset()
         model.cpu()
@@ -43,9 +44,10 @@ class FilterPruner:
 
 
     def reset(self):
-        self.activations = []
+        self.activations = {}
         self.gradients = []
-        self.grad_index = 0
+        self.conv_layer = {}
+        self.grad_index = 0 # TODO remove
         self.activation_to_layer = {}
         self.filter_ranks = {}
         self.forward_res = {}
@@ -76,8 +78,10 @@ class FilterPruner:
             #     a = 0
 
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-                out.register_hook(self.compute_rank)
-                self.activations.append(out)
+                print("name: {}\t\tnode_id: {}\tactivation_index: {}".format(node_name, node_id, self.activation_index))
+                # out.register_hook(self.compute_rank)
+                self.conv_layer[node_id] = curr_module
+                self.activations[node_id] = out
                 self.activation_to_layer[self.activation_index] = node_id
                 self.activation_index += 1
 
@@ -102,11 +106,12 @@ class FilterPruner:
 
     # This is super slow because of the way I parse the execution tree, but it works
     def forward(self, x):
-        self.activations = []
+        self.activations = {}
         self.gradients = []
         self.grad_index = 0
         self.activation_to_layer = {}
         self.forward_res = {}
+        self.conv_layer = {}
 
         self.activation_index = 0
 
@@ -120,30 +125,43 @@ class FilterPruner:
         x = self.parse(self.root)
         return x
 
-    def compute_rank(self, grad):
+    def extract_grad(self, out):
+        for k, node_name in self.activation_to_layer.items():
+            curr_module = self.conv_layer[node_name]
+            grad = curr_module.weight.grad
+            activation = curr_module.weight
+            pdist = nn.PairwiseDistance(p=2)
+            out = pdist(activation, grad)
+            self.filter_ranks[node_name] = out
 
-        activation_index = len(self.activations) - self.grad_index - 1
-        ###
-        atl = self.activation_to_layer[activation_index]
-        # print("Activation index: {} \tcorrespond to layer:{}".format(activation_index, atl))
-        ###
-        activation = self.activations[activation_index]
-        # values = torch.sum((activation * grad), dim = 2).sum(dim=2).sum(dim=3)[0, :, 0, 0].data
-        ag_dot = activation * grad
-        normalized = torch.mul(ag_dot[1], 1 / (activation.size(0) * activation.size(2) * activation.size(3)))
 
-        # Normalize the rank by the filter dimensions
-        # values = values / (activation.size(0) * activation.size(2) * activation.size(3))
-        if activation_index not in self.filter_ranks:
-            self.filter_ranks[activation_index] = torch.FloatTensor(activation.size(1)).zero_().cuda()
-            # print("ninja ai:{}".format(activation_index))
-        # print("tortue")
-
-        normalized = torch.mul(torch.sum(ag_dot, dim=2).sum(dim=2),
-                               1 / (activation.size(0) * activation.size(2) * activation.size(3)))
-        for i in range(normalized.size(0)):
-            self.filter_ranks[activation_index] += normalized[i]
-        self.grad_index += 1
+    # def compute_rank(self, grad):
+    #     activation_index = len(self.activations) - self.grad_index - 1
+    #     print("grad_index: {} \tactivation index: {}".format(self.grad_index, activation_index))
+    #     if grad._backward_hooks is not None:
+    #         a = 0
+    #     ###
+    #     # atl = self.activation_to_layer[activation_index]
+    #     # print("Activation index: {} \tcorrespond to layer:{}".format(activation_index, atl))
+    #     ###
+    #     activation = self.activations[activation_index]
+    #     # values = torch.sum((activation * grad), dim = 2).sum(dim=2).sum(dim=3)[0, :, 0, 0].data
+    #
+    #     # normalized = torch.mul(ag_dot[1], 1 / (activation.size(0) * activation.size(2) * activation.size(3)))
+    #
+    #     # Normalize the rank by the filter dimensions
+    #     # values = values / (activation.size(0) * activation.size(2) * activation.size(3))
+    #     if activation_index not in self.filter_ranks:
+    #         self.filter_ranks[activation_index] = torch.FloatTensor(activation.size(1)).zero_().cuda()
+    #         print("ninja ai:{}".format(activation_index))
+    #     print("tortue")
+    #
+    #     ag_dot = activation * grad
+    #     normalized = torch.mul(torch.sum(ag_dot, dim=2).sum(dim=2),
+    #                            1 / (activation.size(0) * activation.size(2) * activation.size(3)))
+    #     for i in range(normalized.size(0)):
+    #         self.filter_ranks[activation_index] += normalized[i]
+    #     self.grad_index += 1
 
     def sort_filters(self, num):
         data = []
@@ -450,7 +468,7 @@ def common_training_code(model, pruned_save_path=None,
 
     use_gpu = True
     n_epoch = 1
-    n_epoch_retrain = 2
+    n_epoch_retrain = 1
     batch_size = 128
 
     optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
@@ -475,10 +493,10 @@ def common_training_code(model, pruned_save_path=None,
     ###
     pruner = FilterPruner(model, sample_run)
     number_of_filters = total_num_filters(model)
-    num_filters_to_prune_per_iteration = 256 #TODO calculer automatiquement
-    iterations = int(float(number_of_filters) / num_filters_to_prune_per_iteration)
-    ratio = 2.0/3
-    iterations = int(iterations * ratio)
+    num_filters_to_prune_per_iteration = 512 #TODO calculer automatiquement
+    # iterations = int(float(number_of_filters) / num_filters_to_prune_per_iteration)
+    ratio = 1.0/3
+    iterations = int(number_of_filters * ratio)//num_filters_to_prune_per_iteration
     print("{} iterations to reduce {:2.2f}% filters".format(iterations, ratio*100))
 
     for param in model.parameters():
@@ -544,11 +562,11 @@ def exec_poc():
     common_training_code(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
                          best_result_save_path="../saved/alex/alexnet.pth",
                          sample_run=torch.zeros([1, 3, 224, 224]),
-                         reuse_cut_filter=True)
+                         reuse_cut_filter=False)
 
 def exec_poc2():
     print("Proof of concept")
-    model = FResiNet(BasicBlock, [2, 2])
+    model = FResiNet(BasicBlock, [2, 2, 2])
     model.cuda()
 
     # TODO reuse_cut_filter must be false
@@ -580,13 +598,13 @@ def exec_q3b():
     common_training_code(model, pruned_save_path="../saved/resnet/Prunedresnet.pth,",
                          best_result_save_path="../saved/resnet/resnet18.pth",
                          sample_run=torch.zeros([1, 3, 224, 224]),
-                         reuse_cut_filter=True)
+                         reuse_cut_filter=False)
 
 
 def exec_q3():
-    # exec_q3b()
+    exec_q3b()
     # exec_poc()
-    exec_poc2()
+    # exec_poc2()
 
 
 if __name__ == '__main__':

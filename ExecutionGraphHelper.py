@@ -89,7 +89,7 @@ def generate_graph(model, args):
                     new_name = try_correct_broken_name(op, shape, curr_name, model)
                     if new_name is not None:
                         curr_name = new_name
-                print("curr_name: ", curr_name, " \top: ", op + " \tintersect: " + intersect_as_string + " \tTarget: " + str(target_outputs))
+                # print("curr_name: ", curr_name, " \top: ", op + " \tintersect: " + intersect_as_string + " \tTarget: " + str(target_outputs))
                 id_name_dict[intersect_as_string] = curr_name
                 execution_shapes[intersect_as_string] = shape
 
