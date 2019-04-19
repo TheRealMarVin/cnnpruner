@@ -6,6 +6,8 @@ import numpy as np
 import torch
 import time
 
+from sklearn.metrics import accuracy_score
+from torch import nn
 from torch.autograd import Variable
 from torch.utils import model_zoo
 
@@ -18,7 +20,7 @@ from torchvision.transforms import ToTensor
 
 
 def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, scheduler=None,
-          criterion=None, prunner=None, retain_graph=None, best_result_save_path=None):
+          criterion=None, pruner=None, best_result_save_path=None, batch_count=None, should_validate=True):
     history = History()
 
     if criterion is None:
@@ -36,12 +38,16 @@ def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, schedule
     highest_score = 0.0
     for i in range(n_epoch):
         start = time.time()
-        do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, prunner=prunner, retain_graph=retain_graph)
+        do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, pruner=pruner, count=batch_count)
         end = time.time()
 
-        train_acc, train_loss = validate(model, train_loader, use_gpu)
-        val_acc, val_loss = validate(model, val_loader, use_gpu)
-        history.save(train_acc, val_acc, train_loss, val_loss, optimizer.param_groups[0]['lr'])
+        if should_validate:
+            train_acc, train_loss = validate(model, train_loader, use_gpu)
+            val_acc, val_loss = validate(model, val_loader, use_gpu)
+            history.save(train_acc, val_acc, train_loss, val_loss, optimizer.param_groups[0]['lr'])
+            print(
+                'Epoch {} - Train acc: {:.2f} - Val acc: {:.2f} - Train loss: {:.4f} - Val loss: {:.4f} - Training time: {:.2f}s'.format(
+                    i, train_acc, val_acc, train_loss, val_loss, end - start))
 
         if best_result_save_path is not None \
                 and val_acc > highest_score:
@@ -53,14 +59,12 @@ def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, schedule
             if not os.path.exists(basedir):
                 os.makedirs(basedir)
             torch.save(model.state_dict(), best_result_save_path)
-        print(
-            'Epoch {} - Train acc: {:.2f} - Val acc: {:.2f} - Train loss: {:.4f} - Val loss: {:.4f} - Training time: {:.2f}s'.format(
-                i, train_acc, val_acc, train_loss, val_loss, end - start))
+
 
     return history
 
 
-def do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, prunner=None, retain_graph=None):
+def do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, pruner=None, count=None):
     model.train()
     if scheduler:
         scheduler.step()
@@ -76,16 +80,21 @@ def do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, prun
         targets = Variable(targets)
         optimizer.zero_grad()
 
-        if prunner is not None:
-            output = prunner.forward(inputs)
+        if pruner is not None:
+            output = pruner.forward(inputs)
         else:
             output = model(inputs)
 
         loss = criterion(output, targets)
-        loss.backward(retain_graph=retain_graph)
-        if prunner is not None:
-            prunner.extract_grad(output)
+        loss.backward()
+        if pruner is not None:
+            pruner.extract_grad(output)
         optimizer.step()
+
+        if count is not None:
+            count = count - 1
+            if count <= 0:
+                break
 
 
 # fonction de test qui n'override pas la transform
@@ -95,6 +104,39 @@ def test(model, test_dataset, batch_size, use_gpu=True):
 
     score, loss = validate(model, test_loader, use_gpu=use_gpu)
     return score
+
+
+def validate(model, val_loader, use_gpu=True, pruner=None):
+    model.train(False)
+    true = []
+    pred = []
+    val_loss = []
+
+    criterion = nn.CrossEntropyLoss()
+    model.eval()
+
+    for j, batch in enumerate(val_loader):
+
+        inputs, targets = batch
+        if use_gpu:
+            inputs = inputs.cuda()
+            targets = targets.cuda()
+
+        inputs = Variable(inputs, volatile=True)
+        targets = Variable(targets, volatile=True)
+        if pruner is not None:
+            output = pruner.forward(inputs)
+        else:
+            output = model(inputs)
+
+        predictions = output.max(dim=1)[1]
+
+        val_loss.append(criterion(output, targets).item())
+        true.extend(targets.data.cpu().numpy().tolist())
+        pred.extend(predictions.data.cpu().numpy().tolist())
+
+    model.train(True)
+    return accuracy_score(true, pred) * 100, sum(val_loss) / len(val_loss)
 
 
 def plot_images(images, cls_true, label_names=None, cls_pred=None, score=None, gray=False):

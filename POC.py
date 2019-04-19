@@ -4,15 +4,16 @@ from operator import itemgetter
 
 import numpy as np
 import torch
+from deeplib.datasets import train_valid_loaders
 
 from torch import nn
 from torch.optim.lr_scheduler import  StepLR
 from torchvision import models
 from torchvision.datasets import CIFAR10
 from torchvision.models.resnet import BasicBlock
-from torchvision.transforms import transforms
+from torchvision.transforms import transforms, ToTensor
 
-from CustomDeepLib import train, test
+from CustomDeepLib import train, test, do_epoch, validate
 from ExecutionGraphHelper import generate_graph, get__input_connection_count_per_entry
 from FileHelper import load_obj, save_obj
 from ModelHelper import get_node_in_model, total_num_filters
@@ -35,6 +36,7 @@ class FilterPruner:
         self.forward_res = {}
         self.activation_index = 0 # TODO remove
         self.connection_count = {}
+        self.features = []
         self.reset()
         model.cpu()
         self.graph, self.name_dic, self.root = generate_graph(model, sample_run)
@@ -46,6 +48,7 @@ class FilterPruner:
     def reset(self):
         self.activations = {}
         self.gradients = []
+        self.features = []
         self.conv_layer = {}
         self.grad_index = 0 # TODO remove
         self.activation_to_layer = {}
@@ -72,7 +75,7 @@ class FilterPruner:
 
             # if node_id == "246":
             #     a = 0
-            out = curr_module(x)
+            # out = curr_module(x)
             # print("\t module name: {} \tbefore shape: {}\tafter shape:{}".format(node_name, x.shape, out.shape))
             # if node_id == "232":
             #     a = 0
@@ -81,9 +84,12 @@ class FilterPruner:
                 # print("name: {}\t\tnode_id: {}\tactivation_index: {}".format(node_name, node_id, self.activation_index))
                 # out.register_hook(self.compute_rank)
                 self.conv_layer[node_id] = curr_module
-                self.activations[node_id] = out
-                self.activation_to_layer[self.activation_index] = node_id
-                self.activation_index += 1
+                # self.activations[node_id] = out
+                # self.activation_to_layer[self.activation_index] = node_id
+                # self.activation_index += 1
+                self.hook = curr_module.register_forward_hook(self.hook_fn)
+
+            out = curr_module(x)
 
         res = None
         next_nodes = self.graph[node_id]
@@ -103,6 +109,12 @@ class FilterPruner:
 
                 res = self.parse(next_id)
         return res
+
+    def hook_fn(self, module, input, output):
+        self.features.append(torch.tensor(output, requires_grad=True).cuda())
+    #
+    # def close(self):
+    #     self.hook.remove()
 
     # This is super slow because of the way I parse the execution tree, but it works
     def forward(self, x):
@@ -127,16 +139,20 @@ class FilterPruner:
 
     def extract_grad(self, out):
         with torch.no_grad():
-            for k, node_name in self.activation_to_layer.items():
-                curr_module = self.conv_layer[node_name]
+            for node_name, curr_module in self.conv_layer.items():
+                # curr_module = self.conv_layer[node_name]
                 grad = curr_module.weight.grad
+                # means = [x.view(-1).mean() for x in grad]
                 activation = curr_module.weight
                 pdist = nn.PairwiseDistance(p=2)
                 out = pdist(activation, grad)
+                # o1 = torch.abs(out)
+                # o1 = o1 / torch.sqrt(torch.sum(o1 * v))
+                means2 = torch.tensor([x.view(-1).mean() for x in out]).cuda() #TODO I think it should be negative
                 if node_name not in self.filter_ranks:
-                    self.filter_ranks[node_name] = out
+                    self.filter_ranks[node_name] = means2
                 else:
-                    self.filter_ranks[node_name] = self.filter_ranks[node_name] + out
+                    self.filter_ranks[node_name] = self.filter_ranks[node_name] + means2
 
 
     # def compute_rank(self, grad):
@@ -171,7 +187,7 @@ class FilterPruner:
         data = []
         for i in sorted(self.filter_ranks.keys()):
             for j in range(self.filter_ranks[i].size(0)):
-                data.append((self.activation_to_layer[i], j, self.filter_ranks[i][j]))
+                data.append((i, j, self.filter_ranks[i][j]))
 
         return nsmallest(num, data, itemgetter(2))
 
@@ -182,6 +198,7 @@ class FilterPruner:
             self.filter_ranks[i] = v
 
     def plan_prunning(self, num_filters_to_prune):
+        # aaa = nsmallest(num_filters_to_prune, self.filter_ranks, itemgetter(2))
         filters_to_prune = self.sort_filters(num_filters_to_prune)
 
         filters_to_prune_per_layer = {}
@@ -231,7 +248,9 @@ class FilterPruner:
             self._prune_conv_input_batchnorm(layer, removed_filter, initial_filter_count)
 
         if has_more:
-            self._apply_pruning_effect(next_id, removed_filter, initial_filter_count)
+            next_id = self.graph[next_id]
+            for sub_node_id in next_id.split(","):
+                self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count)
         else:
             print("{} has no more".format(self.name_dic[next_id]))
 
@@ -515,8 +534,15 @@ def common_training_code(model, pruned_save_path=None,
             prune_targets = load_obj("filters_dic")
 
         if prune_targets is None:
-            train(model, optimizer, train_dataset, 1, 16, use_gpu=use_gpu, criterion=criterion,
-                  scheduler=scheduler, prunner=pruner)
+            #TODO should use less batch in an epoch and bigger batch size
+            train(model, optimizer, train_dataset, 1, 64, use_gpu=use_gpu, criterion=criterion,
+                  scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
+            # if train_dataset.transform is None:
+            #     train_dataset.transform = ToTensor()
+            #
+            # train_loader, val_loader = train_valid_loaders(train_dataset, batch_size=batch_size)
+            # # do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, pruner=pruner, count=4)
+            # validate(model, train_loader, use_gpu=True, pruner=None)
 
             pruner.normalize_layer()
 
