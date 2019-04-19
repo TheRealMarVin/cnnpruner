@@ -216,43 +216,56 @@ class FilterPruner:
     def prune(self, pruning_dic):
         for layer_id, filters_to_remove in pruning_dic.items():
             layer = get_node_in_model(self.model, self.name_dic[layer_id])
-
+            print("trying to prune for layer: {} \tID: {}".format(self.name_dic[layer_id], layer_id))
             if layer is not None:
                 initial_filter_count = 0
                 if isinstance(layer, torch.nn.modules.conv.Conv2d):
                     initial_filter_count = self._prune_conv_output_filters(layer, filters_to_remove)
 
                 if len(filters_to_remove) > 0:
-                    self._apply_pruning_effect(layer_id, filters_to_remove, initial_filter_count)
-            b = 0
-            # model = self.prune(model, layer_name, filter_index)
-        pass
+                    effect_applied = []
+                    next_id = self.graph[layer_id]
+                    for sub_node_id in next_id.split(","):
+                        if sub_node_id not in effect_applied:
+                            self._apply_pruning_effect(sub_node_id, filters_to_remove, initial_filter_count, effect_applied)
+                        else:
+                            print("already affected by pruning")
+                    # self._apply_pruning_effect(layer_id, filters_to_remove, initial_filter_count, effect_applied)
 
-    def _apply_pruning_effect(self, layer_id, removed_filter, initial_filter_count):
-        next_id = self.graph[layer_id]
-        if next_id not in self.name_dic:
-            for sub_node_id in next_id.split(","):
+    def _apply_pruning_effect(self, layer_id, removed_filter, initial_filter_count, effect_applied):
+        # next_id = self.graph[layer_id]
+        if layer_id not in self.name_dic:
+            for sub_node_id in layer_id.split(","):
                 self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count)
             print("end of effect after loop")
             return
-        layer = get_node_in_model(self.model, self.name_dic[next_id])
+        layer = get_node_in_model(self.model, self.name_dic[layer_id])
+        print("\tapply pruning effect on: {} \tID: {}".format(self.name_dic[layer_id], layer_id))
+        if layer_id == "211":
+            a = 0
 
         has_more = True
         if isinstance(layer, torch.nn.modules.conv.Conv2d):
             self._prune_conv_input_filters(layer, removed_filter, initial_filter_count)
+            effect_applied.append(layer_id)
             has_more = False
         elif isinstance(layer, torch.nn.modules.Linear):
             self._prune_input_linear(layer, removed_filter, initial_filter_count)
+            effect_applied.append(layer_id)
             has_more = False
         elif isinstance(layer, torch.nn.modules.BatchNorm2d):
             self._prune_conv_input_batchnorm(layer, removed_filter, initial_filter_count)
+            effect_applied.append(layer_id)
 
         if has_more:
-            next_id = self.graph[next_id]
+            next_id = self.graph[layer_id]
             for sub_node_id in next_id.split(","):
-                self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count)
+                if sub_node_id not in effect_applied:
+                    self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count, effect_applied)
+                else:
+                    print("already affected by pruning")
         else:
-            print("{} has no more".format(self.name_dic[next_id]))
+            print("\t\t{} has no more".format(self.name_dic[layer_id]))
 
     def _prune_conv_output_filters(self, conv, filters_to_remove):
         # TODO try not using cpu
