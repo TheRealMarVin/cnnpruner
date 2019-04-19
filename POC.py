@@ -576,7 +576,7 @@ def common_training_code(model, pruned_save_path=None,
         optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
         pruner.reset()
 
-        print("Filters pruned {}%".format(100 * float(total_num_filters(model)) / number_of_filters))
+        print("Filters pruned {}%".format(100 - (100 * float(total_num_filters(model)) / number_of_filters)))
         new_test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
         print('Test:\n\tpost prune Score: {}'.format(new_test_score))
 
