@@ -5,16 +5,15 @@ from operator import itemgetter
 
 import numpy as np
 import torch
-from deeplib.datasets import train_valid_loaders
 
 from torch import nn
 from torch.optim.lr_scheduler import  StepLR
 from torchvision import models
 from torchvision.datasets import CIFAR10
 from torchvision.models.resnet import BasicBlock
-from torchvision.transforms import transforms, ToTensor
+from torchvision.transforms import transforms
 
-from CustomDeepLib import train, test, do_epoch, validate
+from CustomDeepLib import train, test
 from ExecutionGraphHelper import generate_graph, get_input_connection_count_per_entry
 from FileHelper import load_obj, save_obj
 from ModelHelper import get_node_in_model, total_num_filters
@@ -43,7 +42,6 @@ class FilterPruner:
         model.cpu()
         self.graph, self.name_dic, self.root = generate_graph(model, sample_run)
 
-        # get__input_connection_count_per_entry(self.graph, self.root, self.connection_count)
         model.cuda()
 
 
@@ -76,21 +74,8 @@ class FilterPruner:
             if isinstance(curr_module, torch.nn.modules.Linear):
                 x = x.view(x.size(0), -1)
 
-            # if node_id == "246":
-            #     a = 0
-            # out = curr_module(x)
-            # print("\t module name: {} \tbefore shape: {}\tafter shape:{}".format(node_name, x.shape, out.shape))
-            # if node_id == "232":
-            #     a = 0
-
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-                # print("name: {}\t\tnode_id: {}\tactivation_index: {}".format(node_name, node_id, self.activation_index))
-                # out.register_hook(self.compute_rank)
                 self.conv_layer[node_id] = curr_module
-                # self.activations[node_id] = out
-                # self.activation_to_layer[self.activation_index] = node_id
-                # self.activation_index += 1
-                # self.hook = curr_module.register_forward_hook(self.hook_fn)
 
             out = curr_module(x)
 
@@ -99,25 +84,15 @@ class FilterPruner:
         if len(next_nodes) == 0:
             res = out
         else:
-            # execute next
             for next_id in self.graph[node_id].split(","):
-                # next_id
                 self.connection_count[next_id] -= 1
                 if next_id in self.forward_res:
-                    # print("AAA adding weights")
-                    # self.forward_res[next_id].require_grad = True
                     self.forward_res[next_id] = self.forward_res[next_id] + out
                 else:
                     self.forward_res[next_id] = out
 
                 res = self.parse(next_id)
         return res
-
-    # def hook_fn(self, module, input, output):
-    #     self.features.append(torch.tensor(output, requires_grad=True).cuda())
-    #
-    # def close(self):
-    #     self.hook.remove()
 
     # This is super slow because of the way I parse the execution tree, but it works
     def forward(self, x):
@@ -156,35 +131,6 @@ class FilterPruner:
                 else:
                     self.filter_ranks[node_name] = self.filter_ranks[node_name] + means2
 
-
-    # def compute_rank(self, grad):
-    #     activation_index = len(self.activations) - self.grad_index - 1
-    #     print("grad_index: {} \tactivation index: {}".format(self.grad_index, activation_index))
-    #     if grad._backward_hooks is not None:
-    #         a = 0
-    #     ###
-    #     # atl = self.activation_to_layer[activation_index]
-    #     # print("Activation index: {} \tcorrespond to layer:{}".format(activation_index, atl))
-    #     ###
-    #     activation = self.activations[activation_index]
-    #     # values = torch.sum((activation * grad), dim = 2).sum(dim=2).sum(dim=3)[0, :, 0, 0].data
-    #
-    #     # normalized = torch.mul(ag_dot[1], 1 / (activation.size(0) * activation.size(2) * activation.size(3)))
-    #
-    #     # Normalize the rank by the filter dimensions
-    #     # values = values / (activation.size(0) * activation.size(2) * activation.size(3))
-    #     if activation_index not in self.filter_ranks:
-    #         self.filter_ranks[activation_index] = torch.FloatTensor(activation.size(1)).zero_().cuda()
-    #         print("ninja ai:{}".format(activation_index))
-    #     print("tortue")
-    #
-    #     ag_dot = activation * grad
-    #     normalized = torch.mul(torch.sum(ag_dot, dim=2).sum(dim=2),
-    #                            1 / (activation.size(0) * activation.size(2) * activation.size(3)))
-    #     for i in range(normalized.size(0)):
-    #         self.filter_ranks[activation_index] += normalized[i]
-    #     self.grad_index += 1
-
     def sort_filters(self, num):
         data = []
         for i in sorted(self.filter_ranks.keys()):
@@ -199,7 +145,6 @@ class FilterPruner:
             return True
 
         layer = get_node_in_model(self.model, self.name_dic[next_id])
-        # print("\tapply pruning effect on: {} \tID: {}".format(self.name_dic[next_id], next_id))
 
         has_more = True
         if isinstance(layer, torch.nn.modules.conv.Conv2d) or isinstance(layer, torch.nn.modules.Linear):
@@ -207,9 +152,6 @@ class FilterPruner:
 
         if has_more:
             next_id = self.graph[next_id]
-            # print("next id: {}".format(next_id))
-            # if next_id == "267":
-            #     a = 0
             if next_id not in self.name_dic:
                 return True
             elif self.connection_count_copy[next_id] > 1:
@@ -224,7 +166,6 @@ class FilterPruner:
             self.filter_ranks[i] = v
 
     def plan_prunning(self, num_filters_to_prune):
-        # aaa = nsmallest(num_filters_to_prune, self.filter_ranks, itemgetter(2))
         filters_to_prune = self.sort_filters(num_filters_to_prune)
 
         filters_to_prune_per_layer = {}
@@ -254,21 +195,13 @@ class FilterPruner:
                     for sub_node_id in next_id.split(","):
                         if sub_node_id not in effect_applied:
                             self._apply_pruning_effect(sub_node_id, filters_to_remove, initial_filter_count, effect_applied)
-                        # else:
-                        #     print("already affected by pruning")
-                    # self._apply_pruning_effect(layer_id, filters_to_remove, initial_filter_count, effect_applied)
 
     def _apply_pruning_effect(self, layer_id, removed_filter, initial_filter_count, effect_applied):
-        # next_id = self.graph[layer_id]
         if layer_id not in self.name_dic:
             for sub_node_id in layer_id.split(","):
                 self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count)
-            # print("end of effect after loop")
             return
         layer = get_node_in_model(self.model, self.name_dic[layer_id])
-        # print("\tapply pruning effect on: {} \tID: {}".format(self.name_dic[layer_id], layer_id))
-        if layer_id == "211":
-            a = 0
 
         has_more = True
         if isinstance(layer, torch.nn.modules.conv.Conv2d):
@@ -288,10 +221,6 @@ class FilterPruner:
             for sub_node_id in next_id.split(","):
                 if sub_node_id not in effect_applied:
                     self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count, effect_applied)
-                # else:
-                #     print("already affected by pruning")
-        # else:
-        #     print("\t\t{} has no more".format(self.name_dic[layer_id]))
 
     def _prune_conv_output_filters(self, conv, filters_to_remove):
         # TODO try not using cpu
@@ -301,7 +230,6 @@ class FilterPruner:
         # TODO make sure there is no overflow
         new_weights = np.delete(old_weights, filters_to_remove, 0)
         conv.weight.data = new_weights.cuda()
-        # print("conv  _ our _ old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
         conv.weight._grad = None
 
         if conv.bias is not None:
@@ -362,7 +290,6 @@ class FilterPruner:
         new_lin_in_feat = lin_in_feat - (elem_per_channel * len(removed_filter))
         old_lin_weights = linear.weight.detach()
         lin_new_weigths = np.delete(old_lin_weights, weight_to_delete, 1)
-        # weight scaling because removing nodes is basically like a form of dropout
         factor = 1 - (elem_per_channel / lin_in_feat)
         lin_new_weigths.mul_(factor)
         linear.weight.data = lin_new_weigths
@@ -376,142 +303,8 @@ class FilterPruner:
             if layer_name not in layers_pruned:
                 layers_pruned[layer_name] = 0
                 layers_pruned[layer_name] = len(pruning_dic[layer_index])
-
         print("Layers that will be pruned", layers_pruned)
 ###
-
-
-# #TODO remove
-# def find_layer_and_next(module, layer_name, in_desired_layer=None):
-#     desired_layer = in_desired_layer
-#     next_desired_layer = None
-#
-#     splitted = layer_name.split(".")
-#     if len(splitted) > 0:
-#         sub = splitted[1:]
-#         next_layer_name = '.'.join(sub)
-#     elif len(splitted) == 0:
-#         next_layer_name = splitted[0]
-#
-#     for name, curr_module in module.named_children():
-#         if desired_layer is None \
-#                 and name == layer_name \
-#                 and isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-#             desired_layer = curr_module
-#         else:
-#             if desired_layer is not None:
-#                 if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-#                     next_desired_layer = curr_module
-#                     break
-#                 elif isinstance(curr_module, torch.nn.modules.Linear):
-#                     next_desired_layer = curr_module
-#                     break
-#                 elif isinstance(curr_module, torch.nn.modules.BatchNorm2d):
-#                     next_desired_layer = curr_module
-#                     break
-#             res_desired, res_next= find_layer_and_next(curr_module, next_layer_name, desired_layer)
-#             if desired_layer is None and res_desired is not None:
-#                 desired_layer = res_desired
-#             if next_desired_layer is None and res_next is not None:
-#                 next_desired_layer = res_next
-#
-#             if desired_layer is not None and next_desired_layer is not None:
-#                 return desired_layer, next_desired_layer
-#     return desired_layer, next_desired_layer
-#
-# #TODO remove
-# #TODO on devrait les faire en batch ca irait pas mal plus vite
-# def prune(model, layer_index, filter_index):
-#     conv, next_layer = find_layer_and_next(model, layer_index)
-#
-#     # TODO try not using cpu
-#     conv.out_channels = conv.out_channels - 1
-#     old_weights = conv.weight.data.cpu().detach()
-#     new_weights = np.delete(old_weights, [filter_index], 0)
-#     conv.weight.data = new_weights.cuda()
-#     print("old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
-#     conv.weight._grad = None
-#
-#     if conv.bias is not None:
-#         # TODO try not using cpu
-#         bias_numpy = conv.bias.data.cpu().detach()
-#         new_bias_numpy = np.delete(bias_numpy, [filter_index], 0)
-#         conv.bias.data = new_bias_numpy.cuda()
-#         conv.bias._grad = None
-#
-#     if isinstance(next_layer, torch.nn.modules.conv.Conv2d):
-#         # TODO try not using cpu
-#         next_layer.in_channels = next_layer.in_channels - 1
-#         old_weights = next_layer.weight.data.cpu()
-#         new_weights = np.delete(old_weights, [filter_index], 1)
-#         next_layer.weight.data = new_weights.cuda()
-#         print("old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
-#         next_layer.weight._grad = None
-#
-#     elif isinstance(next_layer, torch.nn.modules.Linear):
-#         lin_in_feat = next_layer.in_features
-#         conv_out_channels = conv.out_channels
-#
-#         elem_per_channel = (lin_in_feat//conv_out_channels)
-#         new_lin_in_feat = lin_in_feat - elem_per_channel
-#         old_lin_weights = next_layer.weight.detach()
-#         lin_new_weigths = np.delete(old_lin_weights, [x + filter_index * elem_per_channel for x in range(elem_per_channel)], 1)
-#         #weight scaling because removing nodes is basically like a form of dropout
-#         factor = 1 - (elem_per_channel / lin_in_feat)
-#         lin_new_weigths.mul_(factor)
-#         next_layer.weight.data = lin_new_weigths
-#         next_layer.in_features = new_lin_in_feat
-#         next_layer.weight._grad = None
-#
-#     elif isinstance(next_layer, torch.nn.modules.BatchNorm2d):
-#         # print("nb features: ", next_layer.num_features)
-#         #TODO on network that doesn't converge it could reach 0... at this point we might want to remove it completely... maybe
-#         if next_layer.num_features > 10:
-#             next_layer.num_features = next_layer.num_features - 1
-#             old_batch_weights = next_layer.weight.detach()
-#             new_batch_weights = np.delete(old_batch_weights, [filter_index], 0)
-#             next_layer.weight.data = new_batch_weights
-#
-#             if next_layer.bias is not None:
-#                 # TODO try not using cpu
-#                 bias_numpy = next_layer.bias.data.cpu().detach()
-#                 new_bn_bias_numpy = np.delete(bias_numpy, [filter_index], 0)
-#                 next_layer.bias.data = new_bn_bias_numpy.cuda()
-#                 next_layer.bias._grad = None
-#
-#             next_layer.weight._grad = None
-#             if next_layer.track_running_stats:
-#                 next_layer.register_buffer('running_mean', torch.zeros(next_layer.num_features))
-#                 next_layer.register_buffer('running_var', torch.ones(next_layer.num_features))
-#                 next_layer.register_buffer('num_batches_tracked', torch.tensor(0, dtype=torch.long))
-#             else:
-#                 next_layer.register_parameter('running_mean', None)
-#                 next_layer.register_parameter('running_var', None)
-#                 next_layer.register_parameter('num_batches_tracked', None)
-#             next_layer.reset_running_stats()
-#             next_layer.reset_parameters()
-#
-#     return model
-# ###
-
-
-# def total_num_filters(modules):
-#     filters = 0
-#
-#     if isinstance(modules, torch.nn.modules.conv.Conv2d):
-#         filters = filters + modules.out_channels
-#     else:
-#         if len(modules._modules.items()) > 0:
-#             for name, sub_module in modules._modules.items():
-#                 if sub_module is not None:
-#                     filters = filters + total_num_filters(sub_module)
-#
-#         else:
-#             if isinstance(modules, torch.nn.modules.conv.Conv2d):
-#                 filters = filters + modules.out_channels
-#     return filters
-###
-
 
 def common_training_code(model, pruned_save_path=None,
                          best_result_save_path=None, retrain_if_weight_loaded=False,
@@ -557,8 +350,6 @@ def common_training_code(model, pruned_save_path=None,
     ###
     pruner = FilterPruner(model, sample_run)
     number_of_filters = total_num_filters(model)
-    # num_filters_to_prune_per_iteration = 512 #TODO calculer automatiquement
-    # iterations = int(float(number_of_filters) / num_filters_to_prune_per_iteration)
     filter_to_prune = (int)(number_of_filters * prune_ratio)
     max_filters_to_prune_on_iteration = (int)(number_of_filters * max_percent_per_iteration)
     if filter_to_prune < max_filters_to_prune_on_iteration:
@@ -581,12 +372,6 @@ def common_training_code(model, pruned_save_path=None,
             #TODO should use less batch in an epoch and bigger batch size
             train(model, optimizer, train_dataset, 1, 64, use_gpu=use_gpu, criterion=criterion,
                   scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
-            # if train_dataset.transform is None:
-            #     train_dataset.transform = ToTensor()
-            #
-            # train_loader, val_loader = train_valid_loaders(train_dataset, batch_size=batch_size)
-            # # do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, pruner=pruner, count=4)
-            # validate(model, train_loader, use_gpu=True, pruner=None)
 
             pruner.normalize_layer()
 
@@ -599,11 +384,8 @@ def common_training_code(model, pruned_save_path=None,
         print("Pruning filters.. ")
         model = model.cpu()
         pruner.prune(prune_targets)
-        # for layer_index, filter_index in prune_targets:
-        #     model = prune(model, layer_index, filter_index)
 
         model = model.cuda()
-
         optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
         pruner.reset()
 
