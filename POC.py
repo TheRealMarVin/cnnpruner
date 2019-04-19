@@ -1,3 +1,4 @@
+import copy
 import os
 from heapq import nsmallest
 from operator import itemgetter
@@ -14,7 +15,7 @@ from torchvision.models.resnet import BasicBlock
 from torchvision.transforms import transforms, ToTensor
 
 from CustomDeepLib import train, test, do_epoch, validate
-from ExecutionGraphHelper import generate_graph, get__input_connection_count_per_entry
+from ExecutionGraphHelper import generate_graph, get_input_connection_count_per_entry
 from FileHelper import load_obj, save_obj
 from ModelHelper import get_node_in_model, total_num_filters
 from models.AlexNetSki import alexnetski
@@ -36,6 +37,7 @@ class FilterPruner:
         self.forward_res = {}
         self.activation_index = 0 # TODO remove
         self.connection_count = {}
+        self.connection_count_copy = {}
         self.features = []
         self.reset()
         model.cpu()
@@ -56,6 +58,7 @@ class FilterPruner:
         self.forward_res = {}
         self.activation_index = 0
         self.connection_count = {}
+        self.connection_count_copy = {}
 
     def parse(self, node_id):
         # print("PARSE node_name: {}".format(node_id))
@@ -127,7 +130,8 @@ class FilterPruner:
 
         self.activation_index = 0
 
-        get__input_connection_count_per_entry(self.graph, self.root, self.connection_count)
+        get_input_connection_count_per_entry(self.graph, self.root, self.connection_count)
+        self.connection_count_copy = copy.deepcopy(self.connection_count)
         self.layer_to_parse = self.graph.keys()
 
         self.connection_count[self.root] = 0    # for the root we have everything we need
@@ -140,18 +144,12 @@ class FilterPruner:
     def extract_grad(self, out):
         with torch.no_grad():
             for node_name, curr_module in self.conv_layer.items():
-                if self.is_just_before_merge(node_name):
+                if self.is_before_merge(node_name):
                     continue
-                if node_name == "node_name":
-                    a = 0
-                # curr_module = self.conv_layer[node_name]
                 grad = curr_module.weight.grad
-                # means = [x.view(-1).mean() for x in grad]
                 activation = curr_module.weight
                 pdist = nn.PairwiseDistance(p=2)
                 out = pdist(activation, grad)
-                # o1 = torch.abs(out)
-                # o1 = o1 / torch.sqrt(torch.sum(o1 * v))
                 means2 = torch.tensor([x.view(-1).mean() for x in out]).cuda() #TODO I think it should be negative
                 if node_name not in self.filter_ranks:
                     self.filter_ranks[node_name] = means2
@@ -195,9 +193,7 @@ class FilterPruner:
 
         return nsmallest(num, data, itemgetter(2))
 
-    def is_just_before_merge(self, layer_id):
-        if layer_id == "261":
-            a = 0
+    def is_before_merge(self, layer_id):
         next_id = self.graph[layer_id]
         if next_id not in self.name_dic:
             return True
@@ -211,10 +207,15 @@ class FilterPruner:
 
         if has_more:
             next_id = self.graph[next_id]
+            # print("next id: {}".format(next_id))
+            # if next_id == "267":
+            #     a = 0
             if next_id not in self.name_dic:
                 return True
+            elif self.connection_count_copy[next_id] > 1:
+                return True
             else:
-                return self.is_just_before_merge(next_id)
+                return self.is_before_merge(next_id)
 
     def normalize_layer(self):
         for i in self.filter_ranks:

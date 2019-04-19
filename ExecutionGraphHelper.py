@@ -11,15 +11,26 @@ def get_childs(graph_edges, name):
     return res
 
 
-def get__input_connection_count_per_entry(graph_edges, node, res):
+def get_input_connection_count_per_entry(graph_edges, node, res):
+    # print("get_input_connection_count_per_entry: {}".format(str(node)))
     if node in graph_edges:
         for name in graph_edges[node].split(","):
+            if node == "253":
+                aa = 0
             if name in res.keys():
+                # print("\tappend: {} \tfrom node: {}".format(name, node))
                 res[name] += 1
                 break
             else:
+                # print("\tadd: {} \tfrom node: {}".format(name, node))
                 res[name] = 1
-            get__input_connection_count_per_entry(graph_edges, name, res)
+            if len(name) > 0:
+                if name == "253":
+                    a = 0
+                get_input_connection_count_per_entry(graph_edges, name, res)
+
+    else:
+        print("not in : {}".format(node))
 
 
 def generate_graph(model, args):
