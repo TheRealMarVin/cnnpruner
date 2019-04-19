@@ -87,7 +87,7 @@ class FilterPruner:
                 # self.activations[node_id] = out
                 # self.activation_to_layer[self.activation_index] = node_id
                 # self.activation_index += 1
-                self.hook = curr_module.register_forward_hook(self.hook_fn)
+                # self.hook = curr_module.register_forward_hook(self.hook_fn)
 
             out = curr_module(x)
 
@@ -110,8 +110,8 @@ class FilterPruner:
                 res = self.parse(next_id)
         return res
 
-    def hook_fn(self, module, input, output):
-        self.features.append(torch.tensor(output, requires_grad=True).cuda())
+    # def hook_fn(self, module, input, output):
+    #     self.features.append(torch.tensor(output, requires_grad=True).cuda())
     #
     # def close(self):
     #     self.hook.remove()
@@ -140,6 +140,10 @@ class FilterPruner:
     def extract_grad(self, out):
         with torch.no_grad():
             for node_name, curr_module in self.conv_layer.items():
+                if self.is_just_before_merge(node_name):
+                    continue
+                if node_name == "node_name":
+                    a = 0
                 # curr_module = self.conv_layer[node_name]
                 grad = curr_module.weight.grad
                 # means = [x.view(-1).mean() for x in grad]
@@ -191,6 +195,27 @@ class FilterPruner:
 
         return nsmallest(num, data, itemgetter(2))
 
+    def is_just_before_merge(self, layer_id):
+        if layer_id == "261":
+            a = 0
+        next_id = self.graph[layer_id]
+        if next_id not in self.name_dic:
+            return True
+
+        layer = get_node_in_model(self.model, self.name_dic[next_id])
+        # print("\tapply pruning effect on: {} \tID: {}".format(self.name_dic[next_id], next_id))
+
+        has_more = True
+        if isinstance(layer, torch.nn.modules.conv.Conv2d) or isinstance(layer, torch.nn.modules.Linear):
+            has_more = False
+
+        if has_more:
+            next_id = self.graph[next_id]
+            if next_id not in self.name_dic:
+                return True
+            else:
+                return self.is_just_before_merge(next_id)
+
     def normalize_layer(self):
         for i in self.filter_ranks:
             v = torch.abs(self.filter_ranks[i])
@@ -216,7 +241,7 @@ class FilterPruner:
     def prune(self, pruning_dic):
         for layer_id, filters_to_remove in pruning_dic.items():
             layer = get_node_in_model(self.model, self.name_dic[layer_id])
-            print("trying to prune for layer: {} \tID: {}".format(self.name_dic[layer_id], layer_id))
+            # print("trying to prune for layer: {} \tID: {}".format(self.name_dic[layer_id], layer_id))
             if layer is not None:
                 initial_filter_count = 0
                 if isinstance(layer, torch.nn.modules.conv.Conv2d):
@@ -228,8 +253,8 @@ class FilterPruner:
                     for sub_node_id in next_id.split(","):
                         if sub_node_id not in effect_applied:
                             self._apply_pruning_effect(sub_node_id, filters_to_remove, initial_filter_count, effect_applied)
-                        else:
-                            print("already affected by pruning")
+                        # else:
+                        #     print("already affected by pruning")
                     # self._apply_pruning_effect(layer_id, filters_to_remove, initial_filter_count, effect_applied)
 
     def _apply_pruning_effect(self, layer_id, removed_filter, initial_filter_count, effect_applied):
@@ -237,10 +262,10 @@ class FilterPruner:
         if layer_id not in self.name_dic:
             for sub_node_id in layer_id.split(","):
                 self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count)
-            print("end of effect after loop")
+            # print("end of effect after loop")
             return
         layer = get_node_in_model(self.model, self.name_dic[layer_id])
-        print("\tapply pruning effect on: {} \tID: {}".format(self.name_dic[layer_id], layer_id))
+        # print("\tapply pruning effect on: {} \tID: {}".format(self.name_dic[layer_id], layer_id))
         if layer_id == "211":
             a = 0
 
@@ -262,10 +287,10 @@ class FilterPruner:
             for sub_node_id in next_id.split(","):
                 if sub_node_id not in effect_applied:
                     self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count, effect_applied)
-                else:
-                    print("already affected by pruning")
-        else:
-            print("\t\t{} has no more".format(self.name_dic[layer_id]))
+                # else:
+                #     print("already affected by pruning")
+        # else:
+        #     print("\t\t{} has no more".format(self.name_dic[layer_id]))
 
     def _prune_conv_output_filters(self, conv, filters_to_remove):
         # TODO try not using cpu
@@ -587,7 +612,7 @@ def common_training_code(model, pruned_save_path=None,
 
         print("Fine tuning to recover from prunning iteration.")
         history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu, criterion=None,
-              scheduler=scheduler, prunner=None)
+              scheduler=scheduler, pruner=None)
         history.display()
 
     ###
