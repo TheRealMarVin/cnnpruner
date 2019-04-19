@@ -516,7 +516,9 @@ class FilterPruner:
 def common_training_code(model, pruned_save_path=None,
                          best_result_save_path=None, retrain_if_weight_loaded=False,
                          sample_run=None,
-                         reuse_cut_filter=False):
+                         reuse_cut_filter=False,
+                         max_percent_per_iteration=0.1,
+                         prune_ratio=0.3):
     test_transform = transforms.Compose([transforms.Resize((224, 224)),
                                          transforms.ToTensor(),
                                          transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
@@ -555,11 +557,14 @@ def common_training_code(model, pruned_save_path=None,
     ###
     pruner = FilterPruner(model, sample_run)
     number_of_filters = total_num_filters(model)
-    num_filters_to_prune_per_iteration = 512 #TODO calculer automatiquement
+    # num_filters_to_prune_per_iteration = 512 #TODO calculer automatiquement
     # iterations = int(float(number_of_filters) / num_filters_to_prune_per_iteration)
-    ratio = 1.0/3
-    iterations = int(number_of_filters * ratio)//num_filters_to_prune_per_iteration
-    print("{} iterations to reduce {:2.2f}% filters".format(iterations, ratio*100))
+    filter_to_prune = (int)(number_of_filters * prune_ratio)
+    max_filters_to_prune_on_iteration = (int)(number_of_filters * max_percent_per_iteration)
+    if filter_to_prune < max_filters_to_prune_on_iteration:
+        max_filters_to_prune_on_iteration = filter_to_prune
+    iterations = (filter_to_prune//max_filters_to_prune_on_iteration) + 1
+    print("{} iterations to reduce {:2.2f}% filters".format(iterations, prune_ratio*100))
 
     for param in model.parameters():
         param.requires_grad = True
@@ -585,7 +590,7 @@ def common_training_code(model, pruned_save_path=None,
 
             pruner.normalize_layer()
 
-            prune_targets = pruner.plan_prunning(num_filters_to_prune_per_iteration)
+            prune_targets = pruner.plan_prunning(max_filters_to_prune_on_iteration)
             if reuse_cut_filter:
                 save_obj(prune_targets, "filters_dic")
 
@@ -671,8 +676,8 @@ def exec_q3b():
 
 
 def exec_q3():
-    exec_q3b()
-    # exec_poc()
+    # exec_q3b()
+    exec_poc()
     # exec_poc2()
 
 
