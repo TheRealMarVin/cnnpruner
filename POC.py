@@ -1,13 +1,14 @@
 import copy
 import os
-from heapq import nsmallest
+import random
+from heapq import nsmallest, nlargest
 from operator import itemgetter
 
 import numpy as np
 import torch
 
 from torch import nn
-from torch.optim.lr_scheduler import  StepLR
+from torch.optim.lr_scheduler import StepLR
 from torchvision import models
 from torchvision.datasets import CIFAR10
 from torchvision.models.resnet import BasicBlock
@@ -20,7 +21,7 @@ from ModelHelper import get_node_in_model, total_num_filters
 from models.AlexNetSki import alexnetski
 
 # TODO check this one!!! https://towardsdatascience.com/how-to-visualize-convolutional-features-in-40-lines-of-code-70b7d87b0030
-###
+# and this: https://github.com/fg91/visualizing-cnn-feature-maps/blob/master/Calculate_mean_activation_per_filter_in_specific_layer_given_an_image.ipynb
 from models.FResiNet import FResiNet
 
 
@@ -35,6 +36,7 @@ class FilterPruner:
         self.filter_ranks = {}
         self.forward_res = {}
         self.activation_index = 0 # TODO remove
+        self.test_layer_activation = {} #TODO tata
         self.connection_count = {}
         self.connection_count_copy = {}
         self.features = []
@@ -57,6 +59,7 @@ class FilterPruner:
         self.activation_index = 0
         self.connection_count = {}
         self.connection_count_copy = {}
+        self.test_layer_activation = {} #TODO test
 
     def parse(self, node_id):
         # print("PARSE node_name: {}".format(node_id))
@@ -74,10 +77,15 @@ class FilterPruner:
             if isinstance(curr_module, torch.nn.modules.Linear):
                 x = x.view(x.size(0), -1)
 
+            out = curr_module(x)
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
                 self.conv_layer[node_id] = curr_module
+                means = torch.tensor([curr.view(-1).mean() for curr in out]).cuda()
+                if node_id not in self.test_layer_activation:
+                    self.test_layer_activation[node_id] = means
+                else:
+                    self.test_layer_activation[node_id] = self.test_layer_activation[node_id] + means
 
-            out = curr_module(x)
 
         res = None
         next_nodes = self.graph[node_id]
@@ -121,15 +129,33 @@ class FilterPruner:
             for node_name, curr_module in self.conv_layer.items():
                 if self.is_before_merge(node_name):
                     continue
-                grad = curr_module.weight.grad
-                activation = curr_module.weight
-                pdist = nn.PairwiseDistance(p=2)
-                out = pdist(activation, grad)
-                means2 = torch.tensor([x.view(-1).mean() for x in out]).cuda() #TODO I think it should be negative
+
+
+                # grad = curr_module.weight.grad
+                # activation = curr_module.weight
+                # pdist = nn.PairwiseDistance(p=2)
+                # out = pdist(activation, grad)
+                # means2 = torch.tensor([x.view(-1).mean() for x in out]).cuda() #TODO I think it should be negative
+                #
+                # pouet = self.test_layer_activation[node_name]
+                # diff = activation - pouet
+                # means4 = torch.tensor([x.view(-1).mean() for x in diff]).cuda()
+                #
+                # out2 = pdist(pouet, grad)
+                # means3 = torch.tensor([x.view(-1).sum() for x in grad]).cuda()  # TODO I think it should be negative
+
                 if node_name not in self.filter_ranks:
-                    self.filter_ranks[node_name] = means2
+                    self.filter_ranks[node_name] = self.test_layer_activation[node_name]
                 else:
-                    self.filter_ranks[node_name] = self.filter_ranks[node_name] + means2
+                    self.filter_ranks[node_name] = self.filter_ranks[node_name] + self.test_layer_activation[node_name]
+
+    def ramdom_filters(self, num):
+        data = []
+        for i in sorted(self.filter_ranks.keys()):
+            for j in range(self.filter_ranks[i].size(0)):
+                data.append((i, j, self.filter_ranks[i][j]))
+
+        return random.sample(data, num)
 
     def sort_filters(self, num):
         data = []
@@ -137,7 +163,9 @@ class FilterPruner:
             for j in range(self.filter_ranks[i].size(0)):
                 data.append((i, j, self.filter_ranks[i][j]))
 
-        return nsmallest(num, data, itemgetter(2))
+        # return random.sample(data, num)
+        # return nsmallest(num, data, itemgetter(2))
+        return nlargest(num, data, itemgetter(2))
 
     def is_before_merge(self, layer_id):
         next_id = self.graph[layer_id]

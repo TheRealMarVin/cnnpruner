@@ -87,9 +87,10 @@ def do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, prun
 
         loss = criterion(output, targets)
         loss.backward()
+
+        optimizer.step()
         if pruner is not None:
             pruner.extract_grad(output)
-        optimizer.step()
 
         if count is not None:
             count = count - 1
