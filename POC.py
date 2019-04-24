@@ -503,6 +503,13 @@ def exec_q3():
     exec_poc()
     exec_q3b()
 
+    #TODO must test resnet carefully
+    #TODO must do a super history
+    #TODO must plot super history
+    #TODO must plot cut line in super history
+    #TODO must code execution runs
+    #TODO test resnet properly
+
     # exec_poc2()
 
 
