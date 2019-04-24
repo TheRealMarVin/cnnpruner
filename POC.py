@@ -343,8 +343,8 @@ def common_training_code(model, pruned_save_path=None,
                          reuse_cut_filter=False,
                          max_percent_per_iteration=0.1,
                          prune_ratio=0.3,
-                         n_epoch=5,
-                         n_epoch_retrain=2):
+                         n_epoch=15,
+                         n_epoch_retrain=3):
     test_transform = transforms.Compose([transforms.Resize((224, 224)),
                                          transforms.ToTensor(),
                                          transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
@@ -449,7 +449,7 @@ def common_training_code(model, pruned_save_path=None,
 
 
 def exec_poc():
-    print("Proof of concept")
+    print("***alexnet")
     model = alexnetski(pretrained=True)
     model.cuda()
 
@@ -472,7 +472,7 @@ def exec_poc2():
 
 
 def exec_q3b():
-    print("question 3b")
+    print("***resnet")
 
     model = models.resnet18(pretrained=True)
     num_ftrs = model.fc.in_features
@@ -490,14 +490,15 @@ def exec_q3b():
 
     #TODO reuse_cut_filter must be false
     common_training_code(model, pruned_save_path="../saved/resnet/Prunedresnet.pth,",
-                         best_result_save_path="../saved/resnet/resnet18.pth",
+                         # best_result_save_path="../saved/resnet/resnet18.pth",
                          sample_run=torch.zeros([1, 3, 224, 224]),
                          reuse_cut_filter=False)
 
 
 def exec_q3():
-    # exec_q3b()
     exec_poc()
+    exec_q3b()
+
     # exec_poc2()
 
 
