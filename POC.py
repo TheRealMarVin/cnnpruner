@@ -29,7 +29,7 @@ from models.FResiNet import FResiNet
 class FilterPruner:
     def __init__(self, model, sample_run):
         self.model = model
-        self.activations = {}
+        self.activations = {} #TODO remove?
         self.gradients = []
         self.grad_index = 0 # TODO remove
         self.conv_layer = {}
@@ -37,7 +37,7 @@ class FilterPruner:
         self.filter_ranks = {}
         self.forward_res = {}
         self.activation_index = 0 # TODO remove
-        self.test_layer_activation = {} #TODO tata
+        self.test_layer_activation = {} #TODO remove
         self.connection_count = {}
         self.connection_count_copy = {}
         self.features = []
@@ -81,18 +81,14 @@ class FilterPruner:
             out = curr_module(x)
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
                 self.conv_layer[node_id] = curr_module
-                # means = torch.tensor([curr.view(-1).mean() for curr in out]).cuda()
                 average_per_batch_item = torch.tensor([[curr.view(-1).mean() for curr in batch_item] for batch_item in out])
                 activation_average_sum = torch.sum(average_per_batch_item, dim=0)
 
                 val = activation_average_sum.cuda()
-                # means = torch.tensor([out[0,i].mean().item() for i in range(out.shape[0])], requires_grad=True).cuda() #TODO not sure I need grad at all here!
-                # self.test_layer_activation[node_id] = means
-                if node_id not in self.test_layer_activation:
-                    self.test_layer_activation[node_id] = val
+                if node_id not in self.filter_ranks:
+                    self.filter_ranks[node_id] = val
                 else:
-                    self.test_layer_activation[node_id] = self.test_layer_activation[node_id] + val
-
+                    self.filter_ranks[node_id] = self.filter_ranks[node_id] + val
 
         res = None
         next_nodes = self.graph[node_id]
@@ -131,32 +127,32 @@ class FilterPruner:
         x = self.parse(self.root)
         return x
 
-    #TODO most probably useless
-    def extract_filter_activation_mean(self, out):
-        with torch.no_grad():
-            for node_name, curr_module in self.conv_layer.items():
-                if self.is_before_merge(node_name):
-                    continue
-
-                # activations = self.test_layer_activation[node_name]
-                # mean_act = [activations.features[0, i].mean().item() for i in range(total_filters_in_layer)]
-                # grad = curr_module.weight.grad
-                # activation = curr_module.weight
-                # pdist = nn.PairwiseDistance(p=2)
-                # out = pdist(activation, grad)
-                # means2 = torch.tensor([x.view(-1).mean() for x in out]).cuda() #TODO I think it should be negative
-                #
-                # pouet = self.test_layer_activation[node_name]
-                # diff = activation - pouet
-                # means4 = torch.tensor([x.view(-1).mean() for x in diff]).cuda()
-                #
-                # out2 = pdist(pouet, grad)
-                # means3 = torch.tensor([x.view(-1).sum() for x in grad]).cuda()  # TODO I think it should be negative
-
-                if node_name not in self.filter_ranks:
-                    self.filter_ranks[node_name] = self.test_layer_activation[node_name]
-                else:
-                    self.filter_ranks[node_name] = self.filter_ranks[node_name] + self.test_layer_activation[node_name]
+    # #TODO most probably useless
+    # def extract_filter_activation_mean(self, out):
+    #     with torch.no_grad():
+    #         for node_name, curr_module in self.conv_layer.items():
+    #             if self.is_before_merge(node_name):
+    #                 continue
+    #
+    #             # activations = self.test_layer_activation[node_name]
+    #             # mean_act = [activations.features[0, i].mean().item() for i in range(total_filters_in_layer)]
+    #             # grad = curr_module.weight.grad
+    #             # activation = curr_module.weight
+    #             # pdist = nn.PairwiseDistance(p=2)
+    #             # out = pdist(activation, grad)
+    #             # means2 = torch.tensor([x.view(-1).mean() for x in out]).cuda() #TODO I think it should be negative
+    #             #
+    #             # pouet = self.test_layer_activation[node_name]
+    #             # diff = activation - pouet
+    #             # means4 = torch.tensor([x.view(-1).mean() for x in diff]).cuda()
+    #             #
+    #             # out2 = pdist(pouet, grad)
+    #             # means3 = torch.tensor([x.view(-1).sum() for x in grad]).cuda()  # TODO I think it should be negative
+    #
+    #             if node_name not in self.filter_ranks:
+    #                 self.filter_ranks[node_name] = self.test_layer_activation[node_name]
+    #             else:
+    #                 self.filter_ranks[node_name] = self.filter_ranks[node_name] + self.test_layer_activation[node_name]
 
     def ramdom_filters(self, num):
         data = []
@@ -206,13 +202,21 @@ class FilterPruner:
         filters_to_prune = self.sort_filters(num_filters_to_prune)
 
         filters_to_prune_per_layer = {}
-        for (l, f, _) in filters_to_prune:
-            if l not in filters_to_prune_per_layer:
-                filters_to_prune_per_layer[l] = []
-            filters_to_prune_per_layer[l].append(f)
+        for (node_id, f, _) in filters_to_prune:
+            if node_id not in filters_to_prune_per_layer:
+                filters_to_prune_per_layer[node_id] = []
+            filters_to_prune_per_layer[node_id].append(f)
 
-        for l in filters_to_prune_per_layer:
-            filters_to_prune_per_layer[l] = sorted(filters_to_prune_per_layer[l])
+        #test if we fully remove a layer
+        for node_id in filters_to_prune_per_layer:
+            layer_remove_count = len(filters_to_prune_per_layer[node_id])
+            in_filter_in_layer = self.conv_layer[node_id].in_channels
+            if layer_remove_count == in_filter_in_layer:
+                filters_to_prune_per_layer[node_id] = filters_to_prune_per_layer[node_id][:-1]
+
+        #sorting really makes the pruning faster
+        for node_id in filters_to_prune_per_layer:
+            filters_to_prune_per_layer[node_id] = sorted(filters_to_prune_per_layer[node_id])
 
         return filters_to_prune_per_layer
 
@@ -455,7 +459,7 @@ def exec_poc():
 
     # TODO reuse_cut_filter must be false
     common_training_code(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
-                         # best_result_save_path="../saved/alex/alexnet.pth",
+                         best_result_save_path="../saved/alex/alexnet.pth",
                          sample_run=torch.zeros([1, 3, 224, 224]),
                          reuse_cut_filter=False)
 
