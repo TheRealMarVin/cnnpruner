@@ -1,7 +1,7 @@
 import copy
 import os
 import random
-from heapq import nsmallest, nlargest
+from heapq import nsmallest
 from operator import itemgetter
 
 import numpy as np
@@ -18,6 +18,7 @@ from CustomDeepLib import train, test
 from ExecutionGraphHelper import generate_graph, get_input_connection_count_per_entry
 from FileHelper import load_obj, save_obj
 from ModelHelper import get_node_in_model, total_num_filters
+from deeplib_ext.history import History
 from models.AlexNetSki import alexnetski
 
 # TODO check this one!!! https://towardsdatascience.com/how-to-visualize-convolutional-features-in-40-lines-of-code-70b7d87b0030
@@ -362,7 +363,9 @@ def common_training_code(model, pruned_save_path=None,
     use_gpu = True
     n_epoch = 1
     n_epoch_retrain = 1
-    batch_size = 128 # TODO use 128
+    batch_size = 128
+
+    history = History()
 
     optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
     criterion = torch.nn.CrossEntropyLoss()
@@ -375,10 +378,11 @@ def common_training_code(model, pruned_save_path=None,
             if not retrain_if_weight_loaded:
                 should_train = False
     if should_train:
-        history = train(model, optimizer, train_dataset, n_epoch,
+        local_history = train(model, optimizer, train_dataset, n_epoch,
                         batch_size, use_gpu=use_gpu, criterion=criterion,
                         scheduler=scheduler, best_result_save_path=best_result_save_path)
-        history.display()
+        history.append(local_history)
+        # history.display()
 
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test:\n\tScore: {}'.format(test_score))
@@ -435,13 +439,15 @@ def common_training_code(model, pruned_save_path=None,
         torch.save(model, pruned_save_path)
 
         print("Fine tuning to recover from prunning iteration.")
-        history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu, criterion=None,
+        local_history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu, criterion=None,
               scheduler=scheduler, pruner=None)
-        history.display()
+        history.append(local_history)
+        # local_history.display()
         test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
         print('Test pruning iteration :{}\n\tScore: {}'.format(iteration_idx, test_score))
 
     ###
+    history.display()
 
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test Fin :\n\tScore: {}'.format(test_score))
