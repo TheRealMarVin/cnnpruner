@@ -337,11 +337,14 @@ class FilterPruner:
 ###
 
 def common_training_code(model, pruned_save_path=None,
-                         best_result_save_path=None, retrain_if_weight_loaded=False,
+                         best_result_save_path=None,
+                         retrain_if_weight_loaded=False,
                          sample_run=None,
                          reuse_cut_filter=False,
                          max_percent_per_iteration=0.1,
-                         prune_ratio=0.3):
+                         prune_ratio=0.3,
+                         n_epoch=5,
+                         n_epoch_retrain=2):
     test_transform = transforms.Compose([transforms.Resize((224, 224)),
                                          transforms.ToTensor(),
                                          transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
@@ -354,8 +357,8 @@ def common_training_code(model, pruned_save_path=None,
     model.cuda()
 
     use_gpu = True
-    n_epoch = 1
-    n_epoch_retrain = 1
+    # n_epoch = 1
+    # n_epoch_retrain = 1
     batch_size = 128
 
     history = History()
@@ -452,7 +455,7 @@ def exec_poc():
 
     # TODO reuse_cut_filter must be false
     common_training_code(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
-                         best_result_save_path="../saved/alex/alexnet.pth",
+                         # best_result_save_path="../saved/alex/alexnet.pth",
                          sample_run=torch.zeros([1, 3, 224, 224]),
                          reuse_cut_filter=False)
 
@@ -463,8 +466,7 @@ def exec_poc2():
 
     # TODO reuse_cut_filter must be false
     common_training_code(model, pruned_save_path="../saved/fresinet/PrunedFresinet.pth",
-                         # best_result_save_path=None,
-                         best_result_save_path="../saved/fresinet/fresinet.pth",
+                         # best_result_save_path="../saved/fresinet/fresinet.pth",
                          sample_run=torch.zeros([1, 3, 224, 224]),
                          reuse_cut_filter=True)
 
