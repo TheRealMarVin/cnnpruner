@@ -260,32 +260,26 @@ class FilterPruner:
                     self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count, effect_applied)
 
     def _prune_conv_output_filters(self, conv, filters_to_remove):
-        # TODO try not using cpu
         initial_filter_count = conv.out_channels
         conv.out_channels = conv.out_channels - len(filters_to_remove)
-        old_weights = conv.weight.data.cpu().detach()
-        # TODO make sure there is no overflow
+        old_weights = conv.weight.data.detach()
         new_weights = np.delete(old_weights, filters_to_remove, 0)
-        conv.weight.data = new_weights.cuda()
+        conv.weight.data = new_weights
         conv.weight._grad = None
 
         if conv.bias is not None:
-            # TODO try not using cpu
-            bias_numpy = conv.bias.data.cpu().detach()
-            # TODO make sure there is no overflow
+            bias_numpy = conv.bias.data.detach()
             new_bias_numpy = np.delete(bias_numpy, filters_to_remove, 0)
-            conv.bias.data = new_bias_numpy.cuda()
+            conv.bias.data = new_bias_numpy
             conv.bias._grad = None
 
         return initial_filter_count
 
     def _prune_conv_input_filters(self, conv, removed_filter, _):
-        # TODO try not using cpu
         conv.in_channels = conv.in_channels - len(removed_filter)
-        old_weights = conv.weight.data.cpu()
-        # TODO make sure there is no overflow
+        old_weights = conv.weight.data
         new_weights = np.delete(old_weights, removed_filter, 1)
-        conv.weight.data = new_weights.cuda()
+        conv.weight.data = new_weights
         # print("conc _ in _ old weight shape {} vs new weight shape {}".format(old_weights.shape, new_weights.shape))
         conv.weight._grad = None
 
@@ -296,10 +290,9 @@ class FilterPruner:
         batchnorm.weight.data = new_batch_weights
 
         if batchnorm.bias is not None:
-            # TODO try not using cpu
-            bias_numpy = batchnorm.bias.data.cpu().detach()
+            bias_numpy = batchnorm.bias.data.detach()
             new_bn_bias_numpy = np.delete(bias_numpy, removed_filter, 0)
-            batchnorm.bias.data = new_bn_bias_numpy.cuda()
+            batchnorm.bias.data = new_bn_bias_numpy
             batchnorm.bias._grad = None
 
         batchnorm.weight._grad = None
@@ -390,8 +383,8 @@ def common_training_code(model, pruned_save_path=None,
     ###
     pruner = FilterPruner(model, sample_run)
     number_of_filters = total_num_filters(model)
-    filter_to_prune = (int)(number_of_filters * prune_ratio)
-    max_filters_to_prune_on_iteration = (int)(number_of_filters * max_percent_per_iteration)
+    filter_to_prune = int(number_of_filters * prune_ratio)
+    max_filters_to_prune_on_iteration = int(number_of_filters * max_percent_per_iteration)
     if filter_to_prune < max_filters_to_prune_on_iteration:
         max_filters_to_prune_on_iteration = filter_to_prune
     iterations = (filter_to_prune//max_filters_to_prune_on_iteration) + 1
@@ -409,7 +402,6 @@ def common_training_code(model, pruned_save_path=None,
             prune_targets = load_obj("filters_dic")
 
         if prune_targets is None:
-            #TODO should use less batch in an epoch and bigger batch size
             train(model, optimizer, train_dataset, 1, batch_size, use_gpu=use_gpu, criterion=criterion,
                   scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
 

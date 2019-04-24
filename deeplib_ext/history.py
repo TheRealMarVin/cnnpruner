@@ -18,7 +18,7 @@ class History:
             self.TRAIN_LOSS: [],
             self.VAL_LOSS: [],
             self.LR: [],
-            self.STEP: []
+            self.STEP_ID: []
         }
 
     def save(self, train_acc, val_acc, train_loss, val_loss, lr):
@@ -29,12 +29,12 @@ class History:
         self.history[self.LR].append(lr)
 
     def append(self, history):
-        self.STEP.append(len(self.history[self.TRAIN_ACC_KEY]))
-        self.history[self.TRAIN_ACC_KEY].extend(history[self.TRAIN_ACC_KEY])
-        self.history[self.VAL_ACC_KEY].append(history[self.VAL_ACC_KEY])
-        self.history[self.TRAIN_LOSS].append(history[self.TRAIN_LOSS])
-        self.history[self.VAL_LOSS].append(history[self.VAL_LOSS])
-        self.history[self.LR].append(history[self.LR])
+        self.history[self.STEP_ID].append(len(self.history[self.TRAIN_ACC_KEY]))
+        self.history[self.TRAIN_ACC_KEY].extend(history.history[self.TRAIN_ACC_KEY])
+        self.history[self.VAL_ACC_KEY].extend(history.history[self.VAL_ACC_KEY])
+        self.history[self.TRAIN_LOSS].extend(history.history[self.TRAIN_LOSS])
+        self.history[self.VAL_LOSS].extend(history.history[self.VAL_LOSS])
+        self.history[self.LR].extend(history.history[self.LR])
 
     def display_accuracy(self):
         epoch = len(self.history[self.TRAIN_ACC_KEY])
