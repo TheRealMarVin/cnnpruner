@@ -438,6 +438,8 @@ def common_training_code(model, pruned_save_path=None,
         history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu, criterion=None,
               scheduler=scheduler, pruner=None)
         history.display()
+        test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
+        print('Test pruning iteration :{}\n\tScore: {}'.format(iteration_idx, test_score))
 
     ###
 
