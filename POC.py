@@ -80,11 +80,17 @@ class FilterPruner:
             out = curr_module(x)
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
                 self.conv_layer[node_id] = curr_module
-                means = torch.tensor([curr.view(-1).mean() for curr in out]).cuda()
+                # means = torch.tensor([curr.view(-1).mean() for curr in out]).cuda()
+                average_per_batch_item = torch.tensor([[curr.view(-1).mean() for curr in batch_item] for batch_item in out])
+                activation_average_sum = torch.sum(average_per_batch_item, dim=0)
+
+                val = activation_average_sum.cuda()
+                # means = torch.tensor([out[0,i].mean().item() for i in range(out.shape[0])], requires_grad=True).cuda() #TODO not sure I need grad at all here!
+                # self.test_layer_activation[node_id] = means
                 if node_id not in self.test_layer_activation:
-                    self.test_layer_activation[node_id] = means
+                    self.test_layer_activation[node_id] = val
                 else:
-                    self.test_layer_activation[node_id] = self.test_layer_activation[node_id] + means
+                    self.test_layer_activation[node_id] = self.test_layer_activation[node_id] + val
 
 
         res = None
@@ -124,13 +130,15 @@ class FilterPruner:
         x = self.parse(self.root)
         return x
 
-    def extract_grad(self, out):
+    #TODO most probably useless
+    def extract_filter_activation_mean(self, out):
         with torch.no_grad():
             for node_name, curr_module in self.conv_layer.items():
                 if self.is_before_merge(node_name):
                     continue
 
-
+                # activations = self.test_layer_activation[node_name]
+                # mean_act = [activations.features[0, i].mean().item() for i in range(total_filters_in_layer)]
                 # grad = curr_module.weight.grad
                 # activation = curr_module.weight
                 # pdist = nn.PairwiseDistance(p=2)
@@ -164,8 +172,8 @@ class FilterPruner:
                 data.append((i, j, self.filter_ranks[i][j]))
 
         # return random.sample(data, num)
-        # return nsmallest(num, data, itemgetter(2))
-        return nlargest(num, data, itemgetter(2))
+        return nsmallest(num, data, itemgetter(2))
+        # return nlargest(num, data, itemgetter(2))
 
     def is_before_merge(self, layer_id):
         next_id = self.graph[layer_id]
@@ -354,7 +362,7 @@ def common_training_code(model, pruned_save_path=None,
     use_gpu = True
     n_epoch = 1
     n_epoch_retrain = 1
-    batch_size = 128
+    batch_size = 128 # TODO use 128
 
     optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
     criterion = torch.nn.CrossEntropyLoss()
@@ -398,7 +406,7 @@ def common_training_code(model, pruned_save_path=None,
 
         if prune_targets is None:
             #TODO should use less batch in an epoch and bigger batch size
-            train(model, optimizer, train_dataset, 1, 64, use_gpu=use_gpu, criterion=criterion,
+            train(model, optimizer, train_dataset, 1, batch_size, use_gpu=use_gpu, criterion=criterion,
                   scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
 
             pruner.normalize_layer()
