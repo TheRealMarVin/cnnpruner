@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 
 
 class History:
-    TRAIN_ACC_KEY = "train_acc"
-    VAL_ACC_KEY = "val_acc"
-    TRAIN_LOSS = "train_loss"
-    VAL_LOSS = "val_loss"
-    LR = "lr"
-    STEP_ID = "step"
-    TRAINING_TIME = "training_time"
+    TRAIN_ACC_KEY = "Train Accuracy"
+    VAL_ACC_KEY = "Validation Accuracy"
+    TRAIN_LOSS = "Train Loss"
+    VAL_LOSS = "Val Loss"
+    LR = "Learning Rate"
+    STEP_ID = "Step"
+    TRAINING_TIME = "Training Time"
 
     def __init__(self):
         self.history = {
