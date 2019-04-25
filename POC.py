@@ -337,8 +337,8 @@ def common_training_code(model,
                          max_percent_per_iteration=0.1,
                          prune_ratio=0.3,
                          n_epoch=10,
-                         n_epoch_retrain=5,
-                         n_epoch_after=0):
+                         n_epoch_retrain=3,
+                         n_epoch_total=20):
     test_transform = transforms.Compose([transforms.Resize((224, 224)),
                                          transforms.ToTensor(),
                                          transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
@@ -370,69 +370,73 @@ def common_training_code(model,
                               batch_size, use_gpu=use_gpu, criterion=criterion,
                               scheduler=scheduler, best_result_save_path=best_result_save_path)
         history.append(local_history)
+        n_epoch_total = n_epoch_total - n_epoch
         # history.display()
 
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test:\n\tScore: {}'.format(test_score))
 
     ###
-    pruner = FilterPruner(model, sample_run)
-    number_of_filters = total_num_filters(model)
-    filter_to_prune = int(number_of_filters * prune_ratio)
-    max_filters_to_prune_on_iteration = int(number_of_filters * max_percent_per_iteration)
-    if filter_to_prune < max_filters_to_prune_on_iteration:
-        max_filters_to_prune_on_iteration = filter_to_prune
-    iterations = (filter_to_prune//max_filters_to_prune_on_iteration)
-    print("{} iterations to reduce {:2.2f}% filters".format(iterations, prune_ratio*100))
+    #TODO maybe put the loop content in a function that looks terrible now
+    if prune_ratio is not None:
+        pruner = FilterPruner(model, sample_run)
+        number_of_filters = total_num_filters(model)
+        filter_to_prune = int(number_of_filters * prune_ratio)
+        max_filters_to_prune_on_iteration = int(number_of_filters * max_percent_per_iteration)
+        if filter_to_prune < max_filters_to_prune_on_iteration:
+            max_filters_to_prune_on_iteration = filter_to_prune
+        iterations = (filter_to_prune//max_filters_to_prune_on_iteration)
+        print("{} iterations to reduce {:2.2f}% filters".format(iterations, prune_ratio*100))
 
-    for param in model.parameters():
-        param.requires_grad = True
+        for param in model.parameters():
+            param.requires_grad = True
 
-    for iteration_idx in range(iterations):
-        print("Perform pruning iteration: {}".format(iteration_idx))
-        pruner.reset()
+        for iteration_idx in range(iterations):
+            print("Perform pruning iteration: {}".format(iteration_idx))
+            pruner.reset()
 
-        prune_targets = None
-        if reuse_cut_filter:
-            prune_targets = load_obj("filters_dic")
-
-        if prune_targets is None:
-            train(model, optimizer, train_dataset, 1, batch_size, use_gpu=use_gpu, criterion=criterion,
-                  scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
-
-            pruner.normalize_layer()
-
-            prune_targets = pruner.plan_prunning(max_filters_to_prune_on_iteration)
+            prune_targets = None
             if reuse_cut_filter:
-                save_obj(prune_targets, "filters_dic")
+                prune_targets = load_obj("filters_dic")
 
-        pruner.display_pruning_log(prune_targets)
+            if prune_targets is None:
+                train(model, optimizer, train_dataset, 1, batch_size, use_gpu=use_gpu, criterion=criterion,
+                      scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
 
-        print("Pruning filters.. ")
-        model = model.cpu()
-        pruner.prune(prune_targets)
+                pruner.normalize_layer()
 
-        model = model.cuda()
-        optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
-        pruner.reset()
+                prune_targets = pruner.plan_prunning(max_filters_to_prune_on_iteration)
+                if reuse_cut_filter:
+                    save_obj(prune_targets, "filters_dic")
 
-        print("Filters pruned {}%".format(100 - (100 * float(total_num_filters(model)) / number_of_filters)))
-        new_test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
-        print('Test:\n\tpost prune Score: {}'.format(new_test_score))
+            pruner.display_pruning_log(prune_targets)
 
-        basedir = os.path.dirname(pruned_save_path)
-        if not os.path.exists(basedir):
-            os.makedirs(basedir)
-        torch.save(model, pruned_save_path)
+            print("Pruning filters.. ")
+            model = model.cpu()
+            pruner.prune(prune_targets)
 
-        print("Fine tuning to recover from prunning iteration.")
-        local_history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu,
-                              criterion=None, scheduler=scheduler, pruner=None,
-                              best_result_save_path=pruned_best_result_save_path)
-        history.append(local_history)
-        # local_history.display()
-        test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
-        print('Test pruning iteration :{}\n\tScore: {}'.format(iteration_idx, test_score))
+            model = model.cuda()
+            optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
+            pruner.reset()
+
+            print("Filters pruned {}%".format(100 - (100 * float(total_num_filters(model)) / number_of_filters)))
+            new_test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
+            print('Test:\n\tpost prune Score: {}'.format(new_test_score))
+
+            basedir = os.path.dirname(pruned_save_path)
+            if not os.path.exists(basedir):
+                os.makedirs(basedir)
+            torch.save(model, pruned_save_path)
+
+            print("Fine tuning to recover from prunning iteration.")
+            local_history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu,
+                                  criterion=None, scheduler=scheduler, pruner=None,
+                                  best_result_save_path=pruned_best_result_save_path)
+            n_epoch_total = n_epoch_total - n_epoch_retrain
+            history.append(local_history)
+            # local_history.display()
+            test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
+            print('Test pruning iteration :{}\n\tScore: {}'.format(iteration_idx, test_score))
 
     ###
     history.display()
@@ -440,8 +444,8 @@ def common_training_code(model,
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test Fin :\n\tScore: {}'.format(test_score))
 
-    if n_epoch_after > 0:
-        local_history = train(model, optimizer, train_dataset, n_epoch_after,
+    if n_epoch_total > 0:
+        local_history = train(model, optimizer, train_dataset, n_epoch_total,
                               batch_size, use_gpu=use_gpu, criterion=criterion,
                               scheduler=scheduler, best_result_save_path=pruned_best_result_save_path)
         history.append(local_history)
@@ -449,69 +453,93 @@ def common_training_code(model,
     return history
 
 
-def exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.3):
+def exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.3, n_epoch=10):
     print("***alexnet")
     model = alexnetski(pretrained=True)
     model.cuda()
 
-    # TODO reuse_cut_filter must be false
-    history = common_training_code(model, pruned_save_path="saved/alex/PrunedAlexnet.pth",
-                                   # best_result_save_path="saved/alex/alexnet.pth",
-                                   pruned_best_result_save_path="saved/alex/alexnet_pruned.pth",
+    history = common_training_code(model, pruned_save_path="saved/alex{}/PrunedAlexnet.pth".format(prune_ratio),
+                                   # best_result_save_path="saved/alex{}/alexnet.pth".format(prune_ratio),
+                                   pruned_best_result_save_path="saved/alex{}/alexnet_pruned.pth".format(prune_ratio),
                                    sample_run=torch.zeros([1, 3, 224, 224]),
                                    reuse_cut_filter=False,
                                    max_percent_per_iteration=max_percent_per_iteration,
                                    prune_ratio=prune_ratio,
-                                   n_epoch=1,
-                                   n_epoch_retrain=1,
-                                   n_epoch_after=1)
+                                   n_epoch=n_epoch,
+                                   n_epoch_retrain=2,
+                                   n_epoch_total=20)
 
     return history
 
-# def exec_poc2():
-#     print("Proof of concept")
-#     model = FResiNet(BasicBlock, [2, 2, 2])
-#     model.cuda()
-#
-#     # TODO reuse_cut_filter must be false
-#     common_training_code(model, pruned_save_path="saved/fresinet/PrunedFresinet.pth",
-#                          # best_result_save_path="saved/fresinet/fresinet.pth",
-#                          sample_run=torch.zeros([1, 3, 224, 224]),
-#                          reuse_cut_filter=True)
 
-
-def exec_q3b():
-    print("***resnet")
+def exec_resnet18():
+    print("***resnet 18")
 
     model = models.resnet18(pretrained=True)
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, 10)
-    model.conv1.requires_grad = False
-    model.bn1.requires_grad = False
-    model.relu.requires_grad = False
-    model.maxpool.requires_grad = False
-    model.layer1.requires_grad = False
-    model.layer2.requires_grad = False
-    model.layer3.requires_grad = False
-    model.layer4.requires_grad = False
 
     model.cuda()
 
-    #TODO reuse_cut_filter must be false
-    history = common_training_code(model, pruned_save_path="saved/resnet/Prunedresnet.pth,",
-                                   # best_result_save_path="saved/resnet/resnet18.pth",
+    history = common_training_code(model, pruned_save_path="saved/resnet18/Prunedresnet.pth,",
+                                   # best_result_save_path="saved/resnet18/resnet18.pth",
+                                   pruned_best_result_save_path="saved/resnet18 /resnet18_pruned.pth",
                                    sample_run=torch.zeros([1, 3, 224, 224]),
                                    reuse_cut_filter=False)
     return history
 
+
+def exec_resnet34():
+    print("***resnet 34")
+
+    model = models.resnet34(pretrained=True)
+    num_ftrs = model.fc.in_features
+    model.fc = nn.Linear(num_ftrs, 10)
+
+    model.cuda()
+
+    history = common_training_code(model, pruned_save_path="saved/resnet34/Prunedresnet.pth,",
+                                   # best_result_save_path="saved/resnet34/resnet18.pth",
+                                   pruned_best_result_save_path="saved/resnet34/resnet34_pruned.pth",
+                                   sample_run=torch.zeros([1, 3, 224, 224]),
+                                   reuse_cut_filter=False)
+    return history
+
+def exec_resnet50():
+    print("***resnet 50")
+
+    model = models.resnet50(pretrained=True)
+    num_ftrs = model.fc.in_features
+    model.fc = nn.Linear(num_ftrs, 10)
+
+    model.cuda()
+
+    history = common_training_code(model, pruned_save_path="saved/resnet50/Prunedresnet.pth,",
+                                   # best_result_save_path="saved/resnet50/resnet18.pth",
+                                   pruned_best_result_save_path="saved/resnet50/resnet50_pruned.pth",
+                                   sample_run=torch.zeros([1, 3, 224, 224]),
+                                   reuse_cut_filter=False)
+    return history
+
+
 def run_startegy_prune_compare():
     multi_history = MultiHistory()
-    h = exec_q3b()
-    multi_history.append_history("Resnet", h)
+    h = exec_resnet18()
+    multi_history.append_history("Resnet 18", h)
+    h = exec_resnet34()
+    multi_history.append_history("Resnet 34", h)
+    h = exec_resnet50()
+    multi_history.append_history("Resnet 50", h)
+    h = exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.2)
+    multi_history.append_history("Alexnet", h)
+    save_obj(multi_history, "history_compare")
     multi_history.display_single_key(History.VAL_ACC_KEY)
+
 
 def run_alex_prune_compare():
     multi_history = MultiHistory()
+    h = exec_alexnet(max_percent_per_iteration=0.0, prune_ratio=None, n_epoch=20)
+    multi_history.append_history("Alexnet 0%", h)
     h = exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.1)
     multi_history.append_history("Alexnet 10%-1", h)
     h = exec_alexnet(max_percent_per_iteration=0.3, prune_ratio=0.3)
@@ -522,12 +550,8 @@ def run_alex_prune_compare():
     multi_history.append_history("Alexnet 50%-2", h)
     h = exec_alexnet(max_percent_per_iteration=0.25, prune_ratio=0.75)
     multi_history.append_history("Alexnet 75%-3", h)
+    save_obj(multi_history, "history_alex")
     multi_history.display_single_key(History.VAL_ACC_KEY)
-
-    #TODO must code execution runs
-
-
-    # exec_poc2()
 
 
 if __name__ == '__main__':
