@@ -12,11 +12,12 @@ from torch.autograd import Variable
 from torch.utils import model_zoo
 
 from deeplib.datasets import train_valid_loaders
-from deeplib.history import History
 from deeplib.training import validate
 from matplotlib import pyplot as plt
 from torch.utils.data import SequentialSampler
 from torchvision.transforms import ToTensor
+
+from deeplib_ext.history import History
 
 
 def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, scheduler=None,
@@ -44,10 +45,11 @@ def train(model, optimizer, dataset, n_epoch, batch_size, use_gpu=True, schedule
         if should_validate:
             train_acc, train_loss = validate(model, train_loader, use_gpu)
             val_acc, val_loss = validate(model, val_loader, use_gpu)
-            history.save(train_acc, val_acc, train_loss, val_loss, optimizer.param_groups[0]['lr'])
+            train_time = end - start
+            history.save(train_acc, val_acc, train_loss, val_loss, optimizer.param_groups[0]['lr'], train_time)
             print(
                 'Epoch {} - Train acc: {:.2f} - Val acc: {:.2f} - Train loss: {:.4f} - Val loss: {:.4f} - Training time: {:.2f}s'.format(
-                    i, train_acc, val_acc, train_loss, val_loss, end - start))
+                    i, train_acc, val_acc, train_loss, val_loss, train_time))
 
         if best_result_save_path is not None \
                 and val_acc > highest_score:

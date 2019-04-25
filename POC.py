@@ -14,10 +14,11 @@ from torchvision.datasets import CIFAR10
 from torchvision.models.resnet import BasicBlock
 from torchvision.transforms import transforms
 
-from CustomDeepLib import train, test
+from deeplib_ext.CustomDeepLib import train, test
 from ExecutionGraphHelper import generate_graph, get_input_connection_count_per_entry
 from FileHelper import load_obj, save_obj
 from ModelHelper import get_node_in_model, total_num_filters
+from deeplib_ext.MultiHistory import MultiHistory
 from deeplib_ext.history import History
 from models.AlexNetSki import alexnetski
 
@@ -346,9 +347,9 @@ def common_training_code(model, pruned_save_path=None,
                          sample_run=None,
                          reuse_cut_filter=False,
                          max_percent_per_iteration=0.1,
-                         prune_ratio=0.3,
-                         n_epoch=15,
-                         n_epoch_retrain=3):
+                         prune_ratio=0.1,
+                         n_epoch=3,
+                         n_epoch_retrain=1):
     test_transform = transforms.Compose([transforms.Resize((224, 224)),
                                          transforms.ToTensor(),
                                          transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
@@ -379,13 +380,15 @@ def common_training_code(model, pruned_save_path=None,
                 should_train = False
     if should_train:
         local_history = train(model, optimizer, train_dataset, n_epoch,
-                        batch_size, use_gpu=use_gpu, criterion=criterion,
-                        scheduler=scheduler, best_result_save_path=best_result_save_path)
+                              batch_size, use_gpu=use_gpu, criterion=criterion,
+                              scheduler=scheduler, best_result_save_path=best_result_save_path)
         history.append(local_history)
         # history.display()
 
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test:\n\tScore: {}'.format(test_score))
+
+    return history
 
     ###
     pruner = FilterPruner(model, sample_run)
@@ -438,8 +441,8 @@ def common_training_code(model, pruned_save_path=None,
         torch.save(model, pruned_save_path)
 
         print("Fine tuning to recover from prunning iteration.")
-        local_history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu, criterion=None,
-              scheduler=scheduler, pruner=None)
+        local_history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu,
+                              criterion=None, scheduler=scheduler, pruner=None, best_result_save_path="")
         history.append(local_history)
         # local_history.display()
         test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
@@ -451,6 +454,8 @@ def common_training_code(model, pruned_save_path=None,
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test Fin :\n\tScore: {}'.format(test_score))
 
+    return history
+
 
 def exec_poc():
     print("***alexnet")
@@ -458,10 +463,11 @@ def exec_poc():
     model.cuda()
 
     # TODO reuse_cut_filter must be false
-    common_training_code(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
-                         best_result_save_path="../saved/alex/alexnet.pth",
-                         sample_run=torch.zeros([1, 3, 224, 224]),
-                         reuse_cut_filter=False)
+    history = common_training_code(model, pruned_save_path="../saved/alex/PrunedAlexnet.pth",
+                                   # best_result_save_path="../saved/alex/alexnet.pth",
+                                   sample_run=torch.zeros([1, 3, 224, 224]),
+                                   reuse_cut_filter=False)
+    return history
 
 def exec_poc2():
     print("Proof of concept")
@@ -493,15 +499,22 @@ def exec_q3b():
     model.cuda()
 
     #TODO reuse_cut_filter must be false
-    common_training_code(model, pruned_save_path="../saved/resnet/Prunedresnet.pth,",
-                         # best_result_save_path="../saved/resnet/resnet18.pth",
-                         sample_run=torch.zeros([1, 3, 224, 224]),
-                         reuse_cut_filter=False)
+    history = common_training_code(model, pruned_save_path="../saved/resnet/Prunedresnet.pth,",
+                                   # best_result_save_path="../saved/resnet/resnet18.pth",
+                                   sample_run=torch.zeros([1, 3, 224, 224]),
+                                   reuse_cut_filter=False)
+    return history
 
 
 def exec_q3():
-    exec_poc()
-    exec_q3b()
+    multi_history = MultiHistory()
+    h = exec_poc()
+    multi_history.append_history("Alexnet", h)
+    h = exec_poc()
+    multi_history.append_history("Alexnet2", h)
+    # h = exec_q3b()
+    # multi_history.append_history("Resnet", h)
+    multi_history.display_single_key(History.VAL_ACC_KEY)
 
     #TODO must test resnet carefully
     #TODO must do a super history

@@ -1,32 +1,33 @@
 import matplotlib.pyplot as plt
-from IPython.display import clear_output
 
 
 class History:
+    TRAIN_ACC_KEY = "train_acc"
+    VAL_ACC_KEY = "val_acc"
+    TRAIN_LOSS = "train_loss"
+    VAL_LOSS = "val_loss"
+    LR = "lr"
+    STEP_ID = "step"
+    TRAINING_TIME = "training_time"
 
     def __init__(self):
-        self.TRAIN_ACC_KEY = "train_acc"
-        self.VAL_ACC_KEY = "val_acc"
-        self.TRAIN_LOSS = "train_loss"
-        self.VAL_LOSS = "val_loss"
-        self.LR = "lr"
-        self.STEP_ID = "step"
-
         self.history = {
             self.TRAIN_ACC_KEY: [],
             self.VAL_ACC_KEY: [],
             self.TRAIN_LOSS: [],
             self.VAL_LOSS: [],
             self.LR: [],
-            self.STEP_ID: []
+            self.STEP_ID: [],
+            self.TRAINING_TIME: []
         }
 
-    def save(self, train_acc, val_acc, train_loss, val_loss, lr):
+    def save(self, train_acc, val_acc, train_loss, val_loss, lr, time):
         self.history[self.TRAIN_ACC_KEY].append(train_acc)
         self.history[self.VAL_ACC_KEY].append(val_acc)
         self.history[self.TRAIN_LOSS].append(train_loss)
         self.history[self.VAL_LOSS].append(val_loss)
         self.history[self.LR].append(lr)
+        self.history[self.TRAINING_TIME].append(time)
 
     def append(self, history):
         self.history[self.STEP_ID].append(len(self.history[self.TRAIN_ACC_KEY]))
@@ -35,6 +36,7 @@ class History:
         self.history[self.TRAIN_LOSS].extend(history.history[self.TRAIN_LOSS])
         self.history[self.VAL_LOSS].extend(history.history[self.VAL_LOSS])
         self.history[self.LR].extend(history.history[self.LR])
+        self.history[self.TRAINING_TIME].extend(history.history[self.TRAINING_TIME])
 
     def display_accuracy(self):
         epoch = len(self.history[self.TRAIN_ACC_KEY])
