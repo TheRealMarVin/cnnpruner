@@ -42,7 +42,7 @@
 
 
 
-\title{\parbox{\linewidth}{\centering Pruning Filters To Optimize Transfer Learning}}
+\title{\parbox{\linewidth}{\centering Pruning Filters In Convolution Neural Network}}
 \institute{Department of Computer Science and Software Engineering, Université Laval}
 \author{Vincent Martineau}
 
@@ -81,226 +81,13 @@ We explore how reducing network expressivity can affect performance in Convoluti
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \column{0.6}
-\block{OOV handling net}{
+\block{Comparing Various level of Pruning in AlexNet}{
 
 \vspace{-15pt}
 % Comick v3.0 (TheFinalComick)
 \begin{center}
-\begin{tikzpicture}[
-          scale=1.5,
-          lstm_right/.style={draw, minimum width=1cm, minimum height=.5cm, inner sep=0pt, anchor=north, PaleGreen},
-          lstm_left/.style={draw, minimum width=1cm, minimum height=.5cm, inner sep=0pt, PaleBlue},
-          every path/.style={line width=\pathwidth},
-          every node/.append style={line width=\nodewidth}]
-  \def\w{1cm}
-  \def\h{2cm}
-  \def\y{-.2}
-  \def\scalespacetoken{1.5}
-  \def\scalespacecontext{2}
-  \def\oplstmdist{-1}
-  \def\wordToEmbed{-5mm}
-  \def\embedToLstm{-7mm}
-  \def\whiteLineWidth{15pt}
-
-  % \draw (-6,\y) -- (10,\y);
-  % Char embedding
-  \foreach \letter [count=\i] in {S, a, l, e, m}{
-    \pgfmathsetmacro\pos{\i-1}
-    \node[anchor=mid, inner sep=0](\letter) at (\scalespacetoken*\pos,0) {\letter};
-    \node[embed=charEmbedColor](\letter _embed) at (\scalespacetoken*\pos,\wordToEmbed){c};
-    \node[lstm_left](\letter _lstm_left) at ([yshift=\embedToLstm]\letter _embed.south) {};
-    \node[lstm_right](\letter _lstm_right) at (\letter _lstm_left.south) {};
-
-    \draw[-mytip] (\letter _embed) -- (\letter _lstm_left);
-  };
-
-  \draw[decorate,decoration={brace,amplitude=.6cm}]
-    ([yshift=1pt,xshift=-.15cm]S.north west) -- node[midway, yshift=12mm]{Unknown word} ([yshift=1pt,xshift=.15cm]m.north east);
-
-  % LSTM arrows
-  \foreach \a/\b in {S/a, a/l, l/e, e/m}{
-    \draw[mytip-, PaleBlue] (\a _lstm_left) -- (\b _lstm_left);
-    \draw[-mytip, PaleGreen] (\a _lstm_right) -- (\b _lstm_right);
-  };
-
-  \node[operator](cat_word) at ([yshift=\oplstmdist cm]l_lstm_right.south) {\large $\|$};
-  \draw[-mytip, rounded corners=\cornerCurvature, PaleBlue] (S_lstm_left.west) -| +(-.5,-.65) |- (cat_word);
-  \draw[-mytip, rounded corners=\cornerCurvature, PaleGreen] (m_lstm_right.east) -| +(.3,-.43) |- (cat_word);
-
-  % Left side
-  \def\leftcontdist{-.5*\scalespacecontext}
-  \foreach \word [count=\i] in {goalkeeper, which, goal, Syrian}{
-    \pgfmathsetmacro\pos{-\scalespacecontext*\i+\leftcontdist}
-    \node[anchor=mid, inner sep=0, baseline=0](\word) at (\pos,0) {\word};
-    \node[embed=Purple](\word _embed) at (\pos,\wordToEmbed){w};
-    \node[lstm_left](\word _lstm_left) at ([yshift=\embedToLstm]\word _embed.south) {};
-    \node[lstm_right](\word _lstm_right) at (\word _lstm_left.south) {};
-
-    \draw[-mytip] (\word _embed) -- (\word _lstm_left);
-  };
-
-  \foreach \a/\b in {Syrian/goal, goal/which, which/goalkeeper}{
-    \draw[mytip-, PaleBlue] (\a _lstm_left) -- (\b _lstm_left);
-    \draw[-mytip, PaleGreen] (\a _lstm_right) -- (\b _lstm_right);
-  };
-
-  \def\opdist{-2.2}
-
-  \path (Syrian_lstm_right.south west) -- (goalkeeper_lstm_right.south east) node[midway, operator, yshift=\opdist cm](cat_left) {\large $\|$};
-
-  \draw[-mytip, rounded corners=\cornerCurvature, PaleBlue] (Syrian_lstm_left.west) -| +(-.5,-.65) |- (cat_left);
-  \draw[-mytip, rounded corners=\cornerCurvature, PaleGreen] (goalkeeper_lstm_right.east) -| +(.3,-.43) |- (cat_left);
-  
-  \draw[decorate,decoration={brace,amplitude=.6cm}]
-    ([yshift=1pt,xshift=-.15cm]Syrian.north west) -- node[midway, yshift=12mm]{Left context} ([yshift=1pt,xshift=.15cm]goalkeeper.north east);
-
-  % Right side
-  \def\rightcontdist{3.5*\scalespacecontext}
-  \foreach \word/\tag [count=\i] in {Bitar, appeared, to, have}{
-    \pgfmathsetmacro\pos{\scalespacecontext*\i+\rightcontdist}
-    \node[anchor=mid, inner sep=0, baseline=0](\word) at (\pos,0) {\word};
-    \node[embed=Purple](\word _embed) at (\pos,\wordToEmbed){w};
-    \node[lstm_left](\word _lstm_left) at ([yshift=\embedToLstm]\word _embed.south) {};
-    \node[lstm_right](\word _lstm_right) at (\word _lstm_left.south) {};
-
-    \draw[-mytip] (\word _embed) -- (\word _lstm_left);
-  };
-
-  \foreach \a/\b in {Bitar/appeared, appeared/to, to/have}{
-    \draw[mytip-, PaleBlue] (\a _lstm_left) -- (\b _lstm_left);
-    \draw[-mytip, PaleGreen] (\a _lstm_right) -- (\b _lstm_right);
-  };
-
-  \draw[decorate,decoration={brace,amplitude=.6cm}]
-    ([yshift=1pt,xshift=-.15cm]Bitar.north west) -- node[midway, yshift=12mm]{Right context} ([yshift=1pt,xshift=.15cm]have.north east);
-
-  \def\decalage{-.0}
-  \pgfmathsetmacro\opdistright{\opdist + \decalage}
-  \path (Bitar_lstm_right.south west) -- (have_lstm_right.south east) node[midway, operator, yshift=\opdistright cm](cat_right) {\large $\|$};
-
-  \coordinate(mid) at ([yshift=.38cm]cat_right.north);
-  \draw[-mytip, rounded corners=\cornerCurvature, PaleGreen] (have_lstm_right.east) -| ++(.3,-.25) %node[fill]{}
-  |- ([yshift=-.15cm]mid) %node[fill]{}
-  -| ++(-2,-.3) %node[fill]{}
-  |- (cat_right);
-
-  \path (Bitar_lstm_left.west)
-  -| ++(-.5,-.33) coordinate(p1)
-  |- ([yshift=.15cm]mid) coordinate(p2)
-  -| ++(2,-.4) coordinate(p3)
-  |- (cat_right);
-  \draw[white, line width=\whiteLineWidth] (p2) -| (p3);
-  \draw[-mytip, rounded corners=\cornerCurvature, PaleBlue] (Bitar_lstm_left.west)
-  -| (p1)
-  |- (p2)
-  -| (p3)
-  |- (cat_right);
-  
-
-  % Head
-  \def\fcdist{-.5}
-  \pgfmathsetmacro\fcdistleft{\decalage + \fcdist}
-  % FCs
-  \draw[-mytip] (cat_left.south) -- ++(0,\fcdistleft) node[draw, anchor=north, rectangle split, rectangle split parts=2](fc_left) {Fully connected \nodepart{second} tanh};
-  \draw[-mytip] (cat_right.south) -- ++(0,\fcdist) node[draw, anchor=north, rectangle split, rectangle split parts=2](fc_right) {Fully connected \nodepart{second} tanh};
-  \draw[-mytip] (cat_word.south) -- ++(0,\fcdist) node[draw, anchor=north, rectangle split, rectangle split parts=2](fc_word) {Fully connected \nodepart{second} tanh};
-
-  % Attention module
-  \path ([yshift=2*\fcdist cm]fc_word.south west) -| node[pos=.25, operator, anchor=north, attentionColor](cat_att) {\Large $\|$} (fc_left.east);
-  \draw[-mytip, rounded corners=\cornerCurvature, attentionColor] (fc_word.south) |- ++(2*\fcdist,1*\fcdist) -| (cat_att.north);
-  \draw[-mytip, attentionColor] (cat_att.south) -- ++(0,\fcdist) node[draw, anchor=north, rectangle split, rectangle split parts=2, text=attentionColor!60!black](fc_att) {Fully connected \nodepart{second} softmax};
-
-  \draw[-mytip, rounded corners=\cornerCurvature, attentionColor] (fc_left.south) |- (cat_att);
-  \draw[-mytip, rounded corners=\cornerCurvature, attentionColor] (fc_right.south) |- (cat_att);
-
-  \def\softmaxShift{-.5}
-  % Ponderation
-  \path ([yshift=\softmaxShift cm]fc_att.west) -| node[attentionColor, midway, operator](pond_left) {\Large $\times$} (fc_left);
-  \draw[-mytip, attentionColor] ([yshift=\softmaxShift cm]fc_att.west) -- (pond_left);
-  \draw[-mytip] (fc_left) -- (pond_left);
-  
-  \path ([yshift=\softmaxShift cm]fc_att.east) -| node[attentionColor, midway, operator](pond_right) {\Large $\times$} (fc_right);
-  \draw[-mytip, attentionColor] ([yshift=\softmaxShift cm]fc_att.east) -- (pond_right);
-  \draw[-mytip] (fc_right) -- (pond_right);
-
-  \path ([yshift=1.5*\fcdist cm]fc_att.south) -| node[attentionColor, midway, operator](pond_word) {\Large $\times$} (fc_word);
-  \draw[-mytip, attentionColor, rounded corners=\cornerCurvature] (fc_att.south) |- (pond_word);
-
-  \draw[white, line width=\whiteLineWidth] ([yshift=2*\fcdist cm]fc_word.south) -- ([yshift=.5*\fcdist cm]pond_word);
-  \draw[-mytip] (fc_word) -- (pond_word);
-
-
-  % End
-  \draw[-mytip] (pond_word.south) -- ++(0,\fcdist) node[anchor=north, operator](plus) {\large $+$};
-  \draw[-mytip, rounded corners=\cornerCurvature] (pond_left) |- (plus);
-  \draw[-mytip, rounded corners=\cornerCurvature] (pond_right) |- (plus);
-
-
-  \node[draw, anchor=north](tanh-fc1) at ([yshift=\fcdist cm]plus.south) {Fully connected};
-
-  \node[draw, predEmbedColor, text=predEmbedColor!40!black, anchor=north] (output) at ([yshift=\fcdist cm]tanh-fc1.south) {Predicted embedding};
-  \draw[-mytip] (plus) -- (tanh-fc1);
-  \draw[-mytip] (tanh-fc1) -- (output);
-
-
-  % Legend
-  \begin{scope}[xshift=14cm, yshift=-9.5cm,
-          every path/.style={line width=\pathwidth},
-          every node/.append style={line width=\nodewidth}]
-  \def\legspace{-1.3}
-  \def\h{1.3cm}
-  % First col
-  \node[embed=charEmbedColor, anchor=center, minimum height=\h, minimum width=.8cm](leg char embed) at (0,0*\legspace) {c};
-  \node[anchor=west] at (.5,0*\legspace) {Character embedding};
-
-  \node[embed=Purple, anchor=center, minimum height=\h, minimum width=.8cm](leg word embed) at (0,1*\legspace) {w};
-  \node[anchor=west] at (.5,1*\legspace) {Word embedding};
-
-  \node[draw, PaleBlue, minimum width=1cm, inner sep=0pt, minimum height=.5cm, anchor=south] (leg lstm left) at (0,2*\legspace) {};
-  \node[draw, PaleGreen, minimum width=1cm, inner sep=0pt, minimum height=.5cm, anchor=north] (leg lstm right) at (leg lstm left.south) {};
-  \node[anchor=west] at (.5,2*\legspace) {Bidirectional LSTM};
-
-  \node[operator, minimum size=14mm](leg cat) at (0,3*\legspace) {$\|$};
-  \node[anchor=west] at (.5,3*\legspace) {Concatenation};
-
-  \node[operator, minimum size=14mm](leg plus) at (0,4*\legspace) {$+$};
-  \node[anchor=west, align=left] at (.5,4*\legspace) {Element-wise\\[-3pt] summation};
-
-  \node[operator, minimum size=14mm](leg mult) at (0,5*\legspace) {$\times$};
-  \node[anchor=west, align=left] at (.5,5*\legspace) {Multiplication\\[-3pt] by a constant};
-
-  \draw[attentionColor, line width=4pt] (-.35, 6*\legspace) -- (.35, 6*\legspace);
-  \node[anchor=west, align=left] at (.5, 6*\legspace) {Attention module};
-  \end{scope}
-
-\end{tikzpicture}
+	\includegraphics{figures/prune_ratio}
 \end{center}
 
 The net consists in 3 bi-LSTM taking as input the left context, the right context and the word characters. An attention module ponderates their outputs which are then combined in a last fully connected layer.
@@ -308,23 +95,12 @@ The net consists in 3 bi-LSTM taking as input the left context, the right contex
 }
 \end{columns}
 
-
-
-
-
-
-
-
-
-
-
 \begin{columns}
-
-\column{.2}
+\column{.6}
 
 
 % \block[bodyoffsety=48mm, titleoffsety=48mm]{Experiments}{
-\block[bodyoffsety=37mm, titleoffsety=37mm]{Experiments}{
+\block{Experiments}{
 
 \textbf{Set up:}
 \begin{itemize}
@@ -376,7 +152,7 @@ The net consists in 3 bi-LSTM taking as input the left context, the right contex
 }
 
 
-  \column{.8}
+  \column{.38}
   \block[bodyoffsety=0mm, titleoffsety=0mm]{Examples}{
   \vspace{-2mm}
   \begin{center}

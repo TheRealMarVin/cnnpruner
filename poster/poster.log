@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  23 APR 2019 20:57
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  24 APR 2019 20:50
 entering extended mode
 **./poster.tex
 (poster.tex
@@ -1285,25 +1285,29 @@ LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <43> not available
 (Font)              Font shape `T1/yvt/b/n' tried instead on input line 82.
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <29.86> not available
 (Font)              Font shape `T1/yvt/b/n' tried instead on input line 82.
-Missing character: There is no ; in font nullfont!
-Missing character: There is no ; in font nullfont!
-Missing character: There is no ; in font nullfont!
-Missing character: There is no ; in font nullfont!
-Missing character: There is no ; in font nullfont!
-Missing character: There is no ; in font nullfont!
+<figures/prune_ratio.png, id=29, 642.4pt x 481.8pt>
+File: figures/prune_ratio.png Graphic file (type png)
+<use figures/prune_ratio.png>
+Package pdftex.def Info: figures/prune_ratio.png  used on input line 95.
+(pdftex.def)             Requested size: 642.39844pt x 481.79881pt.
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <35.83> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 411.
-LaTeX Font Info:    Try loading font information for T1+aett on input line 411.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 187.
+LaTeX Font Info:    Try loading font information for T1+aett on input line 187.
 
 ("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/ae\t1aett.fd"
 File: t1aett.fd 1997/11/16 Font definitions for T1/aett.
 )
 
 LaTeX Font Warning: Font shape `T1/aett/bx/n' undefined
-(Font)              using `T1/aett/m/n' instead on input line 411.
+(Font)              using `T1/aett/m/n' instead on input line 187.
 
 LaTeX Font Info:    Font shape `T1/yvt/bx/it' in size <35.83> not available
-(Font)              Font shape `T1/yvt/b/it' tried instead on input line 411.
+(Font)              Font shape `T1/yvt/b/it' tried instead on input line 187.
+
+Overfull \hbox (966.00931pt too wide) in paragraph at lines 187--187
+ [] 
+ []
+
 Missing character: There is no g in font nullfont!
 Missing character: There is no r in font nullfont!
 Missing character: There is no a in font nullfont!
@@ -1953,7 +1957,7 @@ Missing character: There is no ; in font nullfont!
 [1
 
 {C:/Users/naked/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./figures/u
-l.pdf>] (poster.aux)
+l.pdf> <./figures/prune_ratio.png (PNG copy)>] (poster.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.5pt have occurred.
@@ -1963,27 +1967,25 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 21776 strings out of 492946
- 462119 string characters out of 3126267
- 669834 words of memory out of 3000000
- 25183 multiletter control sequences out of 15000+200000
+ 21221 strings out of 492946
+ 450304 string characters out of 3126267
+ 594477 words of memory out of 3000000
+ 24626 multiletter control sequences out of 15000+200000
  126593 words of font info for 109 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  62i,17n,85p,791b,1803s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/venturisadf
 /t1-f_f-venturisadf.enc}<C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts
-/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/naked/AppData/Local/Programs/MiKT
-eX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/naked/AppData/Local/
-Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt12.pfb><C:/Users/naked/A
-ppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols/msam10.pfb
+/type1/public/amsfonts/cm/cmtt12.pfb><C:/Users/naked/AppData/Local/Programs/MiK
+TeX 2.9/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Users/naked/AppData/
+Local/Programs/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtb8a.pfb><C:/Users/na
+ked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtbi8a.pfb
 ><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/arkandis/venturi
-s/yvtb8a.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/arka
-ndis/venturis/yvtbi8a.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fon
-ts/type1/arkandis/venturis/yvtr8a.pfb><C:/Users/naked/AppData/Local/Programs/Mi
-KTeX 2.9/fonts/type1/arkandis/venturis/yvtri8a.pfb>
-Output written on poster.pdf (1 page, 144678 bytes).
+s/yvtr8a.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/arka
+ndis/venturis/yvtri8a.pfb>
+Output written on poster.pdf (1 page, 143986 bytes).
 PDF statistics:
- 69 PDF objects out of 1000 (max. 8388607)
+ 62 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 114 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 119 words of extra memory for PDF output out of 10000 (max. 10000000)
 
