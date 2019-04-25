@@ -348,7 +348,7 @@ def common_training_code(model, pruned_save_path=None,
                          reuse_cut_filter=False,
                          max_percent_per_iteration=0.1,
                          prune_ratio=0.1,
-                         n_epoch=3,
+                         n_epoch=1,
                          n_epoch_retrain=1):
     test_transform = transforms.Compose([transforms.Resize((224, 224)),
                                          transforms.ToTensor(),
@@ -362,8 +362,6 @@ def common_training_code(model, pruned_save_path=None,
     model.cuda()
 
     use_gpu = True
-    # n_epoch = 1
-    # n_epoch_retrain = 1
     batch_size = 128
 
     history = History()
@@ -387,8 +385,6 @@ def common_training_code(model, pruned_save_path=None,
 
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test:\n\tScore: {}'.format(test_score))
-
-    return history
 
     ###
     pruner = FilterPruner(model, sample_run)
@@ -508,18 +504,15 @@ def exec_q3b():
 
 def exec_q3():
     multi_history = MultiHistory()
-    h = exec_poc()
-    multi_history.append_history("Alexnet", h)
-    h = exec_poc()
-    multi_history.append_history("Alexnet2", h)
-    # h = exec_q3b()
+    # h = exec_poc()
+    # multi_history.append_history("Alexnet", h)
+    # h = exec_poc()
+    # multi_history.append_history("Alexnet2", h)
+    h = exec_q3b()
     # multi_history.append_history("Resnet", h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
     #TODO must test resnet carefully
-    #TODO must do a super history
-    #TODO must plot super history
-    #TODO must plot cut line in super history
     #TODO must code execution runs
     #TODO test resnet properly
 
