@@ -524,9 +524,8 @@ def run_alex_prune_compare():
     multi_history.append_history("Alexnet 75%-3", h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
-    #TODO must test resnet carefully
     #TODO must code execution runs
-    #TODO test resnet properly
+
 
     # exec_poc2()
 

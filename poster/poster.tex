@@ -322,39 +322,14 @@ The net consists in 3 bi-LSTM taking as input the left context, the right contex
 
 
   \column{.3}
-  \block{Interpretability}
+  \block{Observation}
   {
-  \begin{center}
-  \setlength{\tabcolsep}{5mm}
-  \begin{tabular}{c c c c c c}
-  \toprule
-  \multirow{2}{*}{\textbf{Task}} & \multirow{2}{*}{\textbf{Tag}} & \multirow{2}{*}{\textbf{Ex.}} & \multicolumn{3}{c}{\textbf{Ponderation}}\\
-  \cline{4-6}
-  \addlinespace[3mm]
-  & & & Word & Left & Right\\
-  \midrule
-  \multirow{9}{*}{NER} & O           & 1039  & \colorbold{0.81}    & 0.08    & 0.11 \\
-  & B-PERS      & 63    & 0.21    & 0.31    & \colorbold{0.49} \\
-  & I-PER     & 119   & 0.16  & \colorbold{0.52} & 0.32 \\
-  & B-ORG     & 40  & 0.26  & 0.30  & \colorbold{0.44} \\ 
-  & I-ORG     & 3     & 0.27  & 0.31      & \colorbold{0.42} \\
-  & B-LOC     & 13  & 0.23      & 0.30  & \colorbold{0.47} \\
-  & I-LOC     & 2     & 0.16  & \colorbold{0.48} & 0.36 \\
-  & B-MISC      & 47  & \colorbold{0.40} & 0.21  & 0.39 \\
-  & I-MISC      & 5     & \colorbold{0.41} & 0.26  & 0.33 \\
-  \midrule
-  \multirow{5}{*}{POS} & NNP  & 308 & 0.29  & 0.31  & \colorbold{0.40} \\
-  & NN  & 46  & \colorbold{0.45} & 0.20  & 0.35 \\
-  & CD  & 827 & \colorbold{0.86} & 0.05  & 0.09 \\
-  & NNS & 23  & \colorbold{0.37} & 0.24  & \colorbold{0.39} \\
-  & JJ  & 100 & \colorbold{0.49} & 0.15  & 0.36 \\
-  \bottomrule
-  \end{tabular}
-  \end{center}
-  
-  \vspace{1.5mm}
-   Average weights assigned to word's characters, left context and right context by the attention mechanism. We can clearly see the shift of attention according to the target entity. We also observe that the attention depends on the task at hand.
-  \vspace{-3mm}
+   Not all convolutional layer can be pruned. Pruning layer before a residual connection is dangerous because both side of the residual connection must have the same side.
+  \newline
+  When pruning in a convolution layer it is important to propagate. So the next layer have the right input size. This apply to convolution, linear and batchnorm layers.
+  \newline
+  The algorithm used tend prefer removing filters that are deeper in the model and it is not uncommon to try to prune all filter in a layer.
+  \newline
   }
 
 

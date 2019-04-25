@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  24 APR 2019 20:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  24 APR 2019 21:48
 entering extended mode
 **./poster.tex
 (poster.tex
@@ -1954,6 +1954,11 @@ Missing character: There is no n in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
+
+Underfull \hbox (badness 10000) in paragraph at lines 333--333
+
+ []
+
 [1
 
 {C:/Users/naked/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./figures/u
@@ -1969,7 +1974,7 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 Here is how much of TeX's memory you used:
  21221 strings out of 492946
  450304 string characters out of 3126267
- 594477 words of memory out of 3000000
+ 590477 words of memory out of 3000000
  24626 multiletter control sequences out of 15000+200000
  126593 words of font info for 109 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1983,7 +1988,7 @@ ked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtbi8a.pfb
 ><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/arkandis/venturi
 s/yvtr8a.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/arka
 ndis/venturis/yvtri8a.pfb>
-Output written on poster.pdf (1 page, 143986 bytes).
+Output written on poster.pdf (1 page, 142761 bytes).
 PDF statistics:
  62 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
