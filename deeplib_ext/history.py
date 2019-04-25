@@ -70,7 +70,7 @@ class History:
         plt.show()
 
     def display(self):
-        epoch = len(self.history['train_acc'])
+        epoch = len(self.history[self.TRAIN_ACC_KEY])
         epochs = [x for x in range(1, epoch + 1)]
 
         fig, axes = plt.subplots(3, 1)
