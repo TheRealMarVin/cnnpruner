@@ -82,109 +82,48 @@ We explore how reducing network expressivity can affect performance in Convoluti
 
 }
 
-\column{0.6}
-\block{Comparing Various level of Pruning in AlexNet}{
+\column{0.30}
+\block{Comparing Various Level of Pruning}{
 
 \vspace{-15pt}
-% Comick v3.0 (TheFinalComick)
+
 \begin{center}
-	\includegraphics{figures/prune_ratio}
+	\includegraphics[width=15cm, height=15cm]{figures/prune_ratio}
 \end{center}
 
-The net consists in 3 bi-LSTM taking as input the left context, the right context and the word characters. An attention module ponderates their outputs which are then combined in a last fully connected layer.
+This graph compare various level of pruning. Each level of pruning is made on two iteration made after 10 epochs of training and 3 epochs or retraining. Pretrained weight were used to see the impact on transfer learning.
+}
 
+\column{0.30}
+\block{Comparing Pruning on  Multiple Models}{
+	
+	\vspace{-15pt}
+	
+\begin{center}
+	\includegraphics[width=15cm, height=15cm]{figures/various_models}
+\end{center}
+
+This graph explore the effect of pruning on different models. Each model shows the effect of pruning 20\% of the convolution filters in one step after 10 epochs of training. In this case transfer learning is not applied.
 }
 \end{columns}
 
 \begin{columns}
-\column{.6}
+\column{0.30}
+\block{Example of Network Reduction}{
+	
+\vspace{-15pt}
+\begin{figure}[H]
+	\includegraphics{figures/Alexnet_origin}
+\end{figure}
 
-
-% \block[bodyoffsety=48mm, titleoffsety=48mm]{Experiments}{
-\block{Experiments}{
-
-\textbf{Set up:}
-\begin{itemize}
-  \item Labeling tasks:
-  \begin{itemize}
-      \item \colorbold{Named Entity Recognition} (NER).
-      \item \colorbold{POS tagging} (POS).
-  \end{itemize}
-  \item Dataset: \colorbold{CoNLL 2003}
-  
-%   \item Two nets working together:
-%   \begin{itemize}
-%     \item One predicts OOV embeddings (see OOV handling net section).
-%     \item One predicts tags (see Labeling task section).
-%   \end{itemize}
-  % \item Baseline: randomly generated embeddings for OOV.
-\end{itemize}
-
-
-\textbf{Training details:}
-\begin{itemize}
-    \item Tensors sizes:
-    \begin{itemize}
-        \item Char. emb.: 20.
-        \item Word emb.: 100 (\colorbold{GloVe}).
-        \item LSTMs hidden state: 128.
-    \end{itemize}
-    \item Context size from 2 words to the whole sentence.
-    \item Standard learning rate on the labeling task parameters, reduced learning rate on Comick using SGD (0.01, 0.001).
-\end{itemize}
-
-
-% \textbf{Experiments:}
-% \begin{itemize}
-%   \item Performance gains:
-%   \begin{itemize}
-%     \item Comparison between accuracies for POS.
-%     \item Comparison between F1 scores for NER.
-%   \end{itemize}
-%   \item Interpretability:
-%   \begin{itemize}
-%     \item Comparison of the average weights given to the left context, right context and the words by the network by tags.
-%     \item Qualitative examples of where we observe a shift of attention according to the context.
-%   \end{itemize}
-% \end{itemize}
-
-\vspace{-.25mm}
-
+	
+	blablabla
 }
 
 
   \column{.38}
-  \block[bodyoffsety=0mm, titleoffsety=0mm]{Examples}{
-  \vspace{-2mm}
-  \begin{center}
-  \Large
-  % \resizebox{\textwidth}{!}{%
-  \setlength{\tabcolsep}{8pt}
-  \begin{tabular}{c c c c c c c c}
-  \toprule
-  \multirow{2}{*}{\textbf{Entity}} & \multicolumn{3}{c}{\textbf{Ponderation}} & \multirow{2}{*}{\textbf{Examples}}\\
-  \cline{2-4}
-  \addlinespace[2mm]
-  & Word & Left & Right & \\
-  \midrule
-  \texttt{PER} & 0.19 &  \colorbold{0.49} & 0.32 & \textbf{in sentencing darrel} \underline{\textit{voeks}} , 38 , to a 10-year prison term on thursday\\
-  \texttt{PER} & 0.15 &  \colorbold{0.59} & 0.26 &   \textbf{\texttt{<BOS>} australian parliamentarian john} \underline{\textit{langmore}} has formally resigned from his lower house\\
-  \texttt{PER} & 0.15 &  \colorbold{0.61} & 0.24 &  had received today \textbf{from mr john vance} \underline{\textit{langmore}} , a letter resigning his place as \\
-  \texttt{PER} & 0.15 &  \colorbold{0.69} & 0.16 &  \textbf{\texttt{<BOS>} rtrs - australian mp john} \underline{\textit{langmore}} formally resigns . \texttt{<EOS>}\\
-  \texttt{ORG} & 0.22 & \colorbold{0.46} & 0.32 &  the number of plastic surgeries in [...] the \textbf{brazilian plastic surgery society} ( \underline{\textit{sbcp}} ) , said ,\\
-  \texttt{ORG} & 0.28 & 0.23 & \colorbold{0.49} &  to increase them in the united states , " \underline{\textit{sbcp}} \textbf{vice-president oswaldo saldanha said}\\
-  \texttt{LOC} & 0.16 & 0.22 & \colorbold{0.62} &  some residents of the \underline{\textit{kazanluk}} \textbf{area are moslems who} converted to islam during \\
-  \texttt{LOC} & 0.20 & \colorbold{0.47} & 0.33 &  at a mosque in the \textbf{central bulgarian town of} \underline{\textit{kazanluk}} , causing damage but no injuries\\
-  \texttt{MISC} & \colorbold{0.68} & 0.11 & 0.21 &  freestyle \textbf{\underline{\textit{skiing-world}}} cup aerials results .\\
-  \texttt{MISC} & \colorbold{0.42} & 0.18 & \colorbold{0.40} & the \textbf{\underline{\textit{franco-african}} summit decided to send} a mission bangui [...] civil war .\\
-  %0.17 &  0.40 & \colorbold{0.43} &   \textbf{\texttt{<BOS>}} \textit{langmore} \textbf{, 57 , announced in november that}\\
-  \bottomrule
-  \end{tabular}
-  \end{center}
-  
-  \vspace{2mm}
-  Qualitative example on several OOV words (underlined). We can see that depending on the context and the target, the weights may shift drastically.
-  % \vspace{5.5mm}
+  \block[bodyoffsety=0mm, titleoffsety=0mm]{Algorithm and Settings}{
+
   }
   
 
@@ -330,6 +269,8 @@ The net consists in 3 bi-LSTM taking as input the left context, the right contex
   When pruning in a convolution layer it is important to propagate. So the next layer have the right input size. This apply to convolution, linear and batchnorm layers.
   \newline
   The algorithm used tend prefer removing filters that are deeper in the model and it is not uncommon to try to prune all filter in a layer.
+  \newline
+  When pruning it is important to reset optimizer.
   \newline
   }
 
