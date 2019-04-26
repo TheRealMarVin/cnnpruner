@@ -351,13 +351,17 @@ def common_training_code(model,
     model.cuda()
 
     use_gpu = True
-    batch_size = 128
+    batch_size = 32
+    learning_rate = 0.01
 
     history = History()
 
-    optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
+    optimizer = torch.optim.SGD(model.parameters(), learning_rate)
+    # optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
     criterion = torch.nn.CrossEntropyLoss()
-    scheduler = StepLR(optimizer, step_size=15, gamma=0.5)
+    scheduler = None
+    # scheduler = StepLR(optimizer, step_size=15, gamma=0.5)
+
     #
     should_train = True
     if best_result_save_path is not None:
@@ -416,7 +420,8 @@ def common_training_code(model,
             pruner.prune(prune_targets)
 
             model = model.cuda()
-            optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
+            # optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.007)
+            optimizer = torch.optim.SGD(model.parameters(), learning_rate)
             pruner.reset()
 
             print("Filters pruned {}%".format(100 - (100 * float(total_num_filters(model)) / number_of_filters)))
@@ -472,7 +477,47 @@ def exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.3, n_epoch=10):
     return history
 
 
-def exec_resnet18():
+def exec_dense_net(max_percent_per_iteration=0.1, prune_ratio=0.3, n_epoch=10):
+    print("***densenet121")
+
+    model = models.densenet121(num_classes=10)
+
+    model.cuda()
+
+    history = common_training_code(model, pruned_save_path="saved/resnet18/Prunedresnet.pth,",
+                                   # best_result_save_path="saved/resnet18/resnet18.pth",
+                                   pruned_best_result_save_path="saved/resnet18/resnet18_pruned.pth",
+                                   sample_run=torch.zeros([1, 3, 224, 224]),
+                                   reuse_cut_filter=False,
+                                   max_percent_per_iteration=max_percent_per_iteration,
+                                   prune_ratio=prune_ratio,
+                                   n_epoch=n_epoch,
+                                   n_epoch_retrain=2,
+                                   n_epoch_total=20)
+    return history
+
+
+def exec_vgg16(max_percent_per_iteration=0.1, prune_ratio=0.3, n_epoch=10):
+    print("***vgg16")
+
+    model = models.vgg16(num_classes=10)
+
+    model.cuda()
+
+    history = common_training_code(model, pruned_save_path="saved/resnet18/Prunedresnet.pth,",
+                                   # best_result_save_path="saved/resnet18/resnet18.pth",
+                                   pruned_best_result_save_path="saved/resnet18/resnet18_pruned.pth",
+                                   sample_run=torch.zeros([1, 3, 224, 224]),
+                                   reuse_cut_filter=False,
+                                   max_percent_per_iteration=max_percent_per_iteration,
+                                   prune_ratio=prune_ratio,
+                                   n_epoch=n_epoch,
+                                   n_epoch_retrain=2,
+                                   n_epoch_total=20)
+    return history
+
+
+def exec_resnet18(max_percent_per_iteration=0.1, prune_ratio=0.3, n_epoch=10):
     print("***resnet 18")
 
     model = models.resnet18(pretrained=True)
@@ -483,13 +528,18 @@ def exec_resnet18():
 
     history = common_training_code(model, pruned_save_path="saved/resnet18/Prunedresnet.pth,",
                                    # best_result_save_path="saved/resnet18/resnet18.pth",
-                                   pruned_best_result_save_path="saved/resnet18 /resnet18_pruned.pth",
+                                   pruned_best_result_save_path="saved/resnet18/resnet18_pruned.pth",
                                    sample_run=torch.zeros([1, 3, 224, 224]),
-                                   reuse_cut_filter=False)
+                                   reuse_cut_filter=False,
+                                   max_percent_per_iteration=max_percent_per_iteration,
+                                   prune_ratio=prune_ratio,
+                                   n_epoch=n_epoch,
+                                   n_epoch_retrain=2,
+                                   n_epoch_total=20)
     return history
 
 
-def exec_resnet34():
+def exec_resnet34(max_percent_per_iteration=0.1, prune_ratio=0.3, n_epoch=10):
     print("***resnet 34")
 
     model = models.resnet34(pretrained=True)
@@ -502,10 +552,16 @@ def exec_resnet34():
                                    # best_result_save_path="saved/resnet34/resnet18.pth",
                                    pruned_best_result_save_path="saved/resnet34/resnet34_pruned.pth",
                                    sample_run=torch.zeros([1, 3, 224, 224]),
-                                   reuse_cut_filter=False)
+                                   reuse_cut_filter=False,
+                                   max_percent_per_iteration=max_percent_per_iteration,
+                                   prune_ratio=prune_ratio,
+                                   n_epoch=n_epoch,
+                                   n_epoch_retrain=2,
+                                   n_epoch_total=20)
     return history
 
-def exec_resnet50():
+
+def exec_resnet50(max_percent_per_iteration=0.1, prune_ratio=0.3, n_epoch=10):
     print("***resnet 50")
 
     model = models.resnet50(pretrained=True)
@@ -518,20 +574,42 @@ def exec_resnet50():
                                    # best_result_save_path="saved/resnet50/resnet18.pth",
                                    pruned_best_result_save_path="saved/resnet50/resnet50_pruned.pth",
                                    sample_run=torch.zeros([1, 3, 224, 224]),
-                                   reuse_cut_filter=False)
+                                   reuse_cut_filter=False,
+                                   max_percent_per_iteration=max_percent_per_iteration,
+                                   prune_ratio=prune_ratio,
+                                   n_epoch=n_epoch,
+                                   n_epoch_retrain=2,
+                                   n_epoch_total=20)
     return history
 
 
 def run_startegy_prune_compare():
     multi_history = MultiHistory()
-    h = exec_resnet18()
-    multi_history.append_history("Resnet 18", h)
-    h = exec_resnet34()
-    multi_history.append_history("Resnet 34", h)
-    h = exec_resnet50()
-    multi_history.append_history("Resnet 50", h)
-    h = exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.2)
-    multi_history.append_history("Alexnet", h)
+    h = exec_resnet18(max_percent_per_iteration=0.0, prune_ratio=None, n_epoch=10)
+    multi_history.append_history("Resnet 18-0", h)
+    h = exec_resnet18(max_percent_per_iteration=0.2, prune_ratio=0.2, n_epoch=10)
+    multi_history.append_history("Resnet 18-20", h)
+    # h = exec_resnet34()
+    # multi_history.append_history("Resnet 34", h)
+    # h = exec_resnet50()
+    # multi_history.append_history("Resnet 50", h)
+    h = exec_alexnet(max_percent_per_iteration=0.0, prune_ratio=None, n_epoch=20)
+    multi_history.append_history("Alexnet 0", h)
+    h = exec_alexnet(max_percent_per_iteration=0.2, prune_ratio=0.2, n_epoch=20)
+    multi_history.append_history("Alexnet 20", h)
+
+    h = exec_vgg16(max_percent_per_iteration=0.0, prune_ratio=None, n_epoch=10)
+    multi_history.append_history("vgg16 0", h)
+    h = exec_vgg16(max_percent_per_iteration=0.2, prune_ratio=0.2, n_epoch=10)
+    multi_history.append_history("vgg16 20", h)
+
+    # h = exec_dense_net(max_percent_per_iteration=0.0, prune_ratio=None, n_epoch=10)
+    # multi_history.append_history("densenet121 0", h)
+    # h = exec_dense_net(max_percent_per_iteration=0.2, prune_ratio=0.2, n_epoch=10)
+    # multi_history.append_history("densenet121 20", h)
+
+
+
     save_obj(multi_history, "history_compare")
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
@@ -540,12 +618,12 @@ def run_alex_prune_compare():
     multi_history = MultiHistory()
     h = exec_alexnet(max_percent_per_iteration=0.0, prune_ratio=None, n_epoch=20)
     multi_history.append_history("Alexnet 0%", h)
-    h = exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.1)
+    h = exec_alexnet(max_percent_per_iteration=0.05, prune_ratio=0.1)
     multi_history.append_history("Alexnet 10%-1", h)
-    h = exec_alexnet(max_percent_per_iteration=0.3, prune_ratio=0.3)
+    h = exec_alexnet(max_percent_per_iteration=0.15, prune_ratio=0.3)
     multi_history.append_history("Alexnet 30%-1", h)
-    h = exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.3)
-    multi_history.append_history("Alexnet 30%-3", h)
+    # h = exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.3)
+    # multi_history.append_history("Alexnet 30%-3", h)
     h = exec_alexnet(max_percent_per_iteration=0.25, prune_ratio=0.5)
     multi_history.append_history("Alexnet 50%-2", h)
     h = exec_alexnet(max_percent_per_iteration=0.25, prune_ratio=0.75)
@@ -555,5 +633,11 @@ def run_alex_prune_compare():
 
 
 if __name__ == '__main__':
+    multi_history = MultiHistory()
+    # h = exec_vgg16(max_percent_per_iteration=0.3, prune_ratio=0.3, n_epoch=1)
+    # multi_history.append_history("vgg16 20", h)
+    # h = exec_dense_net(max_percent_per_iteration=0.3, prune_ratio=0.3, n_epoch=1)
+    # multi_history.append_history("densenet121 20", h)
+
     run_alex_prune_compare()
     run_startegy_prune_compare()
