@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  25 APR 2019 21:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  26 APR 2019 06:22
 entering extended mode
 **./poster.tex
 (poster.tex
@@ -1996,7 +1996,7 @@ LaTeX Font Warning: Size substitutions with differences
 Here is how much of TeX's memory you used:
  21183 strings out of 492946
  449813 string characters out of 3126267
- 584357 words of memory out of 3000000
+ 584356 words of memory out of 3000000
  24596 multiletter control sequences out of 15000+200000
  92344 words of font info for 88 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -2006,7 +2006,7 @@ Here is how much of TeX's memory you used:
 /type1/public/amsfonts/symbols/msam10.pfb><C:/Users/naked/AppData/Local/Program
 s/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtb8a.pfb><C:/Users/naked/AppData/L
 ocal/Programs/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtr8a.pfb>
-Output written on poster.pdf (1 page, 207144 bytes).
+Output written on poster.pdf (1 page, 195102 bytes).
 PDF statistics:
  53 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
