@@ -17,6 +17,7 @@ from models.AlexNetSki import alexnetski
 # TODO check this one!!! https://towardsdatascience.com/how-to-visualize-convolutional-features-in-40-lines-of-code-70b7d87b0030
 # and this: https://github.com/fg91/visualizing-cnn-feature-maps/blob/master/Calculate_mean_activation_per_filter_in_specific_layer_given_an_image.ipynb
 from models.FResiNet import FResiNet
+from thop_ext.profile import profile
 
 
 def common_training_code(model,
@@ -41,6 +42,9 @@ def common_training_code(model,
     # display_sample_data(train_dataset)
     # display_sample_data(test_dataset)
     model.cuda()
+
+    flops, params = profile(model, input_size=(1, 3, 224, 224))
+    print("number of flops: {} \tnumber of params: {}".format(flops, params))
 
     use_gpu = True
     batch_size = 32
@@ -134,9 +138,7 @@ def common_training_code(model,
             # local_history.display()
             test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
             print('Test pruning iteration :{}\n\tScore: {}'.format(iteration_idx, test_score))
-
     ###
-    history.display()
 
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test Fin :\n\tScore: {}'.format(test_score))
@@ -147,12 +149,21 @@ def common_training_code(model,
                               scheduler=scheduler, best_result_save_path=pruned_best_result_save_path)
         history.append(local_history)
 
+    basedir = os.path.dirname(pruned_save_path)
+    if not os.path.exists(basedir):
+        os.makedirs(basedir)
+    torch.save(model, pruned_save_path)
+
+    history.display()
+    flops, params = profile(model, input_size=(1, 3, 224, 224))
+    print("end number of flops: {} \tnumber of params: {}".format(flops, params))
+
     return history
 
 
 def exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.3, n_epoch=10):
     print("***alexnet")
-    model = alexnetski(pretrained=True)
+    model = alexnetski(num_classes=10)
     model.cuda()
 
     history = common_training_code(model, pruned_save_path="saved/alex{}/PrunedAlexnet.pth".format(prune_ratio),
@@ -173,7 +184,6 @@ def exec_dense_net(max_percent_per_iteration=0.1, prune_ratio=0.3, n_epoch=10):
     print("***densenet121")
 
     model = models.densenet121(num_classes=10)
-
     model.cuda()
 
     history = common_training_code(model, pruned_save_path="saved/resnet18/Prunedresnet.pth,",
@@ -193,7 +203,6 @@ def exec_vgg16(max_percent_per_iteration=0.1, prune_ratio=0.3, n_epoch=10):
     print("***vgg16")
 
     model = models.vgg16(num_classes=10)
-
     model.cuda()
 
     history = common_training_code(model, pruned_save_path="saved/resnet18/Prunedresnet.pth,",
