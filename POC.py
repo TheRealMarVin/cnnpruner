@@ -47,7 +47,7 @@ def common_training_code(model,
     print("number of flops: {} \tnumber of params: {}".format(flops, params))
 
     use_gpu = True
-    batch_size = 32
+    batch_size = 128
     learning_rate = 0.01
 
     history = History()
@@ -320,15 +320,15 @@ def run_alex_prune_compare():
     h = exec_alexnet(max_percent_per_iteration=0.0, prune_ratio=None, n_epoch=20)
     multi_history.append_history("Alexnet 0%", h)
     h = exec_alexnet(max_percent_per_iteration=0.05, prune_ratio=0.1)
-    multi_history.append_history("Alexnet 10%-1", h)
+    multi_history.append_history("Alexnet 10%", h)
     h = exec_alexnet(max_percent_per_iteration=0.15, prune_ratio=0.3)
-    multi_history.append_history("Alexnet 30%-1", h)
+    multi_history.append_history("Alexnet 30%", h)
     # h = exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.3)
     # multi_history.append_history("Alexnet 30%-3", h)
     h = exec_alexnet(max_percent_per_iteration=0.25, prune_ratio=0.5)
-    multi_history.append_history("Alexnet 50%-2", h)
+    multi_history.append_history("Alexnet 50%", h)
     h = exec_alexnet(max_percent_per_iteration=0.25, prune_ratio=0.75)
-    multi_history.append_history("Alexnet 75%-3", h)
+    multi_history.append_history("Alexnet 75%", h)
     save_obj(multi_history, "history_alex")
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
