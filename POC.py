@@ -47,7 +47,7 @@ def common_training_code(model,
     print("number of flops: {} \tnumber of params: {}".format(flops, params))
 
     use_gpu = True
-    batch_size = 128
+    batch_size = 64
     learning_rate = 0.01
 
     history = History()
