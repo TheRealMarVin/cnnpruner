@@ -6,6 +6,7 @@ from torchvision import models
 from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
+from Pruner.ActivationMeanFilterPruner import ActivationMeanFilterPruner
 from Pruner.FilterPruner import FilterPruner
 from deeplib_ext.CustomDeepLib import train, test
 from FileHelper import load_obj, save_obj
@@ -50,6 +51,11 @@ def common_training_code(model,
     batch_size = 16
     learning_rate = 0.01
 
+    #TODO uncomment
+    # n_epoch = 1
+    # n_epoch_retrain = 1
+    # n_epoch_total = 1
+
     history = History()
 
     optimizer = torch.optim.SGD(model.parameters(), learning_rate)
@@ -79,7 +85,7 @@ def common_training_code(model,
     ###
     #TODO maybe put the loop content in a function that looks terrible now
     if prune_ratio is not None:
-        pruner = FilterPruner(model, sample_run)
+        pruner = ActivationMeanFilterPruner(model, sample_run)
         number_of_filters = total_num_filters(model)
         filter_to_prune = int(number_of_filters * prune_ratio)
         max_filters_to_prune_on_iteration = int(number_of_filters * max_percent_per_iteration)

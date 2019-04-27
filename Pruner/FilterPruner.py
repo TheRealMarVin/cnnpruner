@@ -132,14 +132,7 @@ class FilterPruner:
         return random.sample(data, num)
 
     def sort_filters(self, num):
-        data = []
-        for i in sorted(self.filter_ranks.keys()):
-            for j in range(self.filter_ranks[i].size(0)):
-                data.append((i, j, self.filter_ranks[i][j]))
-
-        # return random.sample(data, num)
-        return nsmallest(num, data, itemgetter(2))
-        # return nlargest(num, data, itemgetter(2))
+        raise NotImplementedError
 
     def is_before_merge(self, layer_id):
         next_id = self.graph[layer_id]
