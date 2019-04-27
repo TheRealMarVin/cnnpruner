@@ -6,7 +6,7 @@ from torchvision import models
 from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
-from FilterPruner import FilterPruner
+from Pruner.FilterPruner import FilterPruner
 from deeplib_ext.CustomDeepLib import train, test
 from FileHelper import load_obj, save_obj
 from ModelHelper import total_num_filters
@@ -14,10 +14,10 @@ from deeplib_ext.MultiHistory import MultiHistory
 from deeplib_ext.history import History
 from models.AlexNetSki import alexnetski
 
+from thop_ext.profile import profile
+
 # TODO check this one!!! https://towardsdatascience.com/how-to-visualize-convolutional-features-in-40-lines-of-code-70b7d87b0030
 # and this: https://github.com/fg91/visualizing-cnn-feature-maps/blob/master/Calculate_mean_activation_per_filter_in_specific_layer_given_an_image.ipynb
-from models.FResiNet import FResiNet
-from thop_ext.profile import profile
 
 
 def common_training_code(model,
@@ -47,7 +47,7 @@ def common_training_code(model,
     print("number of flops: {} \tnumber of params: {}".format(flops, params))
 
     use_gpu = True
-    batch_size = 64
+    batch_size = 16
     learning_rate = 0.01
 
     history = History()
@@ -334,9 +334,7 @@ def run_alex_prune_compare():
 
 
 if __name__ == '__main__':
-    multi_history = MultiHistory()
-    # h = exec_vgg16(max_percent_per_iteration=0.3, prune_ratio=0.3, n_epoch=1)
-    # multi_history.append_history("vgg16 20", h)
+    # multi_history = MultiHistory()
     # h = exec_dense_net(max_percent_per_iteration=0.3, prune_ratio=0.3, n_epoch=1)
     # multi_history.append_history("densenet121 20", h)
 
