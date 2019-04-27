@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  27 APR 2019 12:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  27 APR 2019 14:22
 entering extended mode
 **./poster.tex
 (poster.tex
@@ -1306,7 +1306,7 @@ File: figures/Alexnet_30.png Graphic file (type png)
 Package pdftex.def Info: figures/Alexnet_30.png  used on input line 112.
 (pdftex.def)             Requested size: 774.64217pt x 421.57396pt.
 
-Overfull \hbox (13.53055pt too wide) in paragraph at lines 176--176
+Overfull \hbox (13.53055pt too wide) in paragraph at lines 187--187
  [] 
  []
 
@@ -1321,11 +1321,11 @@ LaTeX Font Warning: Size substitutions with differences
 
  ) 
 Here is how much of TeX's memory you used:
- 20766 strings out of 492946
- 440322 string characters out of 3126267
- 554200 words of memory out of 3000000
- 24179 multiletter control sequences out of 15000+200000
- 98091 words of font info for 93 fonts, out of 3000000 for 9000
+ 20768 strings out of 492946
+ 440342 string characters out of 3126267
+ 557200 words of memory out of 3000000
+ 24180 multiletter control sequences out of 15000+200000
+ 103618 words of font info for 95 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  62i,17n,85p,791b,1207s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/venturisadf
@@ -1333,7 +1333,7 @@ Here is how much of TeX's memory you used:
 /type1/public/amsfonts/symbols/msam10.pfb><C:/Users/naked/AppData/Local/Program
 s/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtb8a.pfb><C:/Users/naked/AppData/L
 ocal/Programs/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtr8a.pfb>
-Output written on poster.pdf (1 page, 237509 bytes).
+Output written on poster.pdf (1 page, 237575 bytes).
 PDF statistics:
  58 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

@@ -84,7 +84,7 @@ We explore how reducing network expressivity can affect performance in Convoluti
 	\includegraphics[width=25cm, height=15cm]{figures/prune_ratio}
 \end{center}
 
-This graph compare various level of pruning. Each level of pruning is made on two iteration made after 10 epochs of training and 3 epochs or retraining. Pretrained weight were used to see the impact on transfer learning.
+This graph compare various level of pruning. Each level of pruning is made on two iterations made after 10 epochs of training and 3 epochs or retraining per iteration. Pretrained weight were used to see the impact on transfer learning.
 }
 
 \column{0.30}
@@ -107,7 +107,7 @@ This graph explore the effect of pruning on different models. Each model shows t
 \includegraphics{figures/Alexnet_origin}
 \includegraphics{figures/Alexnet_30}
 	
-	Comparing the effect of pruning on AlexNet. Left is the original model provided by pytorch. On the right is alex net pruned 30\%. In the case of network like Alexnet there is an important reduction of parameters based on the reduction of the fully connected layer. Their is also an important reduction in the first layers.
+	Comparing the effect of pruning on AlexNet. Left is the original model provided by pytorch. On the right is alex net pruned 30\%. In the case of network like Alexnet there is an important reduction of parameters based on the reduction of the first fully connected layer. There is also an important reduction in the first layers.
 \vspace{41pt}
 }
 
@@ -165,14 +165,25 @@ This graph explore the effect of pruning on different models. Each model shows t
   \block{Performances}{
   % \vspace{3mm}
 \begin{center}
-	\textbf{Comparing Alexnet Attributes after Pruning}
+	\textbf{Comparing Alexnet Attributes After Pruning}
 \begin{tabular}{c|c|cc|cc|cc|cc}
 	& \textbf{0\%} & \multicolumn{2}{c|}{\textbf{10\%}}       & \multicolumn{2}{c|}{\textbf{30\%}}       & \multicolumn{2}{c|}{\textbf{50\%}}       & \multicolumn{2}{c}{\textbf{75\%}}        \\ \hline
 	\textbf{FLOPs(G)}  & 0.815        & 0.665 & {\color[HTML]{009901} (-18.4\%)} & 0.445 & {\color[HTML]{009901} (-45.3\%)} & 0.283 & {\color[HTML]{009901} (-65.3\%)} & 0.133 & {\color[HTML]{009901} (-83.7\%)} \\ \hline
-	\textbf{Params(M)} & 57.0         & 54.8  & {\color[HTML]{009901} (-3.86\%)} & 47.3  & {\color[HTML]{009901} (-17.0\%)} & 37.6  & {\color[HTML]{009901} (-34.0\%)} & 27.0  & {\color[HTML]{009901} (-52.6\%)}
+	\textbf{Params(M)} & 57.0         & 54.8  & {\color[HTML]{009901} (-3.86\%)} & 47.3  & {\color[HTML]{009901} (-17.0\%)} & 37.6  & {\color[HTML]{009901} (-34.0\%)} & 27.0  & {\color[HTML]{009901} (-52.6\%)}             
 \end{tabular}
 \end{center}
-  \vspace{-.5mm}
+\begin{center}
+	\textbf{Comparing Pruning On Various Models}
+	\begin{tabular}{llllllllll}
+		\textbf{}                               & \multicolumn{3}{c}{\textbf{VGG}}                                                                         & \multicolumn{3}{c}{\textbf{Alexnet}}                                                                     & \multicolumn{3}{c}{\textbf{Resnet18}}                                               \\
+		& \multicolumn{1}{c}{0\%} & \multicolumn{1}{c}{20\%} & \multicolumn{1}{c}{Diff}                            & \multicolumn{1}{c}{0\%} & \multicolumn{1}{c}{20\%} & \multicolumn{1}{c}{Diff}                            & \multicolumn{1}{c}{0\%} & \multicolumn{1}{c}{20\%} & \multicolumn{1}{c}{Diff}       \\ \cline{2-10} 
+		\multicolumn{1}{c|}{\textbf{FLOPs(G)}}  & 17.31                   & 12.23                    & \multicolumn{1}{l|}{{\color[HTML]{009901} -29.3\%}} & 0.815                   & 0.592                    & \multicolumn{1}{l|}{{\color[HTML]{009901} -27.3\%}} & 1.83                    & 1.13                     & {\color[HTML]{009901} -38.2\%} \\
+		\multicolumn{1}{c|}{\textbf{Params(M)}} & 134.3                   & 103.7                    & \multicolumn{1}{l|}{{\color[HTML]{009901} -22.8\%}} & 57.0                    & 48.2                     & \multicolumn{1}{l|}{{\color[HTML]{009901} -15.4\%}} & 11.18                   & 5.27                     & {\color[HTML]{009901} -52.9\%}
+	\end{tabular}
+\end{center}
+
+{\tiny element considered in FLOP: Conv1d, Conv2d, Conv3d, ConvTranspose2d, BatchNorm1d, BatchNorm2d, BatchNorm3d, ReLU, ReLU6, LeakyReLU, MaxPool1d, MaxPool2d, MaxPool3d, AdaptiveMaxPool1d, AdaptiveMaxPool2d, AdaptiveMaxPool3d, AvgPool1d, AvgPool2d, AvgPool3d, AdaptiveAvgPool1d, AdaptiveAvgPool2d, AdaptiveAvgPool3d, Linear}
+  
   }
 
 
@@ -180,28 +191,29 @@ This graph explore the effect of pruning on different models. Each model shows t
   \block{Observations}
   {
   	\begin{itemize}
-   \item Not all convolutional layer can be pruned. Pruning layer before a residual connection is dangerous because both side of the residual connection must have the same side.
-  \item When pruning in a convolution layer it is important to propagate. So the next layer have the right input size. This apply to convolution, linear and batchnorm layers.
-  \item The algorithm used tend prefer removing filters that are deeper in the model and it is not uncommon to try to prune all filter in a layer.
+   \item Not all convolutional layer can be pruned. Pruning layers before a residual connection is dangerous because both side of the residual connection must have the same side.
+  \item When pruning in a convolution layer it is important to propagate to the following layers so the next layers have the right input size. This apply to convolution, linear and batchnorm layers..
+  \item It is been seen that algorith leave only one filter on a layer. When this happen it reduce the quality of the results.
   \item When pruning it is important to reset optimizer.
   \end{itemize}
+\vspace{0.5cm}
   }
 
   \column{.4} 
   \block{Conclusion}{
-  
+  \vspace{2.0cm}
   \textbf{Discussion:}
     \begin{itemize}
-        \item \colorbold{Morphology} and \colorbold{context} help predict useful embeddings.
-        \item \colorbold{The attention mechanism works}: depending on the task, the network will use either more the context or the morphology to generate an embedding.
+        \item It is a  \colorbold{possible} to support multiple model type using the same module.
+        \item The reduction on some model is \colorbold{impressive} and could be run on lower trier hardware.
     \end{itemize}
     
-    \textbf{Future works:}
+    \textbf{Future Works:}
     \begin{itemize}
-        \item  Apply the \colorbold{attention mechanism on each character of the OOV word and each word of the context} instead of using the hidden state of the respective elements only.
-        \item Test our attention model in \colorbold{different languages} and on other NLP tasks, such as \colorbold{machine translation}.
+        \item  Pruning proved to be a valid form of regulation.
+        \item  Would be possible to use different criteria to sort filters.
     \end{itemize}
-    \vspace{-3.5mm}
+    \vspace{2.3cm}
   }
 \end{columns}
 
