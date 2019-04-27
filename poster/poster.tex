@@ -107,7 +107,7 @@ This graph explore the effect of pruning on different models. Each model shows t
 \includegraphics{figures/Alexnet_origin}
 \includegraphics{figures/Alexnet_30}
 	
-	Comparing the effect of pruning on AlexNet. Left is the original model provided by pytorch. On the right is alex net pruned 30\%. In the case of network like Alexnet there is an important reduction of parameters based on the reduction of the first fully connected layer. There is also an important reduction in the first layers.
+	Comparing the effect of pruning on Alexnet. Left is the original model provided by pytorch. On the right is Alex net pruned 30\%. In the case of network like Alexnet there is an important reduction of parameters based on the reduction of the first fully connected layer. There is also an important reduction in the first layers.
 \vspace{41pt}
 }
 
@@ -116,7 +116,7 @@ This graph explore the effect of pruning on different models. Each model shows t
   \block{Algorithm}{
   	\begin{itemize}
   	\item Pretrain network with full paramters
-  	\item \textbf{Prepare pruning}
+  	\item \textbf{Prepare Pruning}
   	\begin{itemize}
   	\item Convert model to ONNX
   	\item Extract execution graph
@@ -136,8 +136,8 @@ This graph explore the effect of pruning on different models. Each model shows t
 
   \column{.25}
 \block{Settings}{
-	\textbf{Common:}
 	\begin{itemize}
+		\item \textbf{Dataset}: Cifar10
 		\item \textbf{Optimizer}: Stochastic Gradient Descent
 		\item \textbf{Learning Rate}: 0.01
 		\item \textbf{Momentum}: 0.0
@@ -201,7 +201,7 @@ This graph explore the effect of pruning on different models. Each model shows t
 
   \column{.4} 
   \block{Conclusion}{
-  \vspace{2.0cm}
+  \vspace{1.0cm}
   \textbf{Discussion:}
     \begin{itemize}
         \item It is a  \colorbold{possible} to support multiple model type using the same module.
@@ -212,8 +212,9 @@ This graph explore the effect of pruning on different models. Each model shows t
     \begin{itemize}
         \item  Pruning proved to be a valid form of regulation.
         \item  Would be possible to use different criteria to sort filters.
+        \item  Experiments were made on Cifar10. It would be interesting to try on various datasets.
     \end{itemize}
-    \vspace{2.3cm}
+    \vspace{1.6cm}
   }
 \end{columns}
 
