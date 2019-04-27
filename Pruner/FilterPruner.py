@@ -55,7 +55,6 @@ class FilterPruner:
 
         curr_module = get_node_in_model(self.model, node_name)
         if curr_module is None:
-            # print("is none... should add x together")
             out = self.forward_res[node_id]
         else:
             x = self.forward_res[node_id]
@@ -64,15 +63,8 @@ class FilterPruner:
 
             out = curr_module(x)
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-                self.conv_layer[node_id] = curr_module
-                average_per_batch_item = torch.tensor([[curr.view(-1).mean() for curr in batch_item] for batch_item in out])
-                activation_average_sum = torch.sum(average_per_batch_item, dim=0)
+                self.handle_conv_in_forward(curr_module, node_id, out)
 
-                val = activation_average_sum.cuda()
-                if node_id not in self.filter_ranks:
-                    self.test_layer_activation[node_id] = val
-                else:
-                    self.test_layer_activation[node_id] = self.test_layer_activation[node_id] + val
 
         res = None
         next_nodes = self.graph[node_id]
@@ -117,7 +109,6 @@ class FilterPruner:
                 if self.is_before_merge(node_name):
                     continue
 
-
                 if node_name not in self.filter_ranks:
                     self.filter_ranks[node_name] = self.test_layer_activation[node_name]
                 else:
@@ -130,6 +121,9 @@ class FilterPruner:
                 data.append((i, j, self.filter_ranks[i][j]))
 
         return random.sample(data, num)
+
+    def handle_conv_in_forward(self, curr_module, node_id, out):
+        raise NotImplementedError
 
     def sort_filters(self, num):
         raise NotImplementedError
