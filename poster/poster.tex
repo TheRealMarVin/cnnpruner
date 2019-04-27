@@ -40,9 +40,6 @@
   font=\fontsize{25pt}{24}\selectfont,
   ]
 
-
-
-
 \title{\parbox{\linewidth}{\centering Pruning Filters In Convolution Neural Network}}
 \institute{Department of Computer Science and Software Engineering, Université Laval}
 \author{Vincent Martineau}
@@ -77,9 +74,6 @@ We explore how reducing network expressivity can affect performance in Convoluti
   \item Compare various strategies to prune.
   \item Provide a module that could.
 \end{itemize}
-
-% \vspace{-15pt}
-
 }
 
 \column{0.30}
@@ -88,7 +82,7 @@ We explore how reducing network expressivity can affect performance in Convoluti
 \vspace{-15pt}
 
 \begin{center}
-	\includegraphics[width=15cm, height=15cm]{figures/prune_ratio}
+	\includegraphics[width=25cm, height=15cm]{figures/prune_ratio}
 \end{center}
 
 This graph compare various level of pruning. Each level of pruning is made on two iteration made after 10 epochs of training and 3 epochs or retraining. Pretrained weight were used to see the impact on transfer learning.
@@ -100,7 +94,7 @@ This graph compare various level of pruning. Each level of pruning is made on tw
 	\vspace{-15pt}
 	
 \begin{center}
-	\includegraphics[width=15cm, height=15cm]{figures/various_models}
+	\includegraphics[width=25cm, height=15cm]{figures/various_models}
 \end{center}
 
 This graph explore the effect of pruning on different models. Each model shows the effect of pruning 20\% of the convolution filters in one step after 10 epochs of training. In this case transfer learning is not applied.
@@ -108,47 +102,39 @@ This graph explore the effect of pruning on different models. Each model shows t
 \end{columns}
 
 \begin{columns}
-\column{0.30}
+\column{0.50}
 \block{Example of Network Reduction}{
 	
 \vspace{-15pt}
-\begin{figure}[H]
-	\includegraphics{figures/Alexnet_origin}
-\end{figure}
-
+\includegraphics{figures/Alexnet_origin}
+\includegraphics{figures/Alexnet_30}
 	
-	blablabla
+	Comparing the effect of pruning on AlexNet. Left is the original model provided by pytorch. On the right is alex net pruned 30\%. In the case of network like Alexnet there is an important reduction of parameters based on the reduction of the fully connected layer. Their is also an important reduction in the first layers.
 }
 
 
-  \column{.38}
-  \block[bodyoffsety=0mm, titleoffsety=0mm]{Algorithm and Settings}{
-
+  \column{.25}
+  \block{Algorithm}{
+  	\begin{itemize}
+  	\item Pretrain network with full paramters
+  	\item Prepare pruning
+  	\begin{itemize}
+  	\item Convert model to ONNX
+  	\item Extract execution graph
+  	\item Determine which layer can be pruned
+    \end{itemize}
+  	\item Prune network
+  	\item Reset optimizer
+  	\item Finalize training
+  \end{itemize}
+ \vspace{45mm}
   }
-  
 
-
-
+  \column{.25}
+\block{Settings}{
+}
 
 \end{columns}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 \begin{columns}
@@ -158,91 +144,7 @@ This graph explore the effect of pruning on different models. Each model shows t
 
   \block{Labeling task net}{
 
-  \begin{center}
-  \begin{tikzpicture}[
-          scale=1.5,
-          lstm_right/.style={draw, minimum width=1cm, minimum height=.5cm, inner sep=0pt, anchor=north, PaleGreen},
-          lstm_left/.style={draw, minimum width=1cm, minimum height=.5cm, inner sep=0pt, PaleBlue},
-          every path/.style={line width=\pathwidth},
-          every node/.append style={line width=\nodewidth}]
-    \def\h{2cm}
-    \def\scalespace{2.2}
-    \def\w{145mm}
-    \def\arrowLen{.6}
-    \def\descSpace{-.2}
-
-    % Char embedding
-
-    \foreach \word/\color/\w [count=\i] in {Salem/gray/o, Bitar/gray/o, appeared/Purple/w, to/Purple/w, have/Purple/w}{
-      \pgfmathsetmacro\pos{\i-1}
-      \node[anchor=mid, inner sep=0](\word) at (\scalespace*\pos,0) {\word};
-      \node[embed=\color,draw=\color](\word _embed) at (\scalespace*\pos,-\arrowLen){\w};
-    };
-
-    \node[embed=black, minimum width=\w, minimum height=\h, anchor=north](comick) at ([yshift=-\arrowLen cm]appeared_embed.south) {OOV handling net};
-    % \node[anchor=east, align=left] at ([xshift=\descSpace cm]comick.west) {OOV \\ handling};
-
-    \foreach \word/\color/\w [count=\i] in {Salem/predEmbedColor/p, Bitar/predEmbedColor/p, appeared/Purple/w, to/Purple/w, have/Purple/w}{
-      \pgfmathsetmacro\pos{\i-1}
-
-      \path (\word _embed) edge[draw, -mytip] (comick.north -| \word _embed.south);
-      \draw[-mytip] (comick.south -| \word _embed) -- ++(0,-\arrowLen) node[anchor=north, embed=\color, draw=\color](\word _pred_embed) {\w};
-
-      \node[lstm_left, draw=PaleBlue, anchor=north](\word _lstm_left) at ([yshift=-\arrowLen cm]\word _pred_embed.south) {};
-      \node[lstm_right, draw=PaleGreen](\word _lstm_right) at (\word _lstm_left.south) {};
-      \draw[-mytip] (\word _pred_embed) -- (\word _lstm_left);
-  
-    };
-
-    % LSTM arrows
-    \foreach \a/\b in {Salem/Bitar, Bitar/appeared, appeared/to, to/have}{
-      \draw[mytip-, PaleBlue] (\a _lstm_left) -- (\b _lstm_left);
-      \draw[-mytip, PaleGreen] (\a _lstm_right) -- (\b _lstm_right);
-    };
-    % \node[anchor=east, align=left] at ([xshift=\descSpace cm]Salem_lstm_left.south west) {Bi-LSTM \\ task net};
-
-
-    \foreach \word/\tag [count=\i] in {Salem/B-PER, Bitar/I-PER, appeared/O, to/O, have/O}{
-      \pgfmathsetmacro\pos{\i-1}
-
-      \draw[-mytip] (\word  _lstm_right.south) -- ++(0,-\arrowLen) node[embed=Orange](\word _softmax) {s};
-
-      \node[anchor=mid, inner sep=0] (\word _tag) at ([yshift=-.5cm]\word _softmax.south) {\tag};
-    };
-    % \node[anchor=east, align=right] at ([xshift=\descSpace cm]Salem_tag.west) {Tags};
-
-
-    % Legend
-    % \begin{scope}[xshift=10.7cm, yshift=-2cm,
-    \begin{scope}[xshift=-15mm, yshift=-105mm,
-            every path/.style={line width=\pathwidth},
-            every node/.append style={line width=\nodewidth}]
-    \def\legspace{-1.3}
-    \def\colsep{7}
-    \def\h{1.3cm}
-    % First col
-    \node[embed=gray, anchor=center, minimum height=\h, minimum width=.8cm](leg char embed) at (0,0*\legspace) {o};
-    \node[anchor=west] at (.5,0*\legspace) {OOV word embedding};
-
-    \node[embed=Purple, anchor=center, minimum height=\h, minimum width=.8cm](leg word embed) at (0,1*\legspace) {w};
-    \node[anchor=west] at (.5,1*\legspace) {Word embedding};
-
-    \node[embed=predEmbedColor, anchor=center, minimum height=\h, minimum width=.8cm](leg word embed) at (0,2*\legspace) {p};
-    \node[anchor=west, align=left] at (.5,2*\legspace) {Predicted embedding};
-
-
-    \node[draw, PaleBlue, minimum width=1cm, inner sep=0pt, minimum height=.5cm, anchor=south] (leg lstm left) at (\colsep,0*\legspace) {};
-    \node[draw, PaleGreen, minimum width=1cm, inner sep=0pt, minimum height=.5cm, anchor=north] (leg lstm right) at (leg lstm left.south) {};
-    \node[anchor=west] at (\colsep+.5,0*\legspace) {Bidirectional LSTM};
-
-    \node[embed=Orange, anchor=center, minimum height=\h, minimum width=.8cm](leg word embed) at (\colsep,1*\legspace) {s};
-    \node[anchor=west, align=left] at (\colsep+.5,1*\legspace) {Tag prediction\\ with a softmax};
-
-    \end{scope}
-
-
-  \end{tikzpicture}
-  \end{center}
+ 
   % \vspace{3mm}
 
   Two nets working together: the first predicts OOV embeddings (see OOV handling net section) and the second one predicts tags.
@@ -264,14 +166,12 @@ This graph explore the effect of pruning on different models. Each model shows t
   \column{.3}
   \block{Observation}
   {
-   Not all convolutional layer can be pruned. Pruning layer before a residual connection is dangerous because both side of the residual connection must have the same side.
-  \newline
-  When pruning in a convolution layer it is important to propagate. So the next layer have the right input size. This apply to convolution, linear and batchnorm layers.
-  \newline
-  The algorithm used tend prefer removing filters that are deeper in the model and it is not uncommon to try to prune all filter in a layer.
-  \newline
-  When pruning it is important to reset optimizer.
-  \newline
+  	\begin{itemize}
+   \item Not all convolutional layer can be pruned. Pruning layer before a residual connection is dangerous because both side of the residual connection must have the same side.
+  \item When pruning in a convolution layer it is important to propagate. So the next layer have the right input size. This apply to convolution, linear and batchnorm layers.
+  \item The algorithm used tend prefer removing filters that are deeper in the model and it is not uncommon to try to prune all filter in a layer.
+  \item When pruning it is important to reset optimizer.
+  \end{itemize}
   }
 
 
