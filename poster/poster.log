@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  26 APR 2019 22:20
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  27 APR 2019 12:59
 entering extended mode
 **./poster.tex
 (poster.tex
@@ -1280,36 +1280,41 @@ Overfull \hbox (39.88542pt too wide) in paragraph at lines 49--49
  []
 
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <24.88> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 77.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 76.
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <43> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 77.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 76.
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <29.86> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 77.
-<figures/prune_ratio.png, id=29, 642.4pt x 481.8pt>
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 76.
+<figures/prune_ratio.png, id=29, 481.8pt x 361.35pt>
 File: figures/prune_ratio.png Graphic file (type png)
 <use figures/prune_ratio.png>
-Package pdftex.def Info: figures/prune_ratio.png  used on input line 89.
-(pdftex.def)             Requested size: 711.33746pt x 426.801pt.
-<figures/various_models.png, id=30, 481.8pt x 361.35pt>
+Package pdftex.def Info: figures/prune_ratio.png  used on input line 88.
+(pdftex.def)             Requested size: 711.384pt x 426.79733pt.
+<figures/various_models.png, id=31, 442.65375pt x 361.35pt>
 File: figures/various_models.png Graphic file (type png)
 <use figures/various_models.png>
-Package pdftex.def Info: figures/various_models.png  used on input line 101.
-(pdftex.def)             Requested size: 711.384pt x 426.79733pt.
+Package pdftex.def Info: figures/various_models.png  used on input line 100.
+(pdftex.def)             Requested size: 711.36069pt x 426.79733pt.
 <figures/Alexnet_origin.png, id=32, 769.37437pt x 404.26031pt>
 File: figures/Alexnet_origin.png Graphic file (type png)
 <use figures/Alexnet_origin.png>
-Package pdftex.def Info: figures/Alexnet_origin.png  used on input line 113.
+Package pdftex.def Info: figures/Alexnet_origin.png  used on input line 112.
 (pdftex.def)             Requested size: 769.3725pt x 404.25932pt.
 <figures/Alexnet_30.png, id=33, 774.64406pt x 421.575pt>
 File: figures/Alexnet_30.png Graphic file (type png)
 <use figures/Alexnet_30.png>
-Package pdftex.def Info: figures/Alexnet_30.png  used on input line 113.
+Package pdftex.def Info: figures/Alexnet_30.png  used on input line 112.
 (pdftex.def)             Requested size: 774.64217pt x 421.57396pt.
+
+Overfull \hbox (13.53055pt too wide) in paragraph at lines 176--176
+ [] 
+ []
+
 [1
 
 {C:/Users/naked/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./figures/u
-l.pdf> <./figures/prune_ratio.png (PNG copy)> <./figures/various_models.png> <.
-/figures/Alexnet_origin.png> <./figures/Alexnet_30.png>] (poster.aux)
+l.pdf> <./figures/prune_ratio.png> <./figures/various_models.png> <./figures/Al
+exnet_origin.png> <./figures/Alexnet_30.png>] (poster.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.5pt have occurred.
@@ -1318,19 +1323,19 @@ LaTeX Font Warning: Size substitutions with differences
 Here is how much of TeX's memory you used:
  20766 strings out of 492946
  440322 string characters out of 3126267
- 553200 words of memory out of 3000000
+ 554200 words of memory out of 3000000
  24179 multiletter control sequences out of 15000+200000
  98091 words of font info for 93 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 62i,17n,85p,791b,1203s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 62i,17n,85p,791b,1207s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/venturisadf
 /t1-f_f-venturisadf.enc}<C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts
 /type1/public/amsfonts/symbols/msam10.pfb><C:/Users/naked/AppData/Local/Program
 s/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtb8a.pfb><C:/Users/naked/AppData/L
 ocal/Programs/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtr8a.pfb>
-Output written on poster.pdf (1 page, 234499 bytes).
+Output written on poster.pdf (1 page, 237509 bytes).
 PDF statistics:
- 57 PDF objects out of 1000 (max. 8388607)
+ 58 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  134 words of extra memory for PDF output out of 10000 (max. 10000000)
 

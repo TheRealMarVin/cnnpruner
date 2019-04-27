@@ -7,7 +7,7 @@
 \usepackage{array}
 \usepackage{multirow}
 \usepackage{multicol}
-
+%\usepackage[table,xcdraw]{xcolor}
 
 \definecolor{PaleBlue}{rgb}{0,.55,.9}
 \definecolor{PaleGreen}{rgb}{0,.7,.25}
@@ -50,17 +50,17 @@
 \begin{columns}
 \column{.4}
 \block{Introduction}{%
-We explore how reducing network expressivity can affect performance in Convolution Neural Network (CNN). We implemented a pruner that can remove filters from convolution layer and explore the effect on transfer learning tasks. 
+We explore how reducing network expressivity can affect performance in Convolution Neural Network (CNN). The idea is to take a network that can handle a more complex task and remove filters that are the least important for the new task.
 
 \vspace{5mm}
 \textbf{Motivations:}
 \begin{itemize}
-  \item \colorbold{Reduce} network size.
+  \item \colorbold{Reduce} network size and execution time.
   % \item Goldberg (2017) emphasizes this fact for NLP tasks such as part of speech tagging (POS) or named entity recognition (NER).
-  \item \colorbold{Improve} execution speed.
+  \item \colorbold{Run} network on less demanding hardware with similar accuracy.
 \end{itemize}
 
-\vspace{5mm}
+\vspace{15mm}
 \textbf{Related work:}
 \begin{itemize}
   \item P.Molchanov et al. (2017): Pruning Convolutional Neural Networks for Resource Efficient Inference.
@@ -69,10 +69,9 @@ We explore how reducing network expressivity can affect performance in Convoluti
 \vspace{0mm}
 \textbf{Goals:}
 \begin{itemize}
-  \item Evaluate the impact of reducing network expression on performance.
-  \item Compare training time on various model.
-  \item Compare various strategies to prune.
-  \item Provide a module that could.
+  \item Reduce training time to produce sufficient network.
+  \item Provide a module that could handle multiple models.
+   \item Explore the effect of pruning for speed and size.
 \end{itemize}
 }
 
@@ -97,7 +96,7 @@ This graph compare various level of pruning. Each level of pruning is made on tw
 	\includegraphics[width=25cm, height=15cm]{figures/various_models}
 \end{center}
 
-This graph explore the effect of pruning on different models. Each model shows the effect of pruning 20\% of the convolution filters in one step after 10 epochs of training. In this case transfer learning is not applied.
+This graph explore the effect of pruning on different models. Each model shows the effect of pruning 20\% of the convolution filters in one step after 10 epochs of training.
 }
 \end{columns}
 
@@ -105,11 +104,11 @@ This graph explore the effect of pruning on different models. Each model shows t
 \column{0.50}
 \block{Example of Network Reduction}{
 	
-\vspace{-15pt}
 \includegraphics{figures/Alexnet_origin}
 \includegraphics{figures/Alexnet_30}
 	
 	Comparing the effect of pruning on AlexNet. Left is the original model provided by pytorch. On the right is alex net pruned 30\%. In the case of network like Alexnet there is an important reduction of parameters based on the reduction of the fully connected layer. Their is also an important reduction in the first layers.
+\vspace{41pt}
 }
 
 
@@ -117,21 +116,44 @@ This graph explore the effect of pruning on different models. Each model shows t
   \block{Algorithm}{
   	\begin{itemize}
   	\item Pretrain network with full paramters
-  	\item Prepare pruning
+  	\item \textbf{Prepare pruning}
   	\begin{itemize}
   	\item Convert model to ONNX
   	\item Extract execution graph
   	\item Determine which layer can be pruned
     \end{itemize}
-  	\item Prune network
-  	\item Reset optimizer
+  	\item \textbf{Prune network}
+  	\begin{itemize}
+  		\item Find number of filter to prune on iteration
+  		\item Wort filter based on activation mean
+  		\item Remove filters
+  		\item Apply pruning effect to next layers
+  		\item Reset optimizer
+  	\end{itemize}
   	\item Finalize training
   \end{itemize}
- \vspace{45mm}
   }
 
   \column{.25}
 \block{Settings}{
+	\textbf{Common:}
+	\begin{itemize}
+		\item \textbf{Optimizer}: Stochastic Gradient Descent
+		\item \textbf{Learning Rate}: 0.01
+		\item \textbf{Momentum}: 0.0
+		\item \textbf{Nesterov}: False
+		\item \textbf{Batch Size}: 64
+		\item \textbf{Use GPU}: Yes
+	\end{itemize}
+\textbf{Pruning:}
+\begin{itemize}
+	\item \textbf{Pretrain Epoch}:  10
+	\item \textbf{Retrain Epoch}: 3
+	\item \textbf{Total nb. Epoch}: 20
+\end{itemize}
+\item \textbf{Nb Iteration on Alexnet}:  2
+\item \textbf{Nb Iteration on Model Compare}:  1
+\vspace{-4pt}
 }
 
 \end{columns}
@@ -140,31 +162,22 @@ This graph explore the effect of pruning on different models. Each model shows t
 \begin{columns}
 
   \column{.3}
-
-
-  \block{Labeling task net}{
-
- 
+  \block{Performances}{
   % \vspace{3mm}
-
-  Two nets working together: the first predicts OOV embeddings (see OOV handling net section) and the second one predicts tags.
-
-  The simple architecture of the labeling net is used to emphasize the usefulness of our module, and to minimize the influence of other factors.
-
+\begin{center}
+	\textbf{Comparing Alexnet Attributes after Pruning}
+\begin{tabular}{c|c|cc|cc|cc|cc}
+	& \textbf{0\%} & \multicolumn{2}{c|}{\textbf{10\%}}       & \multicolumn{2}{c|}{\textbf{30\%}}       & \multicolumn{2}{c|}{\textbf{50\%}}       & \multicolumn{2}{c}{\textbf{75\%}}        \\ \hline
+	\textbf{FLOPs(G)}  & 0.815        & 0.665 & {\color[HTML]{009901} (-18.4\%)} & 0.445 & {\color[HTML]{009901} (-45.3\%)} & 0.283 & {\color[HTML]{009901} (-65.3\%)} & 0.133 & {\color[HTML]{009901} (-83.7\%)} \\ \hline
+	\textbf{Params(M)} & 57.0         & 54.8  & {\color[HTML]{009901} (-3.86\%)} & 47.3  & {\color[HTML]{009901} (-17.0\%)} & 37.6  & {\color[HTML]{009901} (-34.0\%)} & 27.0  & {\color[HTML]{009901} (-52.6\%)}
+\end{tabular}
+\end{center}
   \vspace{-.5mm}
-
   }
 
 
-
-
-
-
-
-
-
   \column{.3}
-  \block{Observation}
+  \block{Observations}
   {
   	\begin{itemize}
    \item Not all convolutional layer can be pruned. Pruning layer before a residual connection is dangerous because both side of the residual connection must have the same side.
@@ -174,51 +187,7 @@ This graph explore the effect of pruning on different models. Each model shows t
   \end{itemize}
   }
 
-
-
-
-
-
-
-  
-  
-  
-  \column{.4}
-  
-
-  \block{Performance gain}{%
-  \begin{center}
-  \setlength{\tabcolsep}{5mm}
-  \begin{tabular}{c c c c c}
-  \toprule
-  \textbf{Task} & \textbf{Metric} & \textbf{Random Emb.} & \textbf{Our module} & \textbf{Gain}\\
-  \midrule
-  NER      & F1   & 77.56 & \colorbold{80.62} & 3.9\% \\
-  POS      & acc. & 91.41 & \colorbold{92.58} & 1.2\% \\
-  % Chunking & acc. & 92.63 & 93.16  & \textbf{93.19} \\
-  % Keyphrase& F1   & 37.40 & 39.56 & \textbf{39.77} \\
-  \bottomrule
-  \end{tabular}
-  \end{center}
-  
-  \vspace{2.5mm}
-  The impact of our model on two NLP downstream tasks. We compare our OOV embeddings prediction scheme against random embeddings.
-  \vspace{-12mm}
-  }
-
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  \column{.4} 
   \block{Conclusion}{
   
   \textbf{Discussion:}
