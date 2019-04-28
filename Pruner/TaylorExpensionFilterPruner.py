@@ -45,11 +45,11 @@ class TaylorExpensionFilterPruner(FilterPruner):
 
         if node_id == -1:
             return
-        n_batch, _, n_x, n_y = self.activations[node_id].size()
-        n_parameters = n_batch * n_x * n_y
+        batch_size, _, filter_width, filter_height = self.activations[node_id].size()
+        param_count = batch_size * filter_width * filter_height
 
         # skip dim=1, its the dim for depth
-        estimates = self.activations[node_id].mul_(grad_output[0]).sum(dim=3).sum(dim=2).sum(dim=0).div_(n_parameters)
+        estimates = self.activations[node_id].mul_(grad_output[0]).sum(dim=3).sum(dim=2).sum(dim=0).div_(param_count)
 
         # normalization
         self.test_layer_activation[node_id] = torch.abs(estimates) / torch.sqrt(torch.sum(estimates * estimates))
