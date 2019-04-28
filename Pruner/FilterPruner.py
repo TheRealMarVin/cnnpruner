@@ -17,11 +17,11 @@ class FilterPruner:
         self.gradients = []
         self.grad_index = 0 # TODO remove
         self.conv_layer = {}
-        self.activation_to_layer = {} # TODO remove
+        self.activation_to_layer = {}
         self.filter_ranks = {}
         self.forward_res = {}
         self.activation_index = 0 # TODO remove
-        self.test_layer_activation = {} #TODO remove
+        self.test_layer_activation = {} #TODO rename
         self.connection_count = {}
         self.connection_count_copy = {}
         self.features = []
@@ -44,7 +44,7 @@ class FilterPruner:
         self.activation_index = 0
         self.connection_count = {}
         self.connection_count_copy = {}
-        self.test_layer_activation = {} #TODO test
+        self.test_layer_activation = {} #TODO rename
 
     def parse(self, node_id):
         # print("PARSE node_name: {}".format(node_id))
@@ -61,9 +61,12 @@ class FilterPruner:
             if isinstance(curr_module, torch.nn.modules.Linear):
                 x = x.view(x.size(0), -1)
 
+            if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
+                self.handle_before_conv_in_forward(curr_module, node_id)
+
             out = curr_module(x)
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
-                self.handle_conv_in_forward(curr_module, node_id, out)
+                self.handle_after_conv_in_forward(curr_module, node_id, out)
 
 
         res = None
@@ -122,8 +125,14 @@ class FilterPruner:
 
         return random.sample(data, num)
 
-    def handle_conv_in_forward(self, curr_module, node_id, out):
-        raise NotImplementedError
+    def handle_before_conv_in_forward(self, curr_module, node_id):
+        pass
+
+    def handle_after_conv_in_forward(self, curr_module, node_id, out):
+        pass
+
+    def post_run_cleanup(self):
+        pass
 
     def sort_filters(self, num):
         raise NotImplementedError

@@ -19,7 +19,7 @@ class ActivationMeanFilterPruner(FilterPruner):
 
         return nsmallest(num, data, itemgetter(2))
 
-    def handle_conv_in_forward(self, curr_module, node_id, out):
+    def handle_after_conv_in_forward(self, curr_module, node_id, out):
         self.conv_layer[node_id] = curr_module
         average_per_batch_item = torch.tensor([[curr.view(-1).mean() for curr in batch_item] for batch_item in out])
         activation_average_sum = torch.sum(average_per_batch_item, dim=0)

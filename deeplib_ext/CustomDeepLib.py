@@ -93,6 +93,7 @@ def do_epoch(criterion, model, optimizer, scheduler, train_loader, use_gpu, prun
         optimizer.step()
         if pruner is not None:
             pruner.extract_filter_activation_mean(output)
+            pruner.post_run_cleanup()
 
         if count is not None:
             count = count - 1

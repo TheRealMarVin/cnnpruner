@@ -18,7 +18,7 @@ class RandomFilterPruner(FilterPruner):
 
         return random.sample(data, num)
 
-    def handle_conv_in_forward(self, curr_module, node_id, out):
+    def handle_after_conv_in_forward(self, curr_module, node_id, out):
         #we just reuse mean activation
         self.conv_layer[node_id] = curr_module
         average_per_batch_item = torch.tensor([[curr.view(-1).mean() for curr in batch_item] for batch_item in out])
