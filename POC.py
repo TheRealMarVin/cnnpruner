@@ -8,6 +8,7 @@ from torchvision.transforms import transforms
 
 from Pruner.ActivationMeanFilterPruner import ActivationMeanFilterPruner
 from Pruner.FilterPruner import FilterPruner
+from Pruner.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
 from deeplib_ext.CustomDeepLib import train, test
 from FileHelper import load_obj, save_obj
 from ModelHelper import total_num_filters
@@ -51,8 +52,8 @@ def common_training_code(model,
     batch_size = 16
     learning_rate = 0.01
 
-    #TODO uncomment
-    # n_epoch = 1
+    #TODO remove
+    # n_epoch = 0
     # n_epoch_retrain = 1
     # n_epoch_total = 1
 
@@ -77,7 +78,6 @@ def common_training_code(model,
                               scheduler=scheduler, best_result_save_path=best_result_save_path)
         history.append(local_history)
         n_epoch_total = n_epoch_total - n_epoch
-        # history.display()
 
     test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
     print('Test:\n\tScore: {}'.format(test_score))
@@ -85,7 +85,8 @@ def common_training_code(model,
     ###
     #TODO maybe put the loop content in a function that looks terrible now
     if prune_ratio is not None:
-        pruner = ActivationMeanFilterPruner(model, sample_run)
+        pruner = TaylorExpensionFilterPruner(model, sample_run)
+        # pruner = ActivationMeanFilterPruner(model, sample_run)
         number_of_filters = total_num_filters(model)
         filter_to_prune = int(number_of_filters * prune_ratio)
         max_filters_to_prune_on_iteration = int(number_of_filters * max_percent_per_iteration)
@@ -133,7 +134,7 @@ def common_training_code(model,
             basedir = os.path.dirname(pruned_save_path)
             if not os.path.exists(basedir):
                 os.makedirs(basedir)
-            torch.save(model, pruned_save_path)
+            # torch.save(model, pruned_save_path)
 
             print("Fine tuning to recover from prunning iteration.")
             local_history = train(model, optimizer, train_dataset, n_epoch_retrain, batch_size, use_gpu=use_gpu,
@@ -163,6 +164,9 @@ def common_training_code(model,
     history.display()
     flops, params = profile(model, input_size=(1, 3, 224, 224))
     print("end number of flops: {} \tnumber of params: {}".format(flops, params))
+
+    test_score = test(model, test_dataset, batch_size, use_gpu=use_gpu)
+    print('Final Test:\n\tScore: {}'.format(test_score))
 
     return history
 
@@ -300,6 +304,7 @@ def run_startegy_prune_compare():
     # multi_history.append_history("Resnet 34", h)
     # h = exec_resnet50()
     # multi_history.append_history("Resnet 50", h)
+
     h = exec_alexnet(max_percent_per_iteration=0.0, prune_ratio=None, n_epoch=20)
     multi_history.append_history("Alexnet 0", h)
     h = exec_alexnet(max_percent_per_iteration=0.2, prune_ratio=0.2, n_epoch=20)
@@ -315,8 +320,6 @@ def run_startegy_prune_compare():
     # h = exec_dense_net(max_percent_per_iteration=0.2, prune_ratio=0.2, n_epoch=10)
     # multi_history.append_history("densenet121 20", h)
 
-
-
     save_obj(multi_history, "history_compare")
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
@@ -329,8 +332,6 @@ def run_alex_prune_compare():
     multi_history.append_history("Alexnet 10%", h)
     h = exec_alexnet(max_percent_per_iteration=0.15, prune_ratio=0.3)
     multi_history.append_history("Alexnet 30%", h)
-    # h = exec_alexnet(max_percent_per_iteration=0.1, prune_ratio=0.3)
-    # multi_history.append_history("Alexnet 30%-3", h)
     h = exec_alexnet(max_percent_per_iteration=0.25, prune_ratio=0.5)
     multi_history.append_history("Alexnet 50%", h)
     h = exec_alexnet(max_percent_per_iteration=0.25, prune_ratio=0.75)
