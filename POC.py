@@ -1,5 +1,6 @@
 import os
 import torch
+import torchvision
 
 from torch import nn
 from torchvision import models
@@ -249,12 +250,13 @@ def exec_vgg16(pruning_params=None, exec_params=None, dataset_params=None):
     return history
 
 
-def exec_resnet18(pruning_params=None, exec_params=None, dataset_params=None):
+def exec_resnet18(pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
     print("***resnet 18")
 
     model = models.resnet18(pretrained=True)
-    num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 10)
+    if model.fc.out_features != out_count:
+        num_ftrs = model.fc.in_features
+        model.fc = nn.Linear(num_ftrs, 10)
 
     model.cuda()
 
@@ -269,7 +271,7 @@ def exec_resnet18(pruning_params=None, exec_params=None, dataset_params=None):
     return history
 
 
-def exec_resnet34(pruning_params=None, exec_params=None, dataset_params=None):
+def exec_resnet34(pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
     print("***resnet 34")
 
     model = models.resnet34(pretrained=True)
@@ -289,7 +291,7 @@ def exec_resnet34(pruning_params=None, exec_params=None, dataset_params=None):
     return history
 
 
-def exec_resnet50(pruning_params=None, exec_params=None, dataset_params=None):
+def exec_resnet50(pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
     print("***resnet 50")
 
     model = models.resnet50(pretrained=True)
@@ -316,19 +318,19 @@ def run_strategy_prune_compare(dataset_params):
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.2, prune_ratio=0.2)
 
     multi_history = MultiHistory()
-    h = exec_resnet18(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params)
+    h = exec_resnet18(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params, out_count=10)
     multi_history.append_history("Resnet 18-0", h)
-    h = exec_resnet18(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params)
+    h = exec_resnet18(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params, out_count=10)
     multi_history.append_history("Resnet 18-20", h)
 
-    h = exec_alexnet(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params)
+    h = exec_alexnet(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params, out_count=10)
     multi_history.append_history("Alexnet 0", h)
-    h = exec_alexnet(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params)
+    h = exec_alexnet(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params, out_count=10)
     multi_history.append_history("Alexnet 20", h)
 
-    h = exec_vgg16(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params)
+    h = exec_vgg16(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params, out_count=10)
     multi_history.append_history("vgg16 0", h)
-    h = exec_vgg16(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params)
+    h = exec_vgg16(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params, out_count=10)
     multi_history.append_history("vgg16 20", h)
 
     save_obj(multi_history, "history_compare")
@@ -360,12 +362,44 @@ def run_validation(dataset_params):
     multi_history.append_history("Alexnet 0%", h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
+def run_compare_model_and_prune_alexnet():
+    transform = transforms.Compose([transforms.Resize((224, 224)),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
-if __name__ == '__main__':
-    # multi_history = MultiHistory()
-    # h = exec_dense_net(max_percent_per_iteration=0.3, prune_ratio=0.3, n_epoch=1)
-    # multi_history.append_history("densenet121 20", h)
+    train_dataset = CIFAR10("C:/dev/data/cifar10/", train=True, transform=transform, download=True)
+    test_dataset = CIFAR10("C:/dev/data/cifar10/", train=False, transform=transform, download=True)
+    dataset_params = DatasetParams(transform, train_dataset, test_dataset)
 
+    run_alex_prune_compare(dataset_params)
+    run_strategy_prune_compare(dataset_params)
+
+
+def run_test_using_image_net():
+    exec_param_w_prune = ExecParams(n_pretrain_epoch=10,
+                                    n_epoch_retrain=3,
+                                    n_epoch_total=20,
+                                    pruner=TaylorExpensionFilterPruner)
+    pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.2,
+                                          prune_ratio=0.2)
+
+    transform = transforms.Compose([transforms.Resize((224, 224)),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
+
+    train_dataset = torchvision.datasets.ImageFolder("TrainPATH", transform=transform)
+    test_dataset = torchvision.datasets.ImageFolder("TestPATH", transform=transform)
+    dataset_params = DatasetParams(transform, train_dataset, test_dataset)
+
+
+    multi_history = MultiHistory()
+    h = exec_resnet18(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
+                      dataset_params=dataset_params)
+    multi_history.append_history("Resnet18 20%", h)
+    multi_history.display_single_key(History.VAL_ACC_KEY)
+
+
+def run_validation():
     transform = transforms.Compose([transforms.Resize((224, 224)),
                                     transforms.ToTensor(),
                                     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
@@ -375,5 +409,9 @@ if __name__ == '__main__':
     dataset_params = DatasetParams(transform, train_dataset, test_dataset)
 
     run_validation(dataset_params)
-    # run_alex_prune_compare(dataset_params)
-    # run_strategy_prune_compare(dataset_params)
+
+
+if __name__ == '__main__':
+    # run_validation()
+    run_compare_model_and_prune_alexnet()
+    # run_test_using_image_net()
