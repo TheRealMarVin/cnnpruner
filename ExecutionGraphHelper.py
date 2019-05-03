@@ -108,15 +108,12 @@ def generate_graph(model, args):
                     curr_name = "AveragePool"
                     special_op[intersect_as_string] = "AveragePool"
                     special_op_params[intersect_as_string] = (torch_node["kernel_shape"], torch_node["pads"], torch_node["strides"])
-                print("curr_name: ", curr_name, " \top: ", op + " \tintersect: " + intersect_as_string + " \tTarget: " + str(target_outputs))
-                # if curr_name == "1639":
-                #     a = 0 #TODO remove
+                # print("curr_name: ", curr_name, " \top: ", op + " \tintersect: " + intersect_as_string + " \tTarget: " + str(target_outputs))
                 id_name_dict[intersect_as_string] = curr_name
                 execution_shapes[intersect_as_string] = shape
 
     execution_graph = clean_execution_graph(execution_graph, execution_shapes, id_name_dict)
-    print_exec_graph(execution_graph, id_name_dict)
-    #TODO probably need to clean the number I want to concat
+    # print_exec_graph(execution_graph, id_name_dict)
     return execution_graph, id_name_dict, root, special_op, special_op_params
 
 

@@ -54,10 +54,6 @@ class FilterPruner:
         if self.connection_count[node_id] > 0:
             return None
 
-        if node_id == "1640": #TODO remove
-            a = 0
-
-
         curr_module = get_node_in_model(self.model, node_name)
         if curr_module is None:
             if node_id in self.special_op.keys():
@@ -246,6 +242,7 @@ class FilterPruner:
         elif isinstance(layer, torch.nn.modules.BatchNorm2d):
             self._prune_conv_input_batchnorm(layer, removed_filter, initial_filter_count)
             effect_applied.append(layer_id)
+            initial_filter_count = layer.num_features
 
         if has_more:
             next_id = self.graph[layer_id]
