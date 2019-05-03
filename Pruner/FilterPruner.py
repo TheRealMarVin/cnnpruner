@@ -5,6 +5,7 @@ from operator import itemgetter
 
 import numpy as np
 import torch
+import torch.nn.functional as F
 
 from ExecutionGraphHelper import generate_graph, get_input_connection_count_per_entry
 from ModelHelper import get_node_in_model
@@ -27,7 +28,7 @@ class FilterPruner:
         self.features = []
         self.reset()
         model.cpu()
-        self.graph, self.name_dic, self.root = generate_graph(model, sample_run)
+        self.graph, self.name_dic, self.root, self.special_op, self.special_op_params = generate_graph(model, sample_run)
 
         model.cuda()
 
@@ -53,9 +54,18 @@ class FilterPruner:
         if self.connection_count[node_id] > 0:
             return None
 
+        if node_id == "1640": #TODO remove
+            a = 0
+
+
         curr_module = get_node_in_model(self.model, node_name)
         if curr_module is None:
-            out = self.forward_res[node_id]
+            if node_id in self.special_op.keys():
+                if self.special_op[node_id] == "AveragePool":
+                    shape, pad, stride = self.special_op_params[node_id]
+                    out = F.avg_pool2d(self.forward_res[node_id], kernel_size=shape, stride=stride)
+            else:
+                out = self.forward_res[node_id]
         else:
             x = self.forward_res[node_id]
             if isinstance(curr_module, torch.nn.modules.Linear):
@@ -64,7 +74,19 @@ class FilterPruner:
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
                 self.handle_before_conv_in_forward(curr_module, node_id)
 
-            out = curr_module(x)
+            should_not_skip = True
+            if node_id in self.special_op.keys():
+                if self.special_op[node_id] == "Concat":
+                    should_not_skip = False
+                    out = x
+                elif self.special_op[node_id] == "AveragePool":
+                    shape, pad, stride = self.special_op_params[node_id]
+                    out = F.avg_pool2d(x, kernel_size=shape, stride=stride)
+                    should_not_skip = False
+
+            if should_not_skip:
+                out = curr_module(x)
+
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
                 self.handle_after_conv_in_forward(curr_module, node_id, out)
 
@@ -77,7 +99,10 @@ class FilterPruner:
             for next_id in self.graph[node_id].split(","):
                 self.connection_count[next_id] -= 1
                 if next_id in self.forward_res:
-                    self.forward_res[next_id] = self.forward_res[next_id] + out
+                    if next_id in self.special_op.keys() and self.special_op[next_id] == "Concat":
+                        self.forward_res[next_id] = torch.cat((self.forward_res[next_id], out), 1)
+                    else:
+                        self.forward_res[next_id] = self.forward_res[next_id] + out
                 else:
                     self.forward_res[next_id] = out
 

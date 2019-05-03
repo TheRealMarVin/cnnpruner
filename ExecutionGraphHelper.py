@@ -37,6 +37,8 @@ def generate_graph(model, args):
     execution_graph = {}
     execution_shapes = {}
     id_name_dict = {}
+    special_op = {}
+    special_op_params = {}
 
     # Run the Pytorch graph to get a trace and generate a graph from it
     trace, out = torch.jit.get_trace_graph(model, args)
@@ -100,12 +102,28 @@ def generate_graph(model, args):
                     new_name = try_correct_broken_name(op, shape, curr_name, model)
                     if new_name is not None:
                         curr_name = new_name
-                # print("curr_name: ", curr_name, " \top: ", op + " \tintersect: " + intersect_as_string + " \tTarget: " + str(target_outputs))
+                elif op == "onnx::Concat" and intersect_as_string not in special_op.keys():
+                    special_op[intersect_as_string] = "Concat"
+                elif op == "onnx::AveragePool" and intersect_as_string not in special_op.keys():
+                    curr_name = "AveragePool"
+                    special_op[intersect_as_string] = "AveragePool"
+                    special_op_params[intersect_as_string] = (torch_node["kernel_shape"], torch_node["pads"], torch_node["strides"])
+                print("curr_name: ", curr_name, " \top: ", op + " \tintersect: " + intersect_as_string + " \tTarget: " + str(target_outputs))
+                # if curr_name == "1639":
+                #     a = 0 #TODO remove
                 id_name_dict[intersect_as_string] = curr_name
                 execution_shapes[intersect_as_string] = shape
 
     execution_graph = clean_execution_graph(execution_graph, execution_shapes, id_name_dict)
-    return execution_graph, id_name_dict, root
+    print_exec_graph(execution_graph, id_name_dict)
+    #TODO probably need to clean the number I want to concat
+    return execution_graph, id_name_dict, root, special_op, special_op_params
+
+
+def print_exec_graph(execution_graph, id_name_dict):
+    for k,v in execution_graph.items():
+        if k in id_name_dict and v in id_name_dict:
+            print("From  {}[{}] to {}[{}]".format(id_name_dict[k], k, id_name_dict[v], v))
 
 
 def try_correct_broken_name(onnx_kind, shape, name, module):
@@ -151,11 +169,8 @@ def clean_execution_graph(execution_graph, execution_shapes, id_name_dict):
                 temp_list.append(i)
 
         cleaned_graph[k] = ",".join(str(x) for x in temp_list)
-    # for k, v in cleaned_graph.items():
-    #     cleaned_graph[k] = ",".join(str(x) for x in cleaned_graph[k])
 
     to_delete = []
-
     for k, v in cleaned_graph.items():
         if v in execution_shapes:
             while execution_shapes[v] is None:
@@ -176,6 +191,7 @@ def clean_execution_graph(execution_graph, execution_shapes, id_name_dict):
         id_name_dict.pop(key, None)
 
     return cleaned_graph
+
 
 def reformat_path(model_name, entry):
     if len(entry) == 0:

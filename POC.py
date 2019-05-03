@@ -8,7 +8,6 @@ from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
 from Pruner.ActivationMeanFilterPruner import ActivationMeanFilterPruner
-from Pruner.FilterPruner import FilterPruner
 from Pruner.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
 from deeplib_ext.CustomDeepLib import train, test, display_sample_data
 from FileHelper import load_obj, save_obj
@@ -71,22 +70,12 @@ def common_training_code(model,
                          pruning_params=None,
                          exec_params=None,
                          dataset_params=None):
-    # test_transform = transforms.Compose([transforms.Resize((224, 224)),
-    #                                      transforms.ToTensor(),
-    #                                      transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
-    #
-    # train_dataset = CIFAR10("C:/dev/data/cifar10/", train=True, transform=test_transform, download=True)
-    # test_dataset = CIFAR10("C:/dev/data/cifar10/", train=False, transform=test_transform, download=True)
-    #
-    # # display_sample_data(train_dataset)
-    # # display_sample_data(test_dataset)
     model.cuda()
 
     flops, params = profile(model, input_size=(1, 3, 224, 224))
     print("number of flops: {} \tnumber of params: {}".format(flops, params))
 
     use_gpu = True
-
 
     history = History()
 
@@ -174,7 +163,7 @@ def common_training_code(model,
             exec_params.n_epoch_total = exec_params.n_epoch_total - exec_params.n_epoch_retrain
             history.append(local_history)
             # local_history.display()
-            test_score = test(model, test_dataset, exec_params.batch_size, use_gpu=use_gpu)
+            test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
             print('Test pruning iteration :{}\n\tScore: {}'.format(iteration_idx, test_score))
     ###
 
@@ -313,11 +302,15 @@ def exec_resnet50(pruning_params=None, exec_params=None, dataset_params=None, ou
 
 def run_strategy_prune_compare(dataset_params):
     exec_param_no_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=20, pruner=TaylorExpensionFilterPruner)
-    exec_param_w_prune = ExecParams(n_pretrain_epoch=10, n_epoch_retrain=3, n_epoch_total=20, pruner=TaylorExpensionFilterPruner)
+    exec_param_w_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=1, n_epoch_total=1, batch_size=8, pruner=TaylorExpensionFilterPruner) #TODO put back origginal values
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=None)
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.2, prune_ratio=0.2)
 
     multi_history = MultiHistory()
+
+    h = exec_dense_net(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params)
+    multi_history.append_history("densenet 132-20", h)
+
     h = exec_resnet18(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params, out_count=10)
     multi_history.append_history("Resnet 18-0", h)
     h = exec_resnet18(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params, out_count=10)
@@ -371,7 +364,7 @@ def run_compare_model_and_prune_alexnet():
     test_dataset = CIFAR10("C:/dev/data/cifar10/", train=False, transform=transform, download=True)
     dataset_params = DatasetParams(transform, train_dataset, test_dataset)
 
-    run_alex_prune_compare(dataset_params)
+    # run_alex_prune_compare(dataset_params)
     run_strategy_prune_compare(dataset_params)
 
 
