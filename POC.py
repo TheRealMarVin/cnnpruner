@@ -11,7 +11,7 @@ from Pruner.ActivationMeanFilterPruner import ActivationMeanFilterPruner
 from Pruner.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
 from deeplib_ext.CustomDeepLib import train, test, display_sample_data
 from FileHelper import load_obj, save_obj
-from ModelHelper import total_num_filters
+# from ModelHelper import total_num_filters
 from deeplib_ext.MultiHistory import MultiHistory
 from deeplib_ext.history import History
 from models.AlexNetSki import alexnetski
@@ -66,7 +66,7 @@ def common_training_code(model,
                          pruned_best_result_save_path=None,
                          retrain_if_weight_loaded=False,
                          sample_run=None,
-                         reuse_cut_filter=False,
+                         # reuse_cut_filter=False,
                          pruning_params=None,
                          exec_params=None,
                          dataset_params=None):
@@ -106,8 +106,16 @@ def common_training_code(model,
     #TODO maybe put the loop content in a function that looks terrible now
     if pruning_params.prune_ratio is not None:
         pruner = exec_params.pruner(model, sample_run)
-        # pruner = ActivationMeanFilterPruner(model, sample_run)
-        number_of_filters = total_num_filters(model)
+
+        # prune_targets = None
+        # if reuse_cut_filter:
+        #     prune_targets = load_obj("filters_dic")
+
+        train(model, optimizer, dataset_params.train_dataset, 1, exec_params.batch_size, use_gpu=use_gpu,
+              criterion=criterion, scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
+
+        number_of_filters = pruner.get_number_of_filter_to_prune()
+        initial_number_of_filters = number_of_filters
         filter_to_prune = int(number_of_filters * pruning_params.prune_ratio)
         max_filters_to_prune_on_iteration = int(number_of_filters * pruning_params.max_percent_per_iteration)
         if filter_to_prune < max_filters_to_prune_on_iteration:
@@ -120,21 +128,24 @@ def common_training_code(model,
 
         for iteration_idx in range(iterations):
             print("Perform pruning iteration: {}".format(iteration_idx))
-            pruner.reset()
 
-            prune_targets = None
-            if reuse_cut_filter:
-                prune_targets = load_obj("filters_dic")
+            pruner.normalize_layer()
+            prune_targets = pruner.plan_prunning(max_filters_to_prune_on_iteration)
+            # pruner.reset()
 
-            if prune_targets is None:
-                train(model, optimizer, dataset_params.train_dataset, 1, exec_params.batch_size, use_gpu=use_gpu, criterion=criterion,
-                      scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
+            # prune_targets = None
+            # if reuse_cut_filter:
+            #     prune_targets = load_obj("filters_dic")
 
-                pruner.normalize_layer()
-
-                prune_targets = pruner.plan_prunning(max_filters_to_prune_on_iteration)
-                if reuse_cut_filter:
-                    save_obj(prune_targets, "filters_dic")
+            # if prune_targets is None:
+            #     # train(model, optimizer, dataset_params.train_dataset, 1, exec_params.batch_size, use_gpu=use_gpu, criterion=criterion,
+            #     #       scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
+            #
+            #     pruner.normalize_layer()
+            #
+            #     prune_targets = pruner.plan_prunning(max_filters_to_prune_on_iteration)
+            #     if reuse_cut_filter:
+            #         save_obj(prune_targets, "filters_dic")
 
             pruner.display_pruning_log(prune_targets)
 
@@ -147,7 +158,7 @@ def common_training_code(model,
             optimizer = torch.optim.SGD(model.parameters(), exec_params.learning_rate)
             pruner.reset()
 
-            print("Filters pruned {}%".format(100 - (100 * float(total_num_filters(model)) / number_of_filters)))
+            print("Filters pruned {}%".format(100 * float(max_filters_to_prune_on_iteration) / initial_number_of_filters))
             new_test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
             print('Test:\n\tpost prune Score: {}'.format(new_test_score))
 
@@ -165,6 +176,11 @@ def common_training_code(model,
             # local_history.display()
             test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
             print('Test pruning iteration :{}\n\tScore: {}'.format(iteration_idx, test_score))
+
+            if iteration_idx < iterations - 1:
+                pruner.reset()
+                train(model, optimizer, dataset_params.train_dataset, 1, exec_params.batch_size, use_gpu=use_gpu,
+                      criterion=criterion, scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
     ###
 
     if exec_params.n_epoch_total > 0:
@@ -197,7 +213,6 @@ def exec_alexnet(pruning_params=None, exec_params=None, dataset_params=None):
                                    # best_result_save_path="saved/alex{}/alexnet.pth".format(prune_ratio),
                                    pruned_best_result_save_path="saved/alex{}/alexnet_pruned.pth".format(pruning_params.prune_ratio),
                                    sample_run=torch.zeros([1, 3, 224, 224]),
-                                   reuse_cut_filter=False,
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
                                    dataset_params=dataset_params)
@@ -215,7 +230,6 @@ def exec_dense_net(pruning_params=None, exec_params=None, dataset_params=None):
                                    # best_result_save_path="saved/resnet18/resnet18.pth",
                                    pruned_best_result_save_path="saved/densenet121/densenet121_pruned.pth",
                                    sample_run=torch.zeros([1, 3, 224, 224]),
-                                   reuse_cut_filter=False,
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
                                    dataset_params=dataset_params)
@@ -232,7 +246,6 @@ def exec_vgg16(pruning_params=None, exec_params=None, dataset_params=None):
                                    # best_result_save_path="saved/resnet18/resnet18.pth",
                                    pruned_best_result_save_path="saved/vgg16/vgg16_pruned.pth",
                                    sample_run=torch.zeros([1, 3, 224, 224]),
-                                   reuse_cut_filter=False,
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
                                    dataset_params=dataset_params)
@@ -253,7 +266,6 @@ def exec_resnet18(pruning_params=None, exec_params=None, dataset_params=None, ou
                                    # best_result_save_path="saved/resnet18/resnet18.pth",
                                    pruned_best_result_save_path="saved/resnet18/resnet18_pruned.pth",
                                    sample_run=torch.zeros([1, 3, 224, 224]),
-                                   reuse_cut_filter=False,
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
                                    dataset_params=dataset_params)
@@ -273,7 +285,6 @@ def exec_resnet34(pruning_params=None, exec_params=None, dataset_params=None, ou
                                    # best_result_save_path="saved/resnet34/resnet18.pth",
                                    pruned_best_result_save_path="saved/resnet34/resnet34_pruned.pth",
                                    sample_run=torch.zeros([1, 3, 224, 224]),
-                                   reuse_cut_filter=False,
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
                                    dataset_params=dataset_params)
@@ -293,7 +304,6 @@ def exec_resnet50(pruning_params=None, exec_params=None, dataset_params=None, ou
                                    # best_result_save_path="saved/resnet50/resnet18.pth",
                                    pruned_best_result_save_path="saved/resnet50/resnet50_pruned.pth",
                                    sample_run=torch.zeros([1, 3, 224, 224]),
-                                   reuse_cut_filter=False,
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
                                    dataset_params=dataset_params)
@@ -302,11 +312,17 @@ def exec_resnet50(pruning_params=None, exec_params=None, dataset_params=None, ou
 
 def run_strategy_prune_compare(dataset_params):
     exec_param_no_prune_large = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15, batch_size=16,
-                                     pruner=TaylorExpensionFilterPruner)
+                                           pruner=TaylorExpensionFilterPruner)
+    exec_param_no_prune_medium = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15, batch_size=32,
+                                           pruner=TaylorExpensionFilterPruner)
     exec_param_w_prune_large = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=16,
+                                          pruner=TaylorExpensionFilterPruner)
+    exec_param_w_prune_medium = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=32,
+                                           pruner=TaylorExpensionFilterPruner)
+    exec_param_no_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15, batch_size=64,
+                                     pruner=TaylorExpensionFilterPruner)
+    exec_param_w_prune = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
                                     pruner=TaylorExpensionFilterPruner)
-    exec_param_no_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15, batch_size=64, pruner=TaylorExpensionFilterPruner)
-    exec_param_w_prune = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64, pruner=TaylorExpensionFilterPruner)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=None)
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.3)
 
@@ -323,10 +339,10 @@ def run_strategy_prune_compare(dataset_params):
     multi_history.append_history("Resnet 18-20", h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
-    h = exec_resnet50(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_large,
+    h = exec_resnet50(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_medium,
                       dataset_params=dataset_params, out_count=10)
     multi_history.append_history("Resnet 50-0", h)
-    h = exec_resnet50(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_large,
+    h = exec_resnet50(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_medium,
                       dataset_params=dataset_params, out_count=10)
     multi_history.append_history("Resnet 50-20", h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
