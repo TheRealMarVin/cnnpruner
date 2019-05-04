@@ -27,18 +27,19 @@ def get_node_in_model(module, full_name):
     return res
 
 
-def total_num_filters(modules):
-    filters = 0
-
-    if isinstance(modules, torch.nn.modules.conv.Conv2d):
-        filters = filters + modules.out_channels
-    else:
-        if len(modules._modules.items()) > 0:
-            for name, sub_module in modules._modules.items():
-                if sub_module is not None:
-                    filters = filters + total_num_filters(sub_module)
-
-        else:
-            if isinstance(modules, torch.nn.modules.conv.Conv2d):
-                filters = filters + modules.out_channels
-    return filters
+# def total_num_filters(modules):
+#     filters = 0
+#
+#     if isinstance(modules, torch.nn.modules.conv.Conv2d):
+#         filters = filters + modules.out_channels
+#     else:
+#         if len(modules._modules.items()) > 0:
+#             for name, sub_module in modules._modules.items():
+#                 if sub_module is not None:
+#                     filters = filters + total_num_filters(sub_module)
+#
+#         else:
+#             if isinstance(modules, torch.nn.modules.conv.Conv2d):
+#                 filters = filters + modules.out_channels
+#
+#     return filters

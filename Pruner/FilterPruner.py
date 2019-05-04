@@ -48,8 +48,6 @@ class FilterPruner:
         self.test_layer_activation = {} #TODO rename
 
     def parse(self, node_id):
-        # print("PARSE node_name: {}".format(node_id))
-
         node_name = self.name_dic[node_id]
         if self.connection_count[node_id] > 0:
             return None
@@ -85,7 +83,6 @@ class FilterPruner:
 
             if isinstance(curr_module, torch.nn.modules.conv.Conv2d):
                 self.handle_after_conv_in_forward(curr_module, node_id, out)
-
 
         res = None
         next_nodes = self.graph[node_id]
@@ -157,6 +154,19 @@ class FilterPruner:
 
     def sort_filters(self, num):
         raise NotImplementedError
+
+    """
+    This must be called once the first forward pass is done
+    """
+    def get_number_of_filter_to_prune(self):
+        total_filter_count = 0
+        for k, conv in self.conv_layer.items():
+            if self.is_before_merge(k):
+                continue
+
+            total_filter_count = total_filter_count + conv.out_channels
+
+        return total_filter_count
 
     def is_before_merge(self, layer_id):
         next_id = self.graph[layer_id]
@@ -319,9 +329,16 @@ class FilterPruner:
 
     def display_pruning_log(self, pruning_dic):
         layers_pruned = {}
+        after_pruning = {}
+        sum = 0
+        remain_sum = 0
         for layer_index, filter_index in pruning_dic.items():
             layer_name = self.name_dic[layer_index]
             if layer_name not in layers_pruned:
-                layers_pruned[layer_name] = 0
-                layers_pruned[layer_name] = len(pruning_dic[layer_index])
+                to_remove_count = len(pruning_dic[layer_index])
+                sum = sum + to_remove_count
+                remain_sum = remain_sum + self.conv_layer[layer_index].out_channels - to_remove_count
+                layers_pruned[layer_name] = to_remove_count
+                after_pruning[layer_name] = self.conv_layer[layer_index].out_channels - to_remove_count
         print("Layers that will be pruned", layers_pruned)
+        print("convolution remaining after pruning", after_pruning)
