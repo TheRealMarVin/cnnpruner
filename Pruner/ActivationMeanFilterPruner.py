@@ -8,8 +8,8 @@ from Pruner.FilterPruner import FilterPruner
 
 class ActivationMeanFilterPruner(FilterPruner):
 
-    def __init__(self, model, sample_run):
-        super(ActivationMeanFilterPruner, self).__init__(model, sample_run)
+    def __init__(self, model, sample_run, force_forward_view=False):
+        super(ActivationMeanFilterPruner, self).__init__(model, sample_run, force_forward_view)
 
     def sort_filters(self, num):
         data = []

@@ -12,8 +12,9 @@ from ModelHelper import get_node_in_model
 
 
 class FilterPruner:
-    def __init__(self, model, sample_run):
+    def __init__(self, model, sample_run, force_forward_view=False):
         self.model = model
+        self.force_forward_view = force_forward_view;
         self.activations = {} #TODO remove?
         self.gradients = []
         self.grad_index = 0 # TODO remove
@@ -122,6 +123,8 @@ class FilterPruner:
 
         x.requires_grad = True
         x = self.parse(self.root)
+        if self.force_forward_view:
+           x = x.view(x.size(0), x.shape[1])
         return x
 
     def extract_filter_activation_mean(self, out):

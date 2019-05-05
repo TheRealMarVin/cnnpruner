@@ -29,13 +29,15 @@ class ExecParams:
                  n_epoch_total=20,
                  batch_size=64,
                  learning_rate=0.01,
-                 pruner=TaylorExpensionFilterPruner):
+                 pruner=TaylorExpensionFilterPruner,
+                 force_forward_view=False):
         self.n_pretrain_epoch = n_pretrain_epoch
         self.n_epoch_retrain = n_epoch_retrain
         self.n_epoch_total = n_epoch_total
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.pruner = pruner
+        self.force_forward_view = force_forward_view
 
 
 class PruningParams:
@@ -105,7 +107,7 @@ def common_training_code(model,
     ###
     #TODO maybe put the loop content in a function that looks terrible now
     if pruning_params.prune_ratio is not None:
-        pruner = exec_params.pruner(model, sample_run)
+        pruner = exec_params.pruner(model, sample_run, exec_params.force_forward_view)
 
         # prune_targets = None
         # if reuse_cut_filter:
@@ -332,16 +334,18 @@ def run_strategy_prune_compare(dataset_params):
                                      pruner=TaylorExpensionFilterPruner)
     exec_param_w_prune = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
                                     pruner=TaylorExpensionFilterPruner)
+    exec_param_w_prune_squeeze = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
+                                            pruner=TaylorExpensionFilterPruner, force_forward_view=True)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=None)
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.3)
 
     multi_history = MultiHistory()
-    # exec_name = "SqueezeNet-0"
-    # h = exec_squeeze_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
-    #                      dataset_params=dataset_params)
-    # multi_history.append_history(exec_name, h)
+    exec_name = "SqueezeNet-0"
+    h = exec_squeeze_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
+                         dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
     exec_name = "SqueezeNet-30"
-    h = exec_squeeze_net(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
+    h = exec_squeeze_net(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_squeeze,
                          dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
     multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
@@ -366,35 +370,44 @@ def run_strategy_prune_compare(dataset_params):
     multi_history.append_history(exec_name, h)
     multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
 
+    #create a second history since I am not sure it will look nice in one graph
+    multi_history2 = MultiHistory()
     exec_name = "Resnet 18-0"
     h = exec_resnet18(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
                       dataset_params=dataset_params, out_count=10)
     multi_history.append_history(exec_name, h)
+    multi_history2.append_history(exec_name, h)
     exec_name = "Resnet 18-30"
     h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
                       dataset_params=dataset_params, out_count=10)
     multi_history.append_history(exec_name, h)
+    multi_history2.append_history(exec_name, h)
 
     exec_name = "Alexnet 0"
     h = exec_alexnet(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
                      dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
+    multi_history2.append_history(exec_name, h)
     exec_name = "Alexnet 30"
     h = exec_alexnet(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
                      dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
+    multi_history2.append_history(exec_name, h)
 
     exec_name = "vgg16 0"
     h = exec_vgg16(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
                    dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
+    multi_history2.append_history(exec_name, h)
     exec_name = "vgg16 30"
     h = exec_vgg16(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
                    dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
+    multi_history2.append_history(exec_name, h)
 
     save_obj(multi_history, "history_compare")
     multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
+    multi_history2.display_single_key(History.VAL_ACC_KEY, title="Comparing Models ar 30% Pruning")
 
 
 def run_alex_prune_compare(dataset_params):

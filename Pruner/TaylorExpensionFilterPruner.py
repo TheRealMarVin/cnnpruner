@@ -9,8 +9,8 @@ from Pruner.FilterPruner import FilterPruner
 
 class TaylorExpensionFilterPruner(FilterPruner):
 
-    def __init__(self, model, sample_run):
-        super(TaylorExpensionFilterPruner, self).__init__(model, sample_run)
+    def __init__(self, model, sample_run, force_forward_view=False):
+        super(TaylorExpensionFilterPruner, self).__init__(model, sample_run, force_forward_view)
         self.handles = {}
 
     def sort_filters(self, num):
