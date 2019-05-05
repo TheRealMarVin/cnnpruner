@@ -59,7 +59,7 @@ class DebugHelper:
     def __init__(self, transform, train_dataset, test_dataset):
         pass
 
-
+#TODO some needs to be cleaned or are no longer used
 def common_training_code(model,
                          pruned_save_path=None,
                          best_result_save_path=None,
@@ -162,9 +162,9 @@ def common_training_code(model,
             new_test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
             print('Test:\n\tpost prune Score: {}'.format(new_test_score))
 
-            basedir = os.path.dirname(pruned_save_path)
-            if not os.path.exists(basedir):
-                os.makedirs(basedir)
+            # basedir = os.path.dirname(pruned_save_path)
+            # if not os.path.exists(basedir):
+            #     os.makedirs(basedir)
             # torch.save(model, pruned_save_path)
 
             print("Fine tuning to recover from prunning iteration.")
@@ -204,14 +204,13 @@ def common_training_code(model,
     return history
 
 
-def exec_alexnet(pruning_params=None, exec_params=None, dataset_params=None):
-    print("***alexnet")
-    model = alexnetski(num_classes=10)
+def exec_alexnet(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
+    print("*** ", exec_name)
+    model = alexnetski(pretrained=True)
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="saved/alex{}/PrunedAlexnet.pth".format(pruning_params.prune_ratio),
-                                   # best_result_save_path="saved/alex{}/alexnet.pth".format(prune_ratio),
-                                   pruned_best_result_save_path="saved/alex{}/alexnet_pruned.pth".format(pruning_params.prune_ratio),
+    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
+                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
                                    sample_run=torch.zeros([1, 3, 224, 224]),
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
@@ -220,15 +219,14 @@ def exec_alexnet(pruning_params=None, exec_params=None, dataset_params=None):
     return history
 
 
-def exec_dense_net(pruning_params=None, exec_params=None, dataset_params=None):
-    print("***densenet121")
+def exec_dense_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
+    print("*** ", exec_name)
 
     model = models.densenet121(pretrained=True)
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="saved/densenet121v/Prunedresnet.pth,",
-                                   # best_result_save_path="saved/resnet18/resnet18.pth",
-                                   pruned_best_result_save_path="saved/densenet121/densenet121_pruned.pth",
+    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
+                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
                                    sample_run=torch.zeros([1, 3, 224, 224]),
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
@@ -236,15 +234,14 @@ def exec_dense_net(pruning_params=None, exec_params=None, dataset_params=None):
     return history
 
 
-def exec_vgg16(pruning_params=None, exec_params=None, dataset_params=None):
-    print("***vgg16")
+def exec_vgg16(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
+    print("*** ", exec_name)
 
     model = models.vgg16(pretrained=True)
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="saved/vgg16/Prunedresnet.pth,",
-                                   # best_result_save_path="saved/resnet18/resnet18.pth",
-                                   pruned_best_result_save_path="saved/vgg16/vgg16_pruned.pth",
+    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
+                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
                                    sample_run=torch.zeros([1, 3, 224, 224]),
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
@@ -252,8 +249,8 @@ def exec_vgg16(pruning_params=None, exec_params=None, dataset_params=None):
     return history
 
 
-def exec_resnet18(pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
-    print("***resnet 18")
+def exec_resnet18(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
+    print("*** ", exec_name)
 
     model = models.resnet18(pretrained=True)
     if model.fc.out_features != out_count:
@@ -262,9 +259,8 @@ def exec_resnet18(pruning_params=None, exec_params=None, dataset_params=None, ou
 
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="saved/resnet18/Prunedresnet.pth,",
-                                   # best_result_save_path="saved/resnet18/resnet18.pth",
-                                   pruned_best_result_save_path="saved/resnet18/resnet18_pruned.pth",
+    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
+                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
                                    sample_run=torch.zeros([1, 3, 224, 224]),
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
@@ -272,8 +268,8 @@ def exec_resnet18(pruning_params=None, exec_params=None, dataset_params=None, ou
     return history
 
 
-def exec_resnet34(pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
-    print("***resnet 34")
+def exec_resnet34(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
+    print("*** ", exec_name)
 
     model = models.resnet34(pretrained=True)
     num_ftrs = model.fc.in_features
@@ -281,9 +277,8 @@ def exec_resnet34(pruning_params=None, exec_params=None, dataset_params=None, ou
 
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="saved/resnet34/Prunedresnet.pth,",
-                                   # best_result_save_path="saved/resnet34/resnet18.pth",
-                                   pruned_best_result_save_path="saved/resnet34/resnet34_pruned.pth",
+    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
+                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
                                    sample_run=torch.zeros([1, 3, 224, 224]),
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
@@ -291,8 +286,8 @@ def exec_resnet34(pruning_params=None, exec_params=None, dataset_params=None, ou
     return history
 
 
-def exec_resnet50(pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
-    print("***resnet 50")
+def exec_resnet50(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
+    print("*** ", exec_name)
 
     model = models.resnet50(pretrained=True)
     num_ftrs = model.fc.in_features
@@ -300,9 +295,8 @@ def exec_resnet50(pruning_params=None, exec_params=None, dataset_params=None, ou
 
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="saved/resnet50/Prunedresnet.pth,",
-                                   # best_result_save_path="saved/resnet50/resnet18.pth",
-                                   pruned_best_result_save_path="saved/resnet50/resnet50_pruned.pth",
+    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
+                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
                                    sample_run=torch.zeros([1, 3, 224, 224]),
                                    pruning_params=pruning_params,
                                    exec_params=exec_params,
@@ -314,7 +308,7 @@ def run_strategy_prune_compare(dataset_params):
     exec_param_no_prune_large = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15, batch_size=16,
                                            pruner=TaylorExpensionFilterPruner)
     exec_param_no_prune_medium = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15, batch_size=32,
-                                           pruner=TaylorExpensionFilterPruner)
+                                            pruner=TaylorExpensionFilterPruner)
     exec_param_w_prune_large = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=16,
                                           pruner=TaylorExpensionFilterPruner)
     exec_param_w_prune_medium = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=32,
@@ -327,35 +321,53 @@ def run_strategy_prune_compare(dataset_params):
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.3)
 
     multi_history = MultiHistory()
-    h = exec_dense_net(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_large, dataset_params=dataset_params)
-    multi_history.append_history("densenet 121-0", h)
-    h = exec_dense_net(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_large, dataset_params=dataset_params)
-    multi_history.append_history("densenet 121-30", h)
+    exec_name = "densenet 121-0"
+    h = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_large,
+                       dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+    exec_name = "densenet 121-30"
+    h = exec_dense_net(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_large,
+                       dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
-    h = exec_resnet18(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params, out_count=10)
-    multi_history.append_history("Resnet 18-0", h)
-    h = exec_resnet18(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params, out_count=10)
-    multi_history.append_history("Resnet 18-30", h)
-    multi_history.display_single_key(History.VAL_ACC_KEY)
-
-    h = exec_resnet50(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_medium,
+    exec_name = "Resnet 18-0"
+    h = exec_resnet18(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
                       dataset_params=dataset_params, out_count=10)
-    multi_history.append_history("Resnet 50-0", h)
-    h = exec_resnet50(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_medium,
+    multi_history.append_history(exec_name, h)
+    exec_name = "Resnet 18-30"
+    h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
                       dataset_params=dataset_params, out_count=10)
-    multi_history.append_history("Resnet 50-30", h)
+    multi_history.append_history(exec_name, h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
-    h = exec_alexnet(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params)
-    multi_history.append_history("Alexnet 0", h)
-    h = exec_alexnet(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params)
-    multi_history.append_history("Alexnet 30", h)
+    exec_name = "Resnet 50-0"
+    h = exec_resnet50(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_medium,
+                      dataset_params=dataset_params, out_count=10)
+    multi_history.append_history(exec_name, h)
+    exec_name = "Resnet 50-30"
+    h = exec_resnet50(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_medium,
+                      dataset_params=dataset_params, out_count=10)
+    multi_history.append_history(exec_name, h)
+    multi_history.display_single_key(History.VAL_ACC_KEY)
 
-    h = exec_vgg16(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params)
-    multi_history.append_history("vgg16 0", h)
-    h = exec_vgg16(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params)
-    multi_history.append_history("vgg16 30", h)
+    exec_name = "Alexnet 0"
+    h = exec_alexnet(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+    exec_name = "Alexnet 30"
+    h = exec_alexnet(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+
+    exec_name = "vgg16 0"
+    h = exec_vgg16(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
+                   dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+    exec_name = "vgg16 30"
+    h = exec_vgg16(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
+                   dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
 
     save_obj(multi_history, "history_compare")
     multi_history.display_single_key(History.VAL_ACC_KEY)
@@ -364,26 +376,43 @@ def run_strategy_prune_compare(dataset_params):
 def run_alex_prune_compare(dataset_params):
     multi_history = MultiHistory()
     exec_param = ExecParams(n_pretrain_epoch=10, n_epoch_retrain=3, n_epoch_total=20, pruner=TaylorExpensionFilterPruner)
-    h = exec_alexnet(PruningParams(max_percent_per_iteration=0.0, prune_ratio=None), exec_params=exec_param, dataset_params=dataset_params)
-    multi_history.append_history("Alexnet 0%", h)
-    h = exec_alexnet(PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.1), exec_params=exec_param, dataset_params=dataset_params)
-    multi_history.append_history("Alexnet 10%", h)
-    h = exec_alexnet(PruningParams(max_percent_per_iteration=0.15, prune_ratio=0.3), exec_params=exec_param, dataset_params=dataset_params)
-    multi_history.append_history("Alexnet 30%", h)
-    h = exec_alexnet(PruningParams(max_percent_per_iteration=0.25, prune_ratio=0.5), exec_params=exec_param, dataset_params=dataset_params)
-    multi_history.append_history("Alexnet 50%", h)
-    h = exec_alexnet(PruningParams(max_percent_per_iteration=0.25, prune_ratio=0.75), exec_params=exec_param, dataset_params=dataset_params)
-    multi_history.append_history("Alexnet 75%", h)
+
+    exec_name = "Alexnet 0%"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.0, prune_ratio=None), exec_params=exec_param,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+
+    exec_name = "Alexnet 10%"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.1), exec_params=exec_param,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+
+    exec_name = "Alexnet 30%"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.15, prune_ratio=0.3), exec_params=exec_param,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+
+    exec_name = "Alexnet 50%"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.25, prune_ratio=0.5), exec_params=exec_param,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+
+    exec_name = "Alexnet 75%"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.38, prune_ratio=0.75), exec_params=exec_param,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
     save_obj(multi_history, "history_alex")
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
 
-def run_validation(dataset_params):
+def run_fast_validation(dataset_params):
     multi_history = MultiHistory()
     exec_param = ExecParams(n_pretrain_epoch=1, n_epoch_retrain=1, n_epoch_total=3, pruner=ActivationMeanFilterPruner)
-    h = exec_alexnet(PruningParams(max_percent_per_iteration=0.2, prune_ratio=0.2), exec_params=exec_param,
+
+    exec_name = "Alexnet test"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.2, prune_ratio=0.2), exec_params=exec_param,
                      dataset_params=dataset_params)
-    multi_history.append_history("Alexnet 0%", h)
+    multi_history.append_history(exec_name, h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
 
@@ -433,10 +462,10 @@ def run_validation():
     test_dataset = CIFAR10("C:/dev/data/cifar10/", train=False, transform=transform, download=True)
     dataset_params = DatasetParams(transform, train_dataset, test_dataset)
 
-    run_validation(dataset_params)
+    run_fast_validation(dataset_params)
 
 
 if __name__ == '__main__':
-    # run_validation()
-    run_compare_model_and_prune_alexnet()
+    run_validation()
+    # run_compare_model_and_prune_alexnet()
     # run_test_using_image_net()
