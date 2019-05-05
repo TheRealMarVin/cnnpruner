@@ -410,9 +410,9 @@ def run_strategy_prune_compare(dataset_params):
     multi_history2.display_single_key(History.VAL_ACC_KEY, title="Comparing Models ar 30% Pruning")
 
 
-def run_alex_prune_compare(dataset_params):
+def run_alex_prune_compare_rough(dataset_params):
     multi_history = MultiHistory()
-    exec_param = ExecParams(n_pretrain_epoch=10, n_epoch_retrain=3, n_epoch_total=20, pruner=TaylorExpensionFilterPruner)
+    exec_param = ExecParams(n_pretrain_epoch=3, n_epoch_retrain=3, n_epoch_total=15, pruner=TaylorExpensionFilterPruner)
 
     exec_name = "Alexnet 0%"
     h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.0, prune_ratio=None), exec_params=exec_param,
@@ -438,7 +438,39 @@ def run_alex_prune_compare(dataset_params):
     h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.38, prune_ratio=0.75), exec_params=exec_param,
                      dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
-    save_obj(multi_history, "history_alex")
+    save_obj(multi_history, "history_alex_rough")
+    multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing AlexNet by Level of Pruning")
+
+
+def run_alex_prune_compare_soft(dataset_params):
+    multi_history = MultiHistory()
+    exec_param = ExecParams(n_pretrain_epoch=3, n_epoch_retrain=1, n_epoch_total=15, pruner=TaylorExpensionFilterPruner)
+
+    exec_name = "Alexnet 0%"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.0, prune_ratio=None), exec_params=exec_param,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+
+    exec_name = "Alexnet 10%"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.01, prune_ratio=0.1), exec_params=exec_param,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+
+    exec_name = "Alexnet 30%"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.03, prune_ratio=0.3), exec_params=exec_param,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+
+    exec_name = "Alexnet 50%"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.5), exec_params=exec_param,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+
+    exec_name = "Alexnet 75%"
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.075, prune_ratio=0.75), exec_params=exec_param,
+                     dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+    save_obj(multi_history, "history_alex_soft")
     multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing AlexNet by Level of Pruning")
 
 
@@ -462,8 +494,9 @@ def run_compare_model_and_prune_alexnet():
     test_dataset = CIFAR10("C:/dev/data/cifar10/", train=False, transform=transform, download=True)
     dataset_params = DatasetParams(transform, train_dataset, test_dataset)
 
-    # run_alex_prune_compare(dataset_params)
     run_strategy_prune_compare(dataset_params)
+    run_alex_prune_compare_rough(dataset_params)
+    run_alex_prune_compare_soft(dataset_params)
 
 
 def run_test_using_image_net():
