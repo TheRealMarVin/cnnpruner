@@ -1,0 +1,334 @@
+C:\Users\naked\AppData\Local\conda\conda\envs\7030\python.exe C:/dev/cnnpruner/POC.py
+Files already downloaded and verified
+Files already downloaded and verified
+***densenet121
+C:\Users\naked\AppData\Local\conda\conda\envs\7030\lib\site-packages\torchvision\models\densenet.py:212: UserWarning: nn.init.kaiming_normal is now deprecated in favor of nn.init.kaiming_normal_.
+  nn.init.kaiming_normal(m.weight.data)
+number of flops: 2914598912.0 	number of params: 7978856.0
+C:\dev\cnnpruner\deeplib_ext\CustomDeepLib.py:129: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
+  inputs = Variable(inputs, volatile=True)
+C:\dev\cnnpruner\deeplib_ext\CustomDeepLib.py:130: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
+  targets = Variable(targets, volatile=True)
+Test:
+	Score: 0.0
+Epoch 0 - Train acc: 96.57 - Val acc: 93.38 - Train loss: 0.1073 - Val loss: 0.1878 - Training time: 404.24s
+Epoch 1 - Train acc: 98.19 - Val acc: 94.47 - Train loss: 0.0597 - Val loss: 0.1634 - Training time: 403.52s
+Epoch 2 - Train acc: 98.88 - Val acc: 94.69 - Train loss: 0.0370 - Val loss: 0.1589 - Training time: 407.06s
+Epoch 3 - Train acc: 99.63 - Val acc: 95.73 - Train loss: 0.0152 - Val loss: 0.1453 - Training time: 411.58s
+Epoch 4 - Train acc: 99.62 - Val acc: 95.48 - Train loss: 0.0132 - Val loss: 0.1509 - Training time: 412.34s
+Epoch 5 - Train acc: 99.88 - Val acc: 95.81 - Train loss: 0.0064 - Val loss: 0.1489 - Training time: 403.49s
+Epoch 6 - Train acc: 99.94 - Val acc: 96.25 - Train loss: 0.0034 - Val loss: 0.1419 - Training time: 411.15s
+Epoch 7 - Train acc: 99.91 - Val acc: 96.11 - Train loss: 0.0041 - Val loss: 0.1485 - Training time: 413.40s
+Epoch 8 - Train acc: 99.94 - Val acc: 96.19 - Train loss: 0.0024 - Val loss: 0.1527 - Training time: 412.79s
+Epoch 9 - Train acc: 99.92 - Val acc: 96.14 - Train loss: 0.0031 - Val loss: 0.1402 - Training time: 408.51s
+Epoch 10 - Train acc: 99.94 - Val acc: 96.07 - Train loss: 0.0031 - Val loss: 0.1492 - Training time: 411.46s
+Epoch 11 - Train acc: 99.99 - Val acc: 95.92 - Train loss: 0.0010 - Val loss: 0.1485 - Training time: 412.68s
+Epoch 12 - Train acc: 99.97 - Val acc: 96.16 - Train loss: 0.0019 - Val loss: 0.1518 - Training time: 411.94s
+Epoch 13 - Train acc: 99.99 - Val acc: 96.17 - Train loss: 0.0010 - Val loss: 0.1558 - Training time: 412.91s
+Epoch 14 - Train acc: 100.00 - Val acc: 95.96 - Train loss: 0.0009 - Val loss: 0.1518 - Training time: 405.27s
+end number of flops: 2914598912.0 	number of params: 7978856.0
+Final Test:
+	Score: 96.12
+***densenet121
+number of flops: 2914598912.0 	number of params: 7978856.0
+Epoch 0 - Train acc: 96.14 - Val acc: 92.78 - Train loss: 0.1182 - Val loss: 0.2084 - Training time: 410.44s
+Epoch 1 - Train acc: 98.35 - Val acc: 94.72 - Train loss: 0.0539 - Val loss: 0.1567 - Training time: 408.11s
+Epoch 2 - Train acc: 99.11 - Val acc: 95.31 - Train loss: 0.0309 - Val loss: 0.1423 - Training time: 407.37s
+Epoch 3 - Train acc: 99.06 - Val acc: 94.87 - Train loss: 0.0300 - Val loss: 0.1637 - Training time: 408.80s
+Epoch 4 - Train acc: 99.78 - Val acc: 95.69 - Train loss: 0.0091 - Val loss: 0.1446 - Training time: 413.06s
+Test:
+	Score: 95.87
+6 iterations to reduce 30.00% filters
+Perform pruning iteration: 0
+Layers that will be pruned {'features.denseblock4.denselayer7.conv1': 7, 'features.denseblock4.denselayer9.conv1': 9, 'features.denseblock4.denselayer10.conv1': 6, 'features.denseblock4.denselayer13.conv1': 32, 'features.denseblock4.denselayer14.conv1': 10, 'features.denseblock4.denselayer15.conv1': 19, 'features.denseblock4.denselayer16.conv1': 13, 'features.denseblock1.denselayer1.conv1': 11, 'features.denseblock1.denselayer2.conv1': 9, 'features.denseblock4.denselayer16.conv2': 27, 'features.denseblock4.denselayer12.conv1': 14, 'features.denseblock2.denselayer6.conv1': 8, 'features.denseblock2.denselayer4.conv1': 3, 'features.denseblock2.denselayer10.conv1': 6, 'features.denseblock1.denselayer4.conv1': 6, 'features.denseblock2.denselayer9.conv1': 8, 'features.denseblock3.denselayer12.conv1': 6, 'features.denseblock4.denselayer8.conv1': 10, 'features.denseblock2.denselayer7.conv1': 3, 'features.denseblock4.denselayer5.conv1': 11, 'features.denseblock3.denselayer16.conv1': 5, 'features.denseblock3.denselayer21.conv1': 4, 'features.denseblock3.denselayer2.conv1': 8, 'features.denseblock3.denselayer13.conv1': 2, 'features.denseblock3.denselayer8.conv1': 2, 'features.denseblock3.denselayer1.conv1': 8, 'features.denseblock3.denselayer22.conv1': 3, 'features.denseblock3.denselayer19.conv1': 3, 'features.denseblock3.denselayer6.conv1': 8, 'features.denseblock3.denselayer15.conv1': 4, 'features.denseblock1.denselayer3.conv1': 4, 'features.denseblock3.denselayer3.conv1': 6, 'features.denseblock4.denselayer11.conv1': 7, 'features.denseblock1.denselayer5.conv1': 6, 'features.denseblock3.denselayer18.conv1': 8, 'features.denseblock4.denselayer4.conv1': 8, 'features.denseblock4.denselayer6.conv1': 6, 'features.denseblock1.denselayer6.conv1': 8, 'features.denseblock4.denselayer2.conv1': 2, 'features.denseblock2.denselayer1.conv1': 7, 'features.denseblock3.denselayer20.conv1': 1, 'features.denseblock3.denselayer23.conv1': 4, 'features.denseblock4.denselayer3.conv1': 3, 'features.denseblock3.denselayer4.conv1': 4, 'features.denseblock3.denselayer10.conv1': 3, 'features.denseblock3.denselayer24.conv1': 2, 'features.denseblock3.denselayer11.conv1': 4, 'features.denseblock3.denselayer14.conv1': 1, 'features.denseblock3.denselayer17.conv1': 2, 'features.denseblock3.denselayer9.conv1': 4, 'features.denseblock2.denselayer2.conv1': 1, 'features.denseblock2.denselayer12.conv1': 2, 'features.denseblock2.denselayer8.conv1': 2, 'features.denseblock3.denselayer5.conv1': 3, 'features.denseblock2.denselayer11.conv1': 2, 'features.denseblock4.denselayer1.conv1': 3, 'features.denseblock2.denselayer3.conv1': 2, 'features.denseblock3.denselayer7.conv1': 1, 'features.denseblock2.denselayer5.conv1': 1}
+convolution remaining after pruning {'features.denseblock4.denselayer7.conv1': 121, 'features.denseblock4.denselayer9.conv1': 119, 'features.denseblock4.denselayer10.conv1': 122, 'features.denseblock4.denselayer13.conv1': 96, 'features.denseblock4.denselayer14.conv1': 118, 'features.denseblock4.denselayer15.conv1': 109, 'features.denseblock4.denselayer16.conv1': 115, 'features.denseblock1.denselayer1.conv1': 117, 'features.denseblock1.denselayer2.conv1': 119, 'features.denseblock4.denselayer16.conv2': 5, 'features.denseblock4.denselayer12.conv1': 114, 'features.denseblock2.denselayer6.conv1': 120, 'features.denseblock2.denselayer4.conv1': 125, 'features.denseblock2.denselayer10.conv1': 122, 'features.denseblock1.denselayer4.conv1': 122, 'features.denseblock2.denselayer9.conv1': 120, 'features.denseblock3.denselayer12.conv1': 122, 'features.denseblock4.denselayer8.conv1': 118, 'features.denseblock2.denselayer7.conv1': 125, 'features.denseblock4.denselayer5.conv1': 117, 'features.denseblock3.denselayer16.conv1': 123, 'features.denseblock3.denselayer21.conv1': 124, 'features.denseblock3.denselayer2.conv1': 120, 'features.denseblock3.denselayer13.conv1': 126, 'features.denseblock3.denselayer8.conv1': 126, 'features.denseblock3.denselayer1.conv1': 120, 'features.denseblock3.denselayer22.conv1': 125, 'features.denseblock3.denselayer19.conv1': 125, 'features.denseblock3.denselayer6.conv1': 120, 'features.denseblock3.denselayer15.conv1': 124, 'features.denseblock1.denselayer3.conv1': 124, 'features.denseblock3.denselayer3.conv1': 122, 'features.denseblock4.denselayer11.conv1': 121, 'features.denseblock1.denselayer5.conv1': 122, 'features.denseblock3.denselayer18.conv1': 120, 'features.denseblock4.denselayer4.conv1': 120, 'features.denseblock4.denselayer6.conv1': 122, 'features.denseblock1.denselayer6.conv1': 120, 'features.denseblock4.denselayer2.conv1': 126, 'features.denseblock2.denselayer1.conv1': 121, 'features.denseblock3.denselayer20.conv1': 127, 'features.denseblock3.denselayer23.conv1': 124, 'features.denseblock4.denselayer3.conv1': 125, 'features.denseblock3.denselayer4.conv1': 124, 'features.denseblock3.denselayer10.conv1': 125, 'features.denseblock3.denselayer24.conv1': 126, 'features.denseblock3.denselayer11.conv1': 124, 'features.denseblock3.denselayer14.conv1': 127, 'features.denseblock3.denselayer17.conv1': 126, 'features.denseblock3.denselayer9.conv1': 124, 'features.denseblock2.denselayer2.conv1': 127, 'features.denseblock2.denselayer12.conv1': 126, 'features.denseblock2.denselayer8.conv1': 126, 'features.denseblock3.denselayer5.conv1': 125, 'features.denseblock2.denselayer11.conv1': 126, 'features.denseblock4.denselayer1.conv1': 125, 'features.denseblock2.denselayer3.conv1': 126, 'features.denseblock3.denselayer7.conv1': 127, 'features.denseblock2.denselayer5.conv1': 127}
+Pruning filters.. 
+Filters pruned 4.989270386266094%
+Test:
+	post prune Score: 9.99
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 97.22 - Val acc: 94.98 - Train loss: 0.1009 - Val loss: 0.1579 - Training time: 420.35s
+Test pruning iteration :0
+	Score: 93.83
+Perform pruning iteration: 1
+Layers that will be pruned {'features.denseblock3.denselayer20.conv1': 3, 'features.denseblock4.denselayer2.conv1': 8, 'features.denseblock4.denselayer8.conv1': 5, 'features.denseblock2.denselayer11.conv1': 4, 'features.denseblock3.denselayer5.conv1': 9, 'features.denseblock2.denselayer9.conv1': 8, 'features.denseblock1.denselayer3.conv1': 8, 'features.denseblock4.denselayer1.conv1': 9, 'features.denseblock1.denselayer5.conv1': 11, 'features.denseblock3.denselayer8.conv1': 12, 'features.denseblock4.denselayer10.conv1': 7, 'features.denseblock3.denselayer22.conv1': 4, 'features.denseblock3.denselayer16.conv1': 6, 'features.denseblock2.denselayer12.conv1': 4, 'features.denseblock2.denselayer4.conv1': 10, 'features.denseblock1.denselayer4.conv1': 6, 'features.denseblock4.denselayer16.conv1': 16, 'features.denseblock3.denselayer19.conv1': 6, 'features.denseblock3.denselayer23.conv1': 6, 'features.denseblock2.denselayer10.conv1': 7, 'features.denseblock1.denselayer2.conv1': 12, 'features.denseblock3.denselayer18.conv1': 4, 'features.denseblock2.denselayer7.conv1': 8, 'features.denseblock3.denselayer6.conv1': 4, 'features.denseblock4.denselayer4.conv1': 8, 'features.denseblock1.denselayer6.conv1': 12, 'features.denseblock4.denselayer12.conv1': 10, 'features.denseblock3.denselayer13.conv1': 6, 'features.denseblock3.denselayer9.conv1': 4, 'features.denseblock4.denselayer7.conv1': 7, 'features.denseblock4.denselayer15.conv1': 4, 'features.denseblock2.denselayer1.conv1': 9, 'features.denseblock3.denselayer17.conv1': 4, 'features.denseblock2.denselayer6.conv1': 3, 'features.denseblock3.denselayer2.conv1': 7, 'features.denseblock3.denselayer4.conv1': 5, 'features.denseblock3.denselayer3.conv1': 7, 'features.denseblock4.denselayer6.conv1': 5, 'features.denseblock2.denselayer8.conv1': 3, 'features.denseblock3.denselayer24.conv1': 6, 'features.denseblock2.denselayer3.conv1': 6, 'features.denseblock3.denselayer1.conv1': 5, 'features.denseblock4.denselayer3.conv1': 8, 'features.denseblock3.denselayer7.conv1': 6, 'features.denseblock4.denselayer11.conv1': 5, 'features.denseblock4.denselayer9.conv1': 7, 'features.denseblock1.denselayer1.conv1': 8, 'features.denseblock4.denselayer5.conv1': 10, 'features.denseblock3.denselayer21.conv1': 8, 'features.denseblock3.denselayer15.conv1': 6, 'features.denseblock2.denselayer2.conv1': 1, 'features.denseblock4.denselayer14.conv1': 5, 'features.denseblock3.denselayer14.conv1': 4, 'features.denseblock4.denselayer13.conv1': 1, 'features.denseblock3.denselayer12.conv1': 5, 'features.denseblock3.denselayer11.conv1': 4, 'features.denseblock3.denselayer10.conv1': 3, 'features.denseblock2.denselayer5.conv1': 3}
+convolution remaining after pruning {'features.denseblock3.denselayer20.conv1': 124, 'features.denseblock4.denselayer2.conv1': 118, 'features.denseblock4.denselayer8.conv1': 113, 'features.denseblock2.denselayer11.conv1': 122, 'features.denseblock3.denselayer5.conv1': 116, 'features.denseblock2.denselayer9.conv1': 112, 'features.denseblock1.denselayer3.conv1': 116, 'features.denseblock4.denselayer1.conv1': 116, 'features.denseblock1.denselayer5.conv1': 111, 'features.denseblock3.denselayer8.conv1': 114, 'features.denseblock4.denselayer10.conv1': 115, 'features.denseblock3.denselayer22.conv1': 121, 'features.denseblock3.denselayer16.conv1': 117, 'features.denseblock2.denselayer12.conv1': 122, 'features.denseblock2.denselayer4.conv1': 115, 'features.denseblock1.denselayer4.conv1': 116, 'features.denseblock4.denselayer16.conv1': 99, 'features.denseblock3.denselayer19.conv1': 119, 'features.denseblock3.denselayer23.conv1': 118, 'features.denseblock2.denselayer10.conv1': 115, 'features.denseblock1.denselayer2.conv1': 107, 'features.denseblock3.denselayer18.conv1': 116, 'features.denseblock2.denselayer7.conv1': 117, 'features.denseblock3.denselayer6.conv1': 116, 'features.denseblock4.denselayer4.conv1': 112, 'features.denseblock1.denselayer6.conv1': 108, 'features.denseblock4.denselayer12.conv1': 104, 'features.denseblock3.denselayer13.conv1': 120, 'features.denseblock3.denselayer9.conv1': 120, 'features.denseblock4.denselayer7.conv1': 114, 'features.denseblock4.denselayer15.conv1': 105, 'features.denseblock2.denselayer1.conv1': 112, 'features.denseblock3.denselayer17.conv1': 122, 'features.denseblock2.denselayer6.conv1': 117, 'features.denseblock3.denselayer2.conv1': 113, 'features.denseblock3.denselayer4.conv1': 119, 'features.denseblock3.denselayer3.conv1': 115, 'features.denseblock4.denselayer6.conv1': 117, 'features.denseblock2.denselayer8.conv1': 123, 'features.denseblock3.denselayer24.conv1': 120, 'features.denseblock2.denselayer3.conv1': 120, 'features.denseblock3.denselayer1.conv1': 115, 'features.denseblock4.denselayer3.conv1': 117, 'features.denseblock3.denselayer7.conv1': 121, 'features.denseblock4.denselayer11.conv1': 116, 'features.denseblock4.denselayer9.conv1': 112, 'features.denseblock1.denselayer1.conv1': 109, 'features.denseblock4.denselayer5.conv1': 107, 'features.denseblock3.denselayer21.conv1': 116, 'features.denseblock3.denselayer15.conv1': 118, 'features.denseblock2.denselayer2.conv1': 126, 'features.denseblock4.denselayer14.conv1': 113, 'features.denseblock3.denselayer14.conv1': 123, 'features.denseblock4.denselayer13.conv1': 95, 'features.denseblock3.denselayer12.conv1': 117, 'features.denseblock3.denselayer11.conv1': 120, 'features.denseblock3.denselayer10.conv1': 122, 'features.denseblock2.denselayer5.conv1': 124}
+Pruning filters.. 
+Filters pruned 4.989270386266094%
+Test:
+	post prune Score: 11.82
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 97.91 - Val acc: 96.02 - Train loss: 0.0767 - Val loss: 0.1251 - Training time: 414.54s
+Test pruning iteration :1
+	Score: 94.22
+Perform pruning iteration: 2
+Layers that will be pruned {'features.denseblock2.denselayer2.conv1': 10, 'features.denseblock3.denselayer16.conv1': 7, 'features.denseblock3.denselayer1.conv1': 6, 'features.denseblock1.denselayer4.conv1': 6, 'features.denseblock3.denselayer21.conv1': 6, 'features.denseblock1.denselayer3.conv1': 6, 'features.denseblock2.denselayer7.conv1': 6, 'features.denseblock4.denselayer9.conv1': 9, 'features.denseblock4.denselayer10.conv1': 6, 'features.denseblock2.denselayer8.conv1': 11, 'features.denseblock3.denselayer20.conv1': 5, 'features.denseblock1.denselayer5.conv1': 9, 'features.denseblock3.denselayer11.conv1': 9, 'features.denseblock2.denselayer4.conv1': 7, 'features.denseblock2.denselayer3.conv1': 11, 'features.denseblock3.denselayer10.conv1': 9, 'features.denseblock3.denselayer7.conv1': 7, 'features.denseblock4.denselayer3.conv1': 12, 'features.denseblock4.denselayer13.conv1': 9, 'features.denseblock3.denselayer24.conv1': 8, 'features.denseblock3.denselayer8.conv1': 5, 'features.denseblock3.denselayer4.conv1': 5, 'features.denseblock4.denselayer7.conv1': 7, 'features.denseblock3.denselayer5.conv1': 6, 'features.denseblock3.denselayer3.conv1': 7, 'features.denseblock3.denselayer9.conv1': 5, 'features.denseblock2.denselayer11.conv1': 2, 'features.denseblock4.denselayer6.conv1': 5, 'features.denseblock4.denselayer1.conv1': 5, 'features.denseblock2.denselayer12.conv1': 3, 'features.denseblock4.denselayer16.conv1': 6, 'features.denseblock3.denselayer15.conv1': 7, 'features.denseblock4.denselayer2.conv1': 8, 'features.denseblock1.denselayer1.conv1': 6, 'features.denseblock4.denselayer12.conv1': 6, 'features.denseblock4.denselayer8.conv1': 5, 'features.denseblock2.denselayer10.conv1': 4, 'features.denseblock4.denselayer4.conv1': 4, 'features.denseblock2.denselayer1.conv1': 13, 'features.denseblock4.denselayer14.conv1': 8, 'features.denseblock3.denselayer19.conv1': 6, 'features.denseblock2.denselayer6.conv1': 10, 'features.denseblock3.denselayer6.conv1': 8, 'features.denseblock3.denselayer12.conv1': 7, 'features.denseblock3.denselayer22.conv1': 7, 'features.denseblock3.denselayer2.conv1': 8, 'features.denseblock4.denselayer11.conv1': 2, 'features.denseblock3.denselayer23.conv1': 6, 'features.denseblock1.denselayer6.conv1': 6, 'features.denseblock3.denselayer17.conv1': 2, 'features.denseblock3.denselayer14.conv1': 6, 'features.denseblock3.denselayer18.conv1': 5, 'features.denseblock3.denselayer13.conv1': 4, 'features.denseblock4.denselayer15.conv1': 4, 'features.denseblock2.denselayer9.conv1': 1, 'features.denseblock2.denselayer5.conv1': 3, 'features.denseblock4.denselayer5.conv1': 4, 'features.denseblock1.denselayer2.conv1': 7}
+convolution remaining after pruning {'features.denseblock2.denselayer2.conv1': 116, 'features.denseblock3.denselayer16.conv1': 110, 'features.denseblock3.denselayer1.conv1': 109, 'features.denseblock1.denselayer4.conv1': 110, 'features.denseblock3.denselayer21.conv1': 110, 'features.denseblock1.denselayer3.conv1': 110, 'features.denseblock2.denselayer7.conv1': 111, 'features.denseblock4.denselayer9.conv1': 103, 'features.denseblock4.denselayer10.conv1': 109, 'features.denseblock2.denselayer8.conv1': 112, 'features.denseblock3.denselayer20.conv1': 119, 'features.denseblock1.denselayer5.conv1': 102, 'features.denseblock3.denselayer11.conv1': 111, 'features.denseblock2.denselayer4.conv1': 108, 'features.denseblock2.denselayer3.conv1': 109, 'features.denseblock3.denselayer10.conv1': 113, 'features.denseblock3.denselayer7.conv1': 114, 'features.denseblock4.denselayer3.conv1': 105, 'features.denseblock4.denselayer13.conv1': 86, 'features.denseblock3.denselayer24.conv1': 112, 'features.denseblock3.denselayer8.conv1': 109, 'features.denseblock3.denselayer4.conv1': 114, 'features.denseblock4.denselayer7.conv1': 107, 'features.denseblock3.denselayer5.conv1': 110, 'features.denseblock3.denselayer3.conv1': 108, 'features.denseblock3.denselayer9.conv1': 115, 'features.denseblock2.denselayer11.conv1': 120, 'features.denseblock4.denselayer6.conv1': 112, 'features.denseblock4.denselayer1.conv1': 111, 'features.denseblock2.denselayer12.conv1': 119, 'features.denseblock4.denselayer16.conv1': 93, 'features.denseblock3.denselayer15.conv1': 111, 'features.denseblock4.denselayer2.conv1': 110, 'features.denseblock1.denselayer1.conv1': 103, 'features.denseblock4.denselayer12.conv1': 98, 'features.denseblock4.denselayer8.conv1': 108, 'features.denseblock2.denselayer10.conv1': 111, 'features.denseblock4.denselayer4.conv1': 108, 'features.denseblock2.denselayer1.conv1': 99, 'features.denseblock4.denselayer14.conv1': 105, 'features.denseblock3.denselayer19.conv1': 113, 'features.denseblock2.denselayer6.conv1': 107, 'features.denseblock3.denselayer6.conv1': 108, 'features.denseblock3.denselayer12.conv1': 110, 'features.denseblock3.denselayer22.conv1': 114, 'features.denseblock3.denselayer2.conv1': 105, 'features.denseblock4.denselayer11.conv1': 114, 'features.denseblock3.denselayer23.conv1': 112, 'features.denseblock1.denselayer6.conv1': 102, 'features.denseblock3.denselayer17.conv1': 120, 'features.denseblock3.denselayer14.conv1': 117, 'features.denseblock3.denselayer18.conv1': 111, 'features.denseblock3.denselayer13.conv1': 116, 'features.denseblock4.denselayer15.conv1': 101, 'features.denseblock2.denselayer9.conv1': 111, 'features.denseblock2.denselayer5.conv1': 121, 'features.denseblock4.denselayer5.conv1': 103, 'features.denseblock1.denselayer2.conv1': 100}
+Pruning filters.. 
+Filters pruned 4.989270386266094%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 98.16 - Val acc: 96.12 - Train loss: 0.0673 - Val loss: 0.1175 - Training time: 410.92s
+Test pruning iteration :2
+	Score: 94.28
+Perform pruning iteration: 3
+Layers that will be pruned {'features.denseblock3.denselayer8.conv1': 6, 'features.denseblock2.denselayer11.conv1': 9, 'features.denseblock1.denselayer5.conv1': 6, 'features.denseblock4.denselayer15.conv1': 7, 'features.denseblock3.denselayer19.conv1': 9, 'features.denseblock3.denselayer14.conv1': 4, 'features.denseblock4.denselayer2.conv1': 3, 'features.denseblock2.denselayer8.conv1': 6, 'features.denseblock3.denselayer9.conv1': 8, 'features.denseblock3.denselayer4.conv1': 7, 'features.denseblock1.denselayer6.conv1': 6, 'features.denseblock3.denselayer11.conv1': 7, 'features.denseblock3.denselayer12.conv1': 4, 'features.denseblock1.denselayer4.conv1': 4, 'features.denseblock3.denselayer18.conv1': 8, 'features.denseblock1.denselayer2.conv1': 13, 'features.denseblock2.denselayer1.conv1': 7, 'features.denseblock1.denselayer1.conv1': 8, 'features.denseblock2.denselayer2.conv1': 7, 'features.denseblock3.denselayer7.conv1': 9, 'features.denseblock1.denselayer3.conv1': 10, 'features.denseblock4.denselayer6.conv1': 9, 'features.denseblock4.denselayer10.conv1': 8, 'features.denseblock3.denselayer10.conv1': 8, 'features.denseblock4.denselayer5.conv1': 6, 'features.denseblock4.denselayer11.conv1': 3, 'features.denseblock2.denselayer3.conv1': 5, 'features.denseblock3.denselayer22.conv1': 6, 'features.denseblock4.denselayer1.conv1': 4, 'features.denseblock2.denselayer5.conv1': 4, 'features.denseblock3.denselayer3.conv1': 7, 'features.denseblock4.denselayer12.conv1': 4, 'features.denseblock2.denselayer12.conv1': 10, 'features.denseblock2.denselayer9.conv1': 7, 'features.denseblock3.denselayer21.conv1': 5, 'features.denseblock3.denselayer17.conv1': 10, 'features.denseblock4.denselayer9.conv1': 5, 'features.denseblock4.denselayer4.conv1': 4, 'features.denseblock4.denselayer14.conv1': 3, 'features.denseblock3.denselayer6.conv1': 9, 'features.denseblock2.denselayer4.conv1': 4, 'features.denseblock3.denselayer20.conv1': 6, 'features.denseblock3.denselayer13.conv1': 8, 'features.denseblock4.denselayer7.conv1': 6, 'features.denseblock4.denselayer8.conv1': 6, 'features.denseblock3.denselayer1.conv1': 8, 'features.denseblock4.denselayer13.conv1': 7, 'features.denseblock4.denselayer16.conv1': 8, 'features.denseblock3.denselayer2.conv1': 7, 'features.denseblock3.denselayer24.conv1': 6, 'features.denseblock4.denselayer3.conv1': 7, 'features.denseblock3.denselayer23.conv1': 5, 'features.denseblock2.denselayer10.conv1': 7, 'features.denseblock3.denselayer15.conv1': 5, 'features.denseblock2.denselayer7.conv1': 4, 'features.denseblock2.denselayer6.conv1': 4, 'features.denseblock3.denselayer16.conv1': 6, 'features.denseblock3.denselayer5.conv1': 3}
+convolution remaining after pruning {'features.denseblock3.denselayer8.conv1': 103, 'features.denseblock2.denselayer11.conv1': 111, 'features.denseblock1.denselayer5.conv1': 96, 'features.denseblock4.denselayer15.conv1': 94, 'features.denseblock3.denselayer19.conv1': 104, 'features.denseblock3.denselayer14.conv1': 113, 'features.denseblock4.denselayer2.conv1': 107, 'features.denseblock2.denselayer8.conv1': 106, 'features.denseblock3.denselayer9.conv1': 107, 'features.denseblock3.denselayer4.conv1': 107, 'features.denseblock1.denselayer6.conv1': 96, 'features.denseblock3.denselayer11.conv1': 104, 'features.denseblock3.denselayer12.conv1': 106, 'features.denseblock1.denselayer4.conv1': 106, 'features.denseblock3.denselayer18.conv1': 103, 'features.denseblock1.denselayer2.conv1': 87, 'features.denseblock2.denselayer1.conv1': 92, 'features.denseblock1.denselayer1.conv1': 95, 'features.denseblock2.denselayer2.conv1': 109, 'features.denseblock3.denselayer7.conv1': 105, 'features.denseblock1.denselayer3.conv1': 100, 'features.denseblock4.denselayer6.conv1': 103, 'features.denseblock4.denselayer10.conv1': 101, 'features.denseblock3.denselayer10.conv1': 105, 'features.denseblock4.denselayer5.conv1': 97, 'features.denseblock4.denselayer11.conv1': 111, 'features.denseblock2.denselayer3.conv1': 104, 'features.denseblock3.denselayer22.conv1': 108, 'features.denseblock4.denselayer1.conv1': 107, 'features.denseblock2.denselayer5.conv1': 117, 'features.denseblock3.denselayer3.conv1': 101, 'features.denseblock4.denselayer12.conv1': 94, 'features.denseblock2.denselayer12.conv1': 109, 'features.denseblock2.denselayer9.conv1': 104, 'features.denseblock3.denselayer21.conv1': 105, 'features.denseblock3.denselayer17.conv1': 110, 'features.denseblock4.denselayer9.conv1': 98, 'features.denseblock4.denselayer4.conv1': 104, 'features.denseblock4.denselayer14.conv1': 102, 'features.denseblock3.denselayer6.conv1': 99, 'features.denseblock2.denselayer4.conv1': 104, 'features.denseblock3.denselayer20.conv1': 113, 'features.denseblock3.denselayer13.conv1': 108, 'features.denseblock4.denselayer7.conv1': 101, 'features.denseblock4.denselayer8.conv1': 102, 'features.denseblock3.denselayer1.conv1': 101, 'features.denseblock4.denselayer13.conv1': 79, 'features.denseblock4.denselayer16.conv1': 85, 'features.denseblock3.denselayer2.conv1': 98, 'features.denseblock3.denselayer24.conv1': 106, 'features.denseblock4.denselayer3.conv1': 98, 'features.denseblock3.denselayer23.conv1': 107, 'features.denseblock2.denselayer10.conv1': 104, 'features.denseblock3.denselayer15.conv1': 106, 'features.denseblock2.denselayer7.conv1': 107, 'features.denseblock2.denselayer6.conv1': 103, 'features.denseblock3.denselayer16.conv1': 104, 'features.denseblock3.denselayer5.conv1': 107}
+Pruning filters.. 
+Filters pruned 4.989270386266094%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 98.17 - Val acc: 96.17 - Train loss: 0.0647 - Val loss: 0.1143 - Training time: 413.79s
+Test pruning iteration :3
+	Score: 93.99
+Perform pruning iteration: 4
+Layers that will be pruned {'features.denseblock4.denselayer15.conv1': 7, 'features.denseblock1.denselayer1.conv1': 12, 'features.denseblock3.denselayer19.conv1': 7, 'features.denseblock3.denselayer11.conv1': 8, 'features.denseblock4.denselayer6.conv1': 6, 'features.denseblock3.denselayer12.conv1': 6, 'features.denseblock3.denselayer10.conv1': 4, 'features.denseblock3.denselayer1.conv1': 7, 'features.denseblock3.denselayer16.conv1': 5, 'features.denseblock3.denselayer8.conv1': 2, 'features.denseblock4.denselayer10.conv1': 4, 'features.denseblock2.denselayer4.conv1': 8, 'features.denseblock3.denselayer21.conv1': 9, 'features.denseblock2.denselayer7.conv1': 5, 'features.denseblock3.denselayer24.conv1': 5, 'features.denseblock4.denselayer3.conv1': 5, 'features.denseblock3.denselayer17.conv1': 7, 'features.denseblock4.denselayer13.conv1': 6, 'features.denseblock4.denselayer2.conv1': 6, 'features.denseblock3.denselayer3.conv1': 8, 'features.denseblock3.denselayer13.conv1': 3, 'features.denseblock2.denselayer12.conv1': 8, 'features.denseblock4.denselayer8.conv1': 6, 'features.denseblock3.denselayer7.conv1': 5, 'features.denseblock4.denselayer11.conv1': 8, 'features.denseblock4.denselayer16.conv1': 9, 'features.denseblock3.denselayer5.conv1': 9, 'features.denseblock3.denselayer15.conv1': 6, 'features.denseblock2.denselayer5.conv1': 4, 'features.denseblock3.denselayer9.conv1': 4, 'features.denseblock1.denselayer2.conv1': 10, 'features.denseblock3.denselayer6.conv1': 10, 'features.denseblock3.denselayer2.conv1': 11, 'features.denseblock2.denselayer11.conv1': 7, 'features.denseblock3.denselayer23.conv1': 5, 'features.denseblock4.denselayer7.conv1': 4, 'features.denseblock4.denselayer12.conv1': 7, 'features.denseblock4.denselayer9.conv1': 14, 'features.denseblock3.denselayer18.conv1': 6, 'features.denseblock2.denselayer8.conv1': 1, 'features.denseblock1.denselayer5.conv1': 9, 'features.denseblock2.denselayer3.conv1': 9, 'features.denseblock4.denselayer14.conv1': 6, 'features.denseblock1.denselayer4.conv1': 5, 'features.denseblock2.denselayer10.conv1': 5, 'features.denseblock3.denselayer22.conv1': 4, 'features.denseblock2.denselayer1.conv1': 6, 'features.denseblock3.denselayer14.conv1': 8, 'features.denseblock1.denselayer3.conv1': 8, 'features.denseblock4.denselayer5.conv1': 5, 'features.denseblock4.denselayer1.conv1': 5, 'features.denseblock2.denselayer9.conv1': 7, 'features.denseblock2.denselayer6.conv1': 9, 'features.denseblock3.denselayer4.conv1': 2, 'features.denseblock3.denselayer20.conv1': 5, 'features.denseblock1.denselayer6.conv1': 5, 'features.denseblock2.denselayer2.conv1': 7, 'features.denseblock4.denselayer4.conv1': 3}
+convolution remaining after pruning {'features.denseblock4.denselayer15.conv1': 87, 'features.denseblock1.denselayer1.conv1': 83, 'features.denseblock3.denselayer19.conv1': 97, 'features.denseblock3.denselayer11.conv1': 96, 'features.denseblock4.denselayer6.conv1': 97, 'features.denseblock3.denselayer12.conv1': 100, 'features.denseblock3.denselayer10.conv1': 101, 'features.denseblock3.denselayer1.conv1': 94, 'features.denseblock3.denselayer16.conv1': 99, 'features.denseblock3.denselayer8.conv1': 101, 'features.denseblock4.denselayer10.conv1': 97, 'features.denseblock2.denselayer4.conv1': 96, 'features.denseblock3.denselayer21.conv1': 96, 'features.denseblock2.denselayer7.conv1': 102, 'features.denseblock3.denselayer24.conv1': 101, 'features.denseblock4.denselayer3.conv1': 93, 'features.denseblock3.denselayer17.conv1': 103, 'features.denseblock4.denselayer13.conv1': 73, 'features.denseblock4.denselayer2.conv1': 101, 'features.denseblock3.denselayer3.conv1': 93, 'features.denseblock3.denselayer13.conv1': 105, 'features.denseblock2.denselayer12.conv1': 101, 'features.denseblock4.denselayer8.conv1': 96, 'features.denseblock3.denselayer7.conv1': 100, 'features.denseblock4.denselayer11.conv1': 103, 'features.denseblock4.denselayer16.conv1': 76, 'features.denseblock3.denselayer5.conv1': 98, 'features.denseblock3.denselayer15.conv1': 100, 'features.denseblock2.denselayer5.conv1': 113, 'features.denseblock3.denselayer9.conv1': 103, 'features.denseblock1.denselayer2.conv1': 77, 'features.denseblock3.denselayer6.conv1': 89, 'features.denseblock3.denselayer2.conv1': 87, 'features.denseblock2.denselayer11.conv1': 104, 'features.denseblock3.denselayer23.conv1': 102, 'features.denseblock4.denselayer7.conv1': 97, 'features.denseblock4.denselayer12.conv1': 87, 'features.denseblock4.denselayer9.conv1': 84, 'features.denseblock3.denselayer18.conv1': 97, 'features.denseblock2.denselayer8.conv1': 105, 'features.denseblock1.denselayer5.conv1': 87, 'features.denseblock2.denselayer3.conv1': 95, 'features.denseblock4.denselayer14.conv1': 96, 'features.denseblock1.denselayer4.conv1': 101, 'features.denseblock2.denselayer10.conv1': 99, 'features.denseblock3.denselayer22.conv1': 104, 'features.denseblock2.denselayer1.conv1': 86, 'features.denseblock3.denselayer14.conv1': 105, 'features.denseblock1.denselayer3.conv1': 92, 'features.denseblock4.denselayer5.conv1': 92, 'features.denseblock4.denselayer1.conv1': 102, 'features.denseblock2.denselayer9.conv1': 97, 'features.denseblock2.denselayer6.conv1': 94, 'features.denseblock3.denselayer4.conv1': 105, 'features.denseblock3.denselayer20.conv1': 108, 'features.denseblock1.denselayer6.conv1': 91, 'features.denseblock2.denselayer2.conv1': 102, 'features.denseblock4.denselayer4.conv1': 101}
+Pruning filters.. 
+Filters pruned 4.989270386266094%
+Test:
+	post prune Score: 10.979999999999999
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 98.43 - Val acc: 97.02 - Train loss: 0.0577 - Val loss: 0.0915 - Training time: 416.86s
+Test pruning iteration :4
+	Score: 94.46
+Perform pruning iteration: 5
+Layers that will be pruned {'features.denseblock4.denselayer10.conv1': 9, 'features.denseblock1.denselayer1.conv1': 2, 'features.denseblock2.denselayer8.conv1': 7, 'features.denseblock2.denselayer5.conv1': 5, 'features.denseblock3.denselayer24.conv1': 6, 'features.denseblock2.denselayer10.conv1': 7, 'features.denseblock4.denselayer12.conv1': 7, 'features.denseblock3.denselayer18.conv1': 10, 'features.denseblock4.denselayer9.conv1': 7, 'features.denseblock2.denselayer12.conv1': 5, 'features.denseblock4.denselayer16.conv1': 2, 'features.denseblock2.denselayer1.conv1': 8, 'features.denseblock1.denselayer3.conv1': 12, 'features.denseblock3.denselayer14.conv1': 7, 'features.denseblock1.denselayer4.conv1': 12, 'features.denseblock3.denselayer10.conv1': 10, 'features.denseblock2.denselayer6.conv1': 9, 'features.denseblock4.denselayer2.conv1': 6, 'features.denseblock1.denselayer5.conv1': 12, 'features.denseblock3.denselayer20.conv1': 10, 'features.denseblock4.denselayer14.conv1': 8, 'features.denseblock3.denselayer19.conv1': 2, 'features.denseblock2.denselayer7.conv1': 7, 'features.denseblock4.denselayer11.conv1': 4, 'features.denseblock4.denselayer4.conv1': 11, 'features.denseblock3.denselayer12.conv1': 6, 'features.denseblock3.denselayer13.conv1': 10, 'features.denseblock2.denselayer3.conv1': 10, 'features.denseblock2.denselayer2.conv1': 11, 'features.denseblock3.denselayer21.conv1': 11, 'features.denseblock3.denselayer1.conv1': 7, 'features.denseblock4.denselayer15.conv1': 5, 'features.denseblock3.denselayer6.conv1': 3, 'features.denseblock3.denselayer3.conv1': 7, 'features.denseblock3.denselayer23.conv1': 6, 'features.denseblock3.denselayer17.conv1': 7, 'features.denseblock4.denselayer8.conv1': 2, 'features.denseblock4.denselayer3.conv1': 12, 'features.denseblock3.denselayer5.conv1': 4, 'features.denseblock1.denselayer2.conv1': 8, 'features.denseblock2.denselayer9.conv1': 6, 'features.denseblock4.denselayer7.conv1': 4, 'features.denseblock4.denselayer6.conv1': 5, 'features.denseblock3.denselayer4.conv1': 5, 'features.denseblock3.denselayer7.conv1': 5, 'features.denseblock3.denselayer9.conv1': 4, 'features.denseblock4.denselayer13.conv1': 5, 'features.denseblock3.denselayer2.conv1': 6, 'features.denseblock3.denselayer15.conv1': 4, 'features.denseblock2.denselayer4.conv1': 5, 'features.denseblock4.denselayer16.conv2': 1, 'features.denseblock1.denselayer6.conv1': 3, 'features.denseblock3.denselayer16.conv1': 4, 'features.denseblock2.denselayer11.conv1': 4, 'features.denseblock4.denselayer1.conv1': 4, 'features.denseblock4.denselayer5.conv1': 4, 'features.denseblock3.denselayer11.conv1': 1, 'features.denseblock3.denselayer8.conv1': 4, 'features.denseblock3.denselayer22.conv1': 4}
+convolution remaining after pruning {'features.denseblock4.denselayer10.conv1': 88, 'features.denseblock1.denselayer1.conv1': 81, 'features.denseblock2.denselayer8.conv1': 98, 'features.denseblock2.denselayer5.conv1': 108, 'features.denseblock3.denselayer24.conv1': 95, 'features.denseblock2.denselayer10.conv1': 92, 'features.denseblock4.denselayer12.conv1': 80, 'features.denseblock3.denselayer18.conv1': 87, 'features.denseblock4.denselayer9.conv1': 77, 'features.denseblock2.denselayer12.conv1': 96, 'features.denseblock4.denselayer16.conv1': 74, 'features.denseblock2.denselayer1.conv1': 78, 'features.denseblock1.denselayer3.conv1': 80, 'features.denseblock3.denselayer14.conv1': 98, 'features.denseblock1.denselayer4.conv1': 89, 'features.denseblock3.denselayer10.conv1': 91, 'features.denseblock2.denselayer6.conv1': 85, 'features.denseblock4.denselayer2.conv1': 95, 'features.denseblock1.denselayer5.conv1': 75, 'features.denseblock3.denselayer20.conv1': 98, 'features.denseblock4.denselayer14.conv1': 88, 'features.denseblock3.denselayer19.conv1': 95, 'features.denseblock2.denselayer7.conv1': 95, 'features.denseblock4.denselayer11.conv1': 99, 'features.denseblock4.denselayer4.conv1': 90, 'features.denseblock3.denselayer12.conv1': 94, 'features.denseblock3.denselayer13.conv1': 95, 'features.denseblock2.denselayer3.conv1': 85, 'features.denseblock2.denselayer2.conv1': 91, 'features.denseblock3.denselayer21.conv1': 85, 'features.denseblock3.denselayer1.conv1': 87, 'features.denseblock4.denselayer15.conv1': 82, 'features.denseblock3.denselayer6.conv1': 86, 'features.denseblock3.denselayer3.conv1': 86, 'features.denseblock3.denselayer23.conv1': 96, 'features.denseblock3.denselayer17.conv1': 96, 'features.denseblock4.denselayer8.conv1': 94, 'features.denseblock4.denselayer3.conv1': 81, 'features.denseblock3.denselayer5.conv1': 94, 'features.denseblock1.denselayer2.conv1': 69, 'features.denseblock2.denselayer9.conv1': 91, 'features.denseblock4.denselayer7.conv1': 93, 'features.denseblock4.denselayer6.conv1': 92, 'features.denseblock3.denselayer4.conv1': 100, 'features.denseblock3.denselayer7.conv1': 95, 'features.denseblock3.denselayer9.conv1': 99, 'features.denseblock4.denselayer13.conv1': 68, 'features.denseblock3.denselayer2.conv1': 81, 'features.denseblock3.denselayer15.conv1': 96, 'features.denseblock2.denselayer4.conv1': 91, 'features.denseblock4.denselayer16.conv2': 4, 'features.denseblock1.denselayer6.conv1': 88, 'features.denseblock3.denselayer16.conv1': 95, 'features.denseblock2.denselayer11.conv1': 100, 'features.denseblock4.denselayer1.conv1': 98, 'features.denseblock4.denselayer5.conv1': 88, 'features.denseblock3.denselayer11.conv1': 95, 'features.denseblock3.denselayer8.conv1': 97, 'features.denseblock3.denselayer22.conv1': 100}
+Pruning filters.. 
+Filters pruned 4.989270386266094%
+Test:
+	post prune Score: 11.709999999999999
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 97.81 - Val acc: 96.42 - Train loss: 0.0764 - Val loss: 0.1125 - Training time: 415.70s
+Test pruning iteration :5
+	Score: 93.72
+Epoch 0 - Train acc: 98.81 - Val acc: 97.63 - Train loss: 0.0424 - Val loss: 0.0743 - Training time: 412.97s
+Epoch 1 - Train acc: 99.15 - Val acc: 97.39 - Train loss: 0.0323 - Val loss: 0.0753 - Training time: 413.59s
+Epoch 2 - Train acc: 99.33 - Val acc: 97.25 - Train loss: 0.0262 - Val loss: 0.0802 - Training time: 413.67s
+Epoch 3 - Train acc: 99.78 - Val acc: 97.59 - Train loss: 0.0116 - Val loss: 0.0707 - Training time: 411.38s
+end number of flops: 2147384448.0 	number of params: 6110912.0
+Final Test:
+	Score: 95.36
+***resnet 18
+number of flops: 1825668096.0 	number of params: 11181642.0
+Test:
+	Score: 9.379999999999999
+Epoch 0 - Train acc: 94.06 - Val acc: 92.57 - Train loss: 0.1934 - Val loss: 0.2346 - Training time: 100.03s
+Epoch 1 - Train acc: 96.98 - Val acc: 93.63 - Train loss: 0.1075 - Val loss: 0.1939 - Training time: 100.41s
+Epoch 2 - Train acc: 98.69 - Val acc: 94.42 - Train loss: 0.0563 - Val loss: 0.1656 - Training time: 100.48s
+Epoch 3 - Train acc: 99.42 - Val acc: 94.46 - Train loss: 0.0344 - Val loss: 0.1643 - Training time: 101.00s
+Epoch 4 - Train acc: 99.91 - Val acc: 94.73 - Train loss: 0.0142 - Val loss: 0.1608 - Training time: 101.70s
+Epoch 5 - Train acc: 99.98 - Val acc: 94.88 - Train loss: 0.0085 - Val loss: 0.1634 - Training time: 101.00s
+Epoch 6 - Train acc: 99.99 - Val acc: 94.82 - Train loss: 0.0054 - Val loss: 0.1694 - Training time: 102.23s
+Epoch 7 - Train acc: 100.00 - Val acc: 94.94 - Train loss: 0.0036 - Val loss: 0.1696 - Training time: 102.06s
+Epoch 8 - Train acc: 100.00 - Val acc: 94.93 - Train loss: 0.0024 - Val loss: 0.1713 - Training time: 100.94s
+Epoch 9 - Train acc: 100.00 - Val acc: 95.09 - Train loss: 0.0019 - Val loss: 0.1713 - Training time: 101.33s
+Epoch 10 - Train acc: 100.00 - Val acc: 94.90 - Train loss: 0.0016 - Val loss: 0.1744 - Training time: 101.89s
+Epoch 11 - Train acc: 100.00 - Val acc: 94.99 - Train loss: 0.0013 - Val loss: 0.1793 - Training time: 101.46s
+Epoch 12 - Train acc: 100.00 - Val acc: 94.98 - Train loss: 0.0010 - Val loss: 0.1779 - Training time: 102.51s
+Epoch 13 - Train acc: 100.00 - Val acc: 94.97 - Train loss: 0.0009 - Val loss: 0.1789 - Training time: 101.36s
+Epoch 14 - Train acc: 100.00 - Val acc: 95.11 - Train loss: 0.0008 - Val loss: 0.1816 - Training time: 101.39s
+end number of flops: 1825668096.0 	number of params: 11181642.0
+Final Test:
+	Score: 94.47
+***resnet 18
+number of flops: 1825668096.0 	number of params: 11181642.0
+Epoch 0 - Train acc: 93.87 - Val acc: 91.89 - Train loss: 0.1961 - Val loss: 0.2422 - Training time: 101.51s
+Epoch 1 - Train acc: 97.16 - Val acc: 93.88 - Train loss: 0.1030 - Val loss: 0.1824 - Training time: 101.46s
+Epoch 2 - Train acc: 98.90 - Val acc: 94.46 - Train loss: 0.0540 - Val loss: 0.1647 - Training time: 101.22s
+Epoch 3 - Train acc: 99.59 - Val acc: 94.52 - Train loss: 0.0296 - Val loss: 0.1651 - Training time: 101.32s
+Epoch 4 - Train acc: 99.88 - Val acc: 94.78 - Train loss: 0.0158 - Val loss: 0.1637 - Training time: 101.03s
+Test:
+	Score: 94.25
+6 iterations to reduce 30.00% filters
+Perform pruning iteration: 0
+Layers that will be pruned {'layer4.1.conv1': 34, 'layer4.0.conv1': 30, 'layer3.0.conv1': 11, 'layer2.0.conv1': 4, 'layer3.1.conv1': 6, 'layer2.1.conv1': 5, 'layer1.1.conv1': 2, 'layer1.0.conv1': 4}
+convolution remaining after pruning {'layer4.1.conv1': 478, 'layer4.0.conv1': 482, 'layer3.0.conv1': 245, 'layer2.0.conv1': 124, 'layer3.1.conv1': 250, 'layer2.1.conv1': 123, 'layer1.1.conv1': 62, 'layer1.0.conv1': 60}
+Pruning filters.. 
+Filters pruned 5.0%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 94.49 - Val acc: 91.69 - Train loss: 0.1628 - Val loss: 0.2357 - Training time: 101.03s
+Test pruning iteration :0
+	Score: 90.33
+Perform pruning iteration: 1
+Layers that will be pruned {'layer4.1.conv1': 35, 'layer4.0.conv1': 27, 'layer3.1.conv1': 12, 'layer3.0.conv1': 11, 'layer2.1.conv1': 3, 'layer2.0.conv1': 4, 'layer1.0.conv1': 2, 'layer1.1.conv1': 2}
+convolution remaining after pruning {'layer4.1.conv1': 443, 'layer4.0.conv1': 455, 'layer3.1.conv1': 238, 'layer3.0.conv1': 234, 'layer2.1.conv1': 120, 'layer2.0.conv1': 120, 'layer1.0.conv1': 58, 'layer1.1.conv1': 60}
+Pruning filters.. 
+Filters pruned 5.0%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 96.08 - Val acc: 93.02 - Train loss: 0.1279 - Val loss: 0.1983 - Training time: 101.04s
+Test pruning iteration :1
+	Score: 91.67999999999999
+Perform pruning iteration: 2
+Layers that will be pruned {'layer3.1.conv1': 18, 'layer4.0.conv1': 35, 'layer4.1.conv1': 26, 'layer2.1.conv1': 2, 'layer3.0.conv1': 13, 'layer1.0.conv1': 1, 'layer2.0.conv1': 1}
+convolution remaining after pruning {'layer3.1.conv1': 220, 'layer4.0.conv1': 420, 'layer4.1.conv1': 417, 'layer2.1.conv1': 118, 'layer3.0.conv1': 221, 'layer1.0.conv1': 57, 'layer2.0.conv1': 119}
+Pruning filters.. 
+Filters pruned 5.0%
+Test:
+	post prune Score: 12.18
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 96.50 - Val acc: 93.41 - Train loss: 0.1121 - Val loss: 0.1861 - Training time: 100.21s
+Test pruning iteration :2
+	Score: 91.61
+Perform pruning iteration: 3
+Layers that will be pruned {'layer4.1.conv1': 28, 'layer4.0.conv1': 32, 'layer3.1.conv1': 16, 'layer2.1.conv1': 4, 'layer3.0.conv1': 13, 'layer1.1.conv1': 1, 'layer2.0.conv1': 2}
+convolution remaining after pruning {'layer4.1.conv1': 389, 'layer4.0.conv1': 388, 'layer3.1.conv1': 204, 'layer2.1.conv1': 114, 'layer3.0.conv1': 208, 'layer1.1.conv1': 59, 'layer2.0.conv1': 117}
+Pruning filters.. 
+Filters pruned 5.0%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 96.65 - Val acc: 94.11 - Train loss: 0.1099 - Val loss: 0.1681 - Training time: 99.28s
+Test pruning iteration :3
+	Score: 91.60000000000001
+Perform pruning iteration: 4
+Layers that will be pruned {'layer3.0.conv1': 13, 'layer4.0.conv1': 31, 'layer4.1.conv1': 30, 'layer3.1.conv1': 12, 'layer2.0.conv1': 3, 'layer1.0.conv1': 2, 'layer2.1.conv1': 2, 'layer1.1.conv1': 3}
+convolution remaining after pruning {'layer3.0.conv1': 195, 'layer4.0.conv1': 357, 'layer4.1.conv1': 359, 'layer3.1.conv1': 192, 'layer2.0.conv1': 114, 'layer1.0.conv1': 55, 'layer2.1.conv1': 112, 'layer1.1.conv1': 56}
+Pruning filters.. 
+Filters pruned 5.0%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 96.89 - Val acc: 94.19 - Train loss: 0.1036 - Val loss: 0.1676 - Training time: 99.16s
+Test pruning iteration :4
+	Score: 91.81
+Perform pruning iteration: 5
+Layers that will be pruned {'layer4.1.conv1': 37, 'layer4.0.conv1': 23, 'layer3.1.conv1': 14, 'layer2.0.conv1': 5, 'layer3.0.conv1': 12, 'layer1.0.conv1': 1, 'layer2.1.conv1': 4}
+convolution remaining after pruning {'layer4.1.conv1': 322, 'layer4.0.conv1': 334, 'layer3.1.conv1': 178, 'layer2.0.conv1': 109, 'layer3.0.conv1': 183, 'layer1.0.conv1': 54, 'layer2.1.conv1': 108}
+Pruning filters.. 
+Filters pruned 5.0%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 96.84 - Val acc: 94.03 - Train loss: 0.1024 - Val loss: 0.1727 - Training time: 99.71s
+Test pruning iteration :5
+	Score: 91.8
+Epoch 0 - Train acc: 98.80 - Val acc: 96.54 - Train loss: 0.0515 - Val loss: 0.1029 - Training time: 100.32s
+Epoch 1 - Train acc: 99.56 - Val acc: 96.86 - Train loss: 0.0279 - Val loss: 0.0940 - Training time: 100.25s
+Epoch 2 - Train acc: 99.94 - Val acc: 97.04 - Train loss: 0.0131 - Val loss: 0.0890 - Training time: 100.38s
+Epoch 3 - Train acc: 99.96 - Val acc: 97.06 - Train loss: 0.0077 - Val loss: 0.0875 - Training time: 100.31s
+end number of flops: 1432251392.0 	number of params: 7487754.0
+Final Test:
+	Score: 93.49
+***resnet 50
+number of flops: 4138573824.0 	number of params: 23528522.0
+Test:
+	Score: 8.469999999999999
+Epoch 0 - Train acc: 97.50 - Val acc: 95.18 - Train loss: 0.0852 - Val loss: 0.1460 - Training time: 198.43s
+Epoch 1 - Train acc: 99.29 - Val acc: 95.85 - Train loss: 0.0290 - Val loss: 0.1228 - Training time: 201.20s
+Epoch 2 - Train acc: 99.67 - Val acc: 95.85 - Train loss: 0.0144 - Val loss: 0.1272 - Training time: 198.70s
+Epoch 3 - Train acc: 99.93 - Val acc: 96.32 - Train loss: 0.0048 - Val loss: 0.1167 - Training time: 197.86s
+Epoch 4 - Train acc: 99.98 - Val acc: 96.40 - Train loss: 0.0021 - Val loss: 0.1287 - Training time: 198.32s
+Epoch 5 - Train acc: 99.96 - Val acc: 96.24 - Train loss: 0.0022 - Val loss: 0.1344 - Training time: 197.92s
+Epoch 6 - Train acc: 99.94 - Val acc: 95.90 - Train loss: 0.0033 - Val loss: 0.1471 - Training time: 198.67s
+Epoch 7 - Train acc: 99.98 - Val acc: 96.22 - Train loss: 0.0014 - Val loss: 0.1386 - Training time: 198.37s
+Epoch 8 - Train acc: 99.98 - Val acc: 96.48 - Train loss: 0.0012 - Val loss: 0.1356 - Training time: 202.36s
+Epoch 9 - Train acc: 99.99 - Val acc: 96.30 - Train loss: 0.0006 - Val loss: 0.1378 - Training time: 199.06s
+Epoch 10 - Train acc: 100.00 - Val acc: 96.67 - Train loss: 0.0003 - Val loss: 0.1307 - Training time: 198.41s
+Epoch 11 - Train acc: 100.00 - Val acc: 96.47 - Train loss: 0.0002 - Val loss: 0.1237 - Training time: 197.21s
+Epoch 12 - Train acc: 100.00 - Val acc: 96.72 - Train loss: 0.0001 - Val loss: 0.1266 - Training time: 202.33s
+Epoch 13 - Train acc: 100.00 - Val acc: 96.75 - Train loss: 0.0001 - Val loss: 0.1293 - Training time: 229.78s
+Epoch 14 - Train acc: 100.00 - Val acc: 96.62 - Train loss: 0.0001 - Val loss: 0.1293 - Training time: 228.37s
+end number of flops: 4138573824.0 	number of params: 23528522.0
+Final Test:
+	Score: 96.74000000000001
+***resnet 50
+number of flops: 4138573824.0 	number of params: 23528522.0
+Epoch 0 - Train acc: 97.53 - Val acc: 94.58 - Train loss: 0.0809 - Val loss: 0.1610 - Training time: 208.87s
+Epoch 1 - Train acc: 99.29 - Val acc: 95.43 - Train loss: 0.0305 - Val loss: 0.1295 - Training time: 198.89s
+Epoch 2 - Train acc: 99.41 - Val acc: 95.21 - Train loss: 0.0218 - Val loss: 0.1503 - Training time: 199.17s
+Epoch 3 - Train acc: 99.89 - Val acc: 96.03 - Train loss: 0.0063 - Val loss: 0.1261 - Training time: 198.63s
+Epoch 4 - Train acc: 99.95 - Val acc: 96.22 - Train loss: 0.0037 - Val loss: 0.1271 - Training time: 198.55s
+Test:
+	Score: 96.1
+6 iterations to reduce 30.00% filters
+Perform pruning iteration: 0
+Layers that will be pruned {'layer1.0.conv1': 7, 'layer1.0.conv2': 7, 'layer1.1.conv1': 4, 'layer4.1.conv1': 24, 'layer3.0.conv1': 7, 'layer3.4.conv1': 9, 'layer3.5.conv2': 23, 'layer4.1.conv2': 33, 'layer4.2.conv2': 31, 'layer4.2.conv1': 31, 'layer3.0.conv2': 11, 'layer2.1.conv2': 5, 'layer3.1.conv1': 13, 'layer2.0.conv2': 7, 'layer3.4.conv2': 12, 'layer2.0.conv1': 4, 'layer4.0.conv1': 24, 'layer1.2.conv1': 6, 'layer4.0.conv2': 31, 'layer2.3.conv1': 6, 'layer3.2.conv2': 9, 'layer3.1.conv2': 11, 'layer3.3.conv1': 21, 'layer3.5.conv1': 12, 'layer3.3.conv2': 10, 'layer3.2.conv1': 8, 'layer2.3.conv2': 3, 'layer2.2.conv2': 3, 'layer2.2.conv1': 1, 'layer1.1.conv2': 1, 'layer2.1.conv1': 2, 'layer1.2.conv2': 1}
+convolution remaining after pruning {'layer1.0.conv1': 57, 'layer1.0.conv2': 57, 'layer1.1.conv1': 60, 'layer4.1.conv1': 488, 'layer3.0.conv1': 249, 'layer3.4.conv1': 247, 'layer3.5.conv2': 233, 'layer4.1.conv2': 479, 'layer4.2.conv2': 481, 'layer4.2.conv1': 481, 'layer3.0.conv2': 245, 'layer2.1.conv2': 123, 'layer3.1.conv1': 243, 'layer2.0.conv2': 121, 'layer3.4.conv2': 244, 'layer2.0.conv1': 124, 'layer4.0.conv1': 488, 'layer1.2.conv1': 58, 'layer4.0.conv2': 481, 'layer2.3.conv1': 122, 'layer3.2.conv2': 247, 'layer3.1.conv2': 245, 'layer3.3.conv1': 235, 'layer3.5.conv1': 244, 'layer3.3.conv2': 246, 'layer3.2.conv1': 248, 'layer2.3.conv2': 125, 'layer2.2.conv2': 125, 'layer2.2.conv1': 127, 'layer1.1.conv2': 63, 'layer2.1.conv1': 126, 'layer1.2.conv2': 63}
+Pruning filters.. 
+Filters pruned 4.992055084745763%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 97.18 - Val acc: 94.50 - Train loss: 0.0899 - Val loss: 0.1577 - Training time: 194.97s
+Test pruning iteration :0
+	Score: 93.03
+Perform pruning iteration: 1
+Layers that will be pruned {'layer2.1.conv2': 6, 'layer2.2.conv2': 5, 'layer3.4.conv1': 11, 'layer3.4.conv2': 9, 'layer3.5.conv2': 9, 'layer4.0.conv2': 26, 'layer1.0.conv1': 4, 'layer4.0.conv1': 43, 'layer4.2.conv1': 36, 'layer4.2.conv2': 30, 'layer3.3.conv2': 11, 'layer2.0.conv1': 7, 'layer2.0.conv2': 5, 'layer3.1.conv1': 6, 'layer1.1.conv1': 3, 'layer3.2.conv1': 13, 'layer4.1.conv2': 30, 'layer3.0.conv1': 8, 'layer4.1.conv1': 39, 'layer1.2.conv1': 3, 'layer2.3.conv2': 5, 'layer3.3.conv1': 7, 'layer2.1.conv1': 11, 'layer2.2.conv1': 5, 'layer1.1.conv2': 1, 'layer3.2.conv2': 9, 'layer3.0.conv2': 11, 'layer3.5.conv1': 6, 'layer3.1.conv2': 12, 'layer2.3.conv1': 5, 'layer1.2.conv2': 1}
+convolution remaining after pruning {'layer2.1.conv2': 117, 'layer2.2.conv2': 120, 'layer3.4.conv1': 236, 'layer3.4.conv2': 235, 'layer3.5.conv2': 224, 'layer4.0.conv2': 455, 'layer1.0.conv1': 53, 'layer4.0.conv1': 445, 'layer4.2.conv1': 445, 'layer4.2.conv2': 451, 'layer3.3.conv2': 235, 'layer2.0.conv1': 117, 'layer2.0.conv2': 116, 'layer3.1.conv1': 237, 'layer1.1.conv1': 57, 'layer3.2.conv1': 235, 'layer4.1.conv2': 449, 'layer3.0.conv1': 241, 'layer4.1.conv1': 449, 'layer1.2.conv1': 55, 'layer2.3.conv2': 120, 'layer3.3.conv1': 228, 'layer2.1.conv1': 115, 'layer2.2.conv1': 122, 'layer1.1.conv2': 62, 'layer3.2.conv2': 238, 'layer3.0.conv2': 234, 'layer3.5.conv1': 238, 'layer3.1.conv2': 233, 'layer2.3.conv1': 117, 'layer1.2.conv2': 62}
+Pruning filters.. 
+Filters pruned 4.992055084745763%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 97.32 - Val acc: 94.84 - Train loss: 0.0869 - Val loss: 0.1583 - Training time: 190.52s
+Test pruning iteration :1
+	Score: 92.83
+Perform pruning iteration: 2
+Layers that will be pruned {'layer2.1.conv2': 6, 'layer3.0.conv2': 10, 'layer4.0.conv2': 34, 'layer4.1.conv2': 30, 'layer4.2.conv2': 39, 'layer3.2.conv2': 9, 'layer4.0.conv1': 29, 'layer4.2.conv1': 23, 'layer4.1.conv1': 27, 'layer2.3.conv2': 6, 'layer2.0.conv1': 5, 'layer3.1.conv1': 18, 'layer3.5.conv1': 14, 'layer1.1.conv2': 3, 'layer3.5.conv2': 13, 'layer1.0.conv1': 3, 'layer3.1.conv2': 14, 'layer3.3.conv1': 13, 'layer3.2.conv1': 11, 'layer3.4.conv1': 15, 'layer1.2.conv1': 1, 'layer3.0.conv1': 18, 'layer3.3.conv2': 9, 'layer3.4.conv2': 12, 'layer2.2.conv1': 4, 'layer2.0.conv2': 1, 'layer2.1.conv1': 4, 'layer1.1.conv1': 2, 'layer2.3.conv1': 2, 'layer2.2.conv2': 2}
+convolution remaining after pruning {'layer2.1.conv2': 111, 'layer3.0.conv2': 224, 'layer4.0.conv2': 421, 'layer4.1.conv2': 419, 'layer4.2.conv2': 412, 'layer3.2.conv2': 229, 'layer4.0.conv1': 416, 'layer4.2.conv1': 422, 'layer4.1.conv1': 422, 'layer2.3.conv2': 114, 'layer2.0.conv1': 112, 'layer3.1.conv1': 219, 'layer3.5.conv1': 224, 'layer1.1.conv2': 59, 'layer3.5.conv2': 211, 'layer1.0.conv1': 50, 'layer3.1.conv2': 219, 'layer3.3.conv1': 215, 'layer3.2.conv1': 224, 'layer3.4.conv1': 221, 'layer1.2.conv1': 54, 'layer3.0.conv1': 223, 'layer3.3.conv2': 226, 'layer3.4.conv2': 223, 'layer2.2.conv1': 118, 'layer2.0.conv2': 115, 'layer2.1.conv1': 111, 'layer1.1.conv1': 55, 'layer2.3.conv1': 115, 'layer2.2.conv2': 118}
+Pruning filters.. 
+Filters pruned 4.992055084745763%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 97.58 - Val acc: 94.25 - Train loss: 0.0803 - Val loss: 0.1625 - Training time: 184.66s
+Test pruning iteration :2
+	Score: 92.51
+Perform pruning iteration: 3
+Layers that will be pruned {'layer3.2.conv2': 17, 'layer4.0.conv2': 24, 'layer2.0.conv1': 8, 'layer3.1.conv1': 13, 'layer4.0.conv1': 21, 'layer4.2.conv2': 47, 'layer4.2.conv1': 23, 'layer3.3.conv2': 14, 'layer2.1.conv2': 3, 'layer3.0.conv2': 12, 'layer3.0.conv1': 8, 'layer4.1.conv2': 33, 'layer4.1.conv1': 30, 'layer2.2.conv2': 7, 'layer3.5.conv2': 18, 'layer3.3.conv1': 10, 'layer2.2.conv1': 6, 'layer3.5.conv1': 15, 'layer2.3.conv2': 6, 'layer1.0.conv1': 3, 'layer2.0.conv2': 4, 'layer3.4.conv2': 9, 'layer2.3.conv1': 4, 'layer2.1.conv1': 6, 'layer3.4.conv1': 10, 'layer3.1.conv2': 10, 'layer3.2.conv1': 10, 'layer1.0.conv2': 1, 'layer1.1.conv2': 3, 'layer1.2.conv1': 2}
+convolution remaining after pruning {'layer3.2.conv2': 212, 'layer4.0.conv2': 397, 'layer2.0.conv1': 104, 'layer3.1.conv1': 206, 'layer4.0.conv1': 395, 'layer4.2.conv2': 365, 'layer4.2.conv1': 399, 'layer3.3.conv2': 212, 'layer2.1.conv2': 108, 'layer3.0.conv2': 212, 'layer3.0.conv1': 215, 'layer4.1.conv2': 386, 'layer4.1.conv1': 392, 'layer2.2.conv2': 111, 'layer3.5.conv2': 193, 'layer3.3.conv1': 205, 'layer2.2.conv1': 112, 'layer3.5.conv1': 209, 'layer2.3.conv2': 108, 'layer1.0.conv1': 47, 'layer2.0.conv2': 111, 'layer3.4.conv2': 214, 'layer2.3.conv1': 111, 'layer2.1.conv1': 105, 'layer3.4.conv1': 211, 'layer3.1.conv2': 209, 'layer3.2.conv1': 214, 'layer1.0.conv2': 56, 'layer1.1.conv2': 56, 'layer1.2.conv1': 52}
+Pruning filters.. 
+Filters pruned 4.992055084745763%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 97.81 - Val acc: 95.26 - Train loss: 0.0687 - Val loss: 0.1342 - Training time: 180.66s
+Test pruning iteration :3
+	Score: 93.38
+Perform pruning iteration: 4
+Layers that will be pruned {'layer2.3.conv2': 3, 'layer4.2.conv1': 30, 'layer2.2.conv1': 8, 'layer3.1.conv2': 13, 'layer4.0.conv1': 21, 'layer3.1.conv1': 16, 'layer2.0.conv1': 7, 'layer3.4.conv1': 11, 'layer2.0.conv2': 8, 'layer4.1.conv1': 39, 'layer3.3.conv1': 6, 'layer4.2.conv2': 33, 'layer3.2.conv2': 8, 'layer4.0.conv2': 30, 'layer3.0.conv1': 9, 'layer3.5.conv1': 12, 'layer3.5.conv2': 6, 'layer4.1.conv2': 44, 'layer3.3.conv2': 14, 'layer1.0.conv1': 3, 'layer2.1.conv2': 8, 'layer1.2.conv1': 1, 'layer3.4.conv2': 15, 'layer3.2.conv1': 9, 'layer3.0.conv2': 9, 'layer1.1.conv2': 4, 'layer2.3.conv1': 2, 'layer2.1.conv1': 2, 'layer2.2.conv2': 4, 'layer1.1.conv1': 2}
+convolution remaining after pruning {'layer2.3.conv2': 105, 'layer4.2.conv1': 369, 'layer2.2.conv1': 104, 'layer3.1.conv2': 196, 'layer4.0.conv1': 374, 'layer3.1.conv1': 190, 'layer2.0.conv1': 97, 'layer3.4.conv1': 200, 'layer2.0.conv2': 103, 'layer4.1.conv1': 353, 'layer3.3.conv1': 199, 'layer4.2.conv2': 332, 'layer3.2.conv2': 204, 'layer4.0.conv2': 367, 'layer3.0.conv1': 206, 'layer3.5.conv1': 197, 'layer3.5.conv2': 187, 'layer4.1.conv2': 342, 'layer3.3.conv2': 198, 'layer1.0.conv1': 44, 'layer2.1.conv2': 100, 'layer1.2.conv1': 51, 'layer3.4.conv2': 199, 'layer3.2.conv1': 205, 'layer3.0.conv2': 203, 'layer1.1.conv2': 52, 'layer2.3.conv1': 109, 'layer2.1.conv1': 103, 'layer2.2.conv2': 107, 'layer1.1.conv1': 53}
+Pruning filters.. 
+Filters pruned 4.992055084745763%
+Test:
+	post prune Score: 9.959999999999999
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 97.72 - Val acc: 95.02 - Train loss: 0.0716 - Val loss: 0.1418 - Training time: 178.28s
+Test pruning iteration :4
+	Score: 92.86999999999999
+Perform pruning iteration: 5
+Layers that will be pruned {'layer3.0.conv2': 14, 'layer3.3.conv2': 10, 'layer4.1.conv2': 26, 'layer2.0.conv1': 5, 'layer3.0.conv1': 7, 'layer4.2.conv1': 19, 'layer4.1.conv1': 27, 'layer1.1.conv1': 1, 'layer2.2.conv2': 8, 'layer3.4.conv2': 12, 'layer4.0.conv1': 33, 'layer3.1.conv2': 10, 'layer3.5.conv1': 10, 'layer4.0.conv2': 34, 'layer4.2.conv2': 36, 'layer2.3.conv2': 10, 'layer2.1.conv1': 10, 'layer3.2.conv2': 16, 'layer3.4.conv1': 9, 'layer2.3.conv1': 6, 'layer3.3.conv1': 14, 'layer2.0.conv2': 6, 'layer3.2.conv1': 13, 'layer2.2.conv1': 6, 'layer3.1.conv1': 9, 'layer1.0.conv2': 1, 'layer1.1.conv2': 5, 'layer1.2.conv2': 5, 'layer3.5.conv2': 10, 'layer2.1.conv2': 4, 'layer1.2.conv1': 1}
+convolution remaining after pruning {'layer3.0.conv2': 189, 'layer3.3.conv2': 188, 'layer4.1.conv2': 316, 'layer2.0.conv1': 92, 'layer3.0.conv1': 199, 'layer4.2.conv1': 350, 'layer4.1.conv1': 326, 'layer1.1.conv1': 52, 'layer2.2.conv2': 99, 'layer3.4.conv2': 187, 'layer4.0.conv1': 341, 'layer3.1.conv2': 186, 'layer3.5.conv1': 187, 'layer4.0.conv2': 333, 'layer4.2.conv2': 296, 'layer2.3.conv2': 95, 'layer2.1.conv1': 93, 'layer3.2.conv2': 188, 'layer3.4.conv1': 191, 'layer2.3.conv1': 103, 'layer3.3.conv1': 185, 'layer2.0.conv2': 97, 'layer3.2.conv1': 192, 'layer2.2.conv1': 98, 'layer3.1.conv1': 181, 'layer1.0.conv2': 55, 'layer1.1.conv2': 47, 'layer1.2.conv2': 57, 'layer3.5.conv2': 177, 'layer2.1.conv2': 96, 'layer1.2.conv1': 50}
+Pruning filters.. 
+Filters pruned 4.992055084745763%
+Test:
+	post prune Score: 10.0
+Fine tuning to recover from prunning iteration.
+Epoch 0 - Train acc: 97.82 - Val acc: 95.17 - Train loss: 0.0709 - Val loss: 0.1387 - Training time: 173.34s
+Test pruning iteration :5
+	Score: 92.77
+Epoch 0 - Train acc: 98.46 - Val acc: 96.54 - Train loss: 0.0494 - Val loss: 0.1002 - Training time: 171.10s
+Epoch 1 - Train acc: 99.48 - Val acc: 97.51 - Train loss: 0.0191 - Val loss: 0.0734 - Training time: 171.34s
+Epoch 2 - Train acc: 99.80 - Val acc: 97.57 - Train loss: 0.0097 - Val loss: 0.0695 - Training time: 172.12s
+Epoch 3 - Train acc: 99.93 - Val acc: 97.78 - Train loss: 0.0042 - Val loss: 0.0612 - Training time: 172.32s
+end number of flops: 2808646656.0 	number of params: 14346069.0
+Final Test:
+	Score: 94.43
+Traceback (most recent call last):
+  File "C:/dev/cnnpruner/POC.py", line 440, in <module>
+    run_compare_model_and_prune_alexnet()
+  File "C:/dev/cnnpruner/POC.py", line 399, in run_compare_model_and_prune_alexnet
+    run_strategy_prune_compare(dataset_params)
+  File "C:/dev/cnnpruner/POC.py", line 350, in run_strategy_prune_compare
+    h = exec_alexnet(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params, out_count=10)
+TypeError: exec_alexnet() got an unexpected keyword argument 'out_count'
+
+Process finished with exit code 1

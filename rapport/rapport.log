@@ -1,0 +1,163 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  5 MAY 2019 16:23
+entering extended mode
+**./rapport.tex
+(rapport.tex
+LaTeX2e <2018-12-01>
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\article.cls"
+Document Class: article 2018/09/03 v1.4i Standard LaTeX document class
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\size12.clo"
+File: size12.clo 2018/09/03 v1.4i Standard LaTeX file (size option)
+)
+\c@part=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (scicite.sty
+LaTeX Info: Redefining \cite on input line 160.
+LaTeX Info: Redefining \nocite on input line 227.
+Package: scicite 2003/11/04  v 4.01
+)
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/psnfss\times.sty"
+Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
+)
+\c@lastnote=\count88
+(rapport.aux)
+\openout1 = `rapport.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 93.
+
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/psnfss\ot1ptm.fd"
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 101.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 101.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 101.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 101.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 101.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 107.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17.28> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 123.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 126.
+
+LaTeX Warning: Citation `beathuman' on page 1 undefined on input line 126.
+
+[1
+
+{C:/Users/naked/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 128.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 144.
+
+
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/psnfss\ot1pcr.fd"
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+) [2]
+LaTeX Font Info:    Try loading font information for OMS+pcr on input line 195.
+
+
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/psnfss\omspcr.fd"
+File: omspcr.fd 
+)
+LaTeX Font Info:    Font shape `OMS/pcr/m/n' in size <12> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 195.
+[3] [4] [5]
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 282.
+
+
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/psnfss\omsptm.fd"
+File: omsptm.fd 
+)
+LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 282.
+
+Overfull \hbox (30.35535pt too wide) in paragraph at lines 304--307
+[]\OT1/ptm/m/n/12 From B\OT1/ptm/m/n/10.95 IB\OT1/ptm/m/n/12 T[]X users, your b
+ib-li-og-ra-phy (\OT1/pcr/m/n/12 .bib\OT1/ptm/m/n/12 ) file, \OT1/ptm/m/it/12 a
+nd \OT1/ptm/m/n/12 the gen-er-ated file \OT1/pcr/m/n/12 ltxfile.bbl
+ []
+
+(rapport.bbl
+Underfull \hbox (badness 10000) in paragraph at lines 4--6
+[]\OT1/ptm/m/n/12 Backpropagation Ap-plied to Hand-writ-ten Zip Code Recog-ni-t
+ion:
+ []
+
+[6]
+
+! Package inputenc Error: Unicode character ﬁ (U+FB01)
+(inputenc)                not set up for use with LaTeX.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.13 ...an-level performance on imagenet classiﬁ
+                                                  cation. In ICCV, 2015.
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+) [7] [8] [9
+
+] (rapport.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 462 strings out of 492946
+ 5878 string characters out of 3126267
+ 63146 words of memory out of 3000000
+ 4399 multiletter control sequences out of 15000+200000
+ 24427 words of font info for 49 fonts, out of 3000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 22i,8n,20p,724b,278s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/base/8r.enc
+}<C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/
+cm/cmmi12.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pub
+lic/amsfonts/cm/cmmi8.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fon
+ts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/naked/AppData/Local/Programs/Mi
+KTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/naked/AppData/Local
+/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/naked/Ap
+pData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/U
+sers/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cms
+y8.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/courie
+r/ucrr8a.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/
+times/utmb8a.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/
+urw/times/utmbi8a.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/t
+ype1/urw/times/utmr8a.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fon
+ts/type1/urw/times/utmri8a.pfb>
+Output written on rapport.pdf (9 pages, 142169 bytes).
+PDF statistics:
+ 81 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
