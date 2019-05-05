@@ -330,13 +330,13 @@ def run_strategy_prune_compare(dataset_params):
     h = exec_dense_net(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_large, dataset_params=dataset_params)
     multi_history.append_history("densenet 121-0", h)
     h = exec_dense_net(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_large, dataset_params=dataset_params)
-    multi_history.append_history("densenet 121-20", h)
+    multi_history.append_history("densenet 121-30", h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
     h = exec_resnet18(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params, out_count=10)
     multi_history.append_history("Resnet 18-0", h)
     h = exec_resnet18(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params, out_count=10)
-    multi_history.append_history("Resnet 18-20", h)
+    multi_history.append_history("Resnet 18-30", h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
     h = exec_resnet50(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_medium,
@@ -344,18 +344,18 @@ def run_strategy_prune_compare(dataset_params):
     multi_history.append_history("Resnet 50-0", h)
     h = exec_resnet50(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_medium,
                       dataset_params=dataset_params, out_count=10)
-    multi_history.append_history("Resnet 50-20", h)
+    multi_history.append_history("Resnet 50-30", h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
 
-    h = exec_alexnet(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params, out_count=10)
+    h = exec_alexnet(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params)
     multi_history.append_history("Alexnet 0", h)
-    h = exec_alexnet(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params, out_count=10)
-    multi_history.append_history("Alexnet 20", h)
+    h = exec_alexnet(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params)
+    multi_history.append_history("Alexnet 30", h)
 
-    h = exec_vgg16(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params, out_count=10)
+    h = exec_vgg16(pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune, dataset_params=dataset_params)
     multi_history.append_history("vgg16 0", h)
-    h = exec_vgg16(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params, out_count=10)
-    multi_history.append_history("vgg16 20", h)
+    h = exec_vgg16(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune, dataset_params=dataset_params)
+    multi_history.append_history("vgg16 30", h)
 
     save_obj(multi_history, "history_compare")
     multi_history.display_single_key(History.VAL_ACC_KEY)
@@ -385,6 +385,7 @@ def run_validation(dataset_params):
                      dataset_params=dataset_params)
     multi_history.append_history("Alexnet 0%", h)
     multi_history.display_single_key(History.VAL_ACC_KEY)
+
 
 def run_compare_model_and_prune_alexnet():
     transform = transforms.Compose([transforms.Resize((224, 224)),
