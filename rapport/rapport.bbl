@@ -10,7 +10,7 @@ Backpropagation Applied to Handwritten Zip Code Recognition:
 
 \bibitem{beathuman}
 K. He, X. Zhang, S. Ren, and J. Sun. Delving deep into rectifiers: Surpassing
-  human-level performance on imagenet classiﬁcation. In ICCV, 2015.
+  human-level performance on imagenet classification. In ICCV, 2015.
 
 \bibitem{transfer}
 A Survey on Deep Transfer Learning https://arxiv.org/pdf/1808.01974.pdf .
@@ -24,21 +24,8 @@ Bandwidth-efficient deep learning: https://dl.acm.org/citation.cfm?id=3199847 .
 \bibitem{pytorchmodel}
 Https://pytorch.org/docs/stable/torchvision/models.html .
 
-\bibitem{inclme}
-Among whom are the author of this document. The ``real'' references and notes
-  contained herein were compiled using B{\small{IB}}\TeX\ from the sample .bib
-  file \texttt{scibib.bib}, the style package \texttt{scicite.sty}, and the
-  bibliography style file \texttt{Science.bst}.
-
-\bibitem{nattex}
-One of the equation editors we use, Equation Magic (MicroPress Inc., Forest
-  Hills, NY; http://www.micropress-inc.com/), interprets native \TeX\ source
-  code and generates an equation as an OLE picture object that can then be cut
-  and pasted directly into Word. This editor, however, does not handle \LaTeX\
-  environments (such as \texttt{\{array\}} or \texttt{\{eqnarray\}}); it can
-  interpret only \TeX\ codes. Thus, when there's a choice, we ask that you
-  avoid these \LaTeX\ calls in displayed math --- for example, that you use the
-  \TeX\ \verb+\matrix+ command for ordinary matrices, rather than the \LaTeX\
-  \texttt{\{array\}} environment.
+\bibitem{weightinference}
+Srivastava et al. (2014). Dropout: A Simple Way to Prevent Neural Networks from
+  Overfitting..
 
 \end{thebibliography}
