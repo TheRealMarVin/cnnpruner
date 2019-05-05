@@ -13,8 +13,8 @@ class MultiHistory:
         else:
             self.data[key] = self.data[key].append(history)
 
-    def display_single_key(self, key):
-        plt.title('Training accuracy')
+    def display_single_key(self, key, title="Training accuracy"):
+        plt.title(title)
         plt.xlabel('Epochs')
         plt.ylabel(key)
         for k, v in self.data.items():

@@ -219,6 +219,21 @@ def exec_alexnet(exec_name, pruning_params=None, exec_params=None, dataset_param
     return history
 
 
+def exec_squeeze_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
+    print("*** ", exec_name)
+
+    model = models.squeezenet1_1(pretrained=True)
+    model.cuda()
+
+    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
+                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
+                                   sample_run=torch.zeros([1, 3, 224, 224]),
+                                   pruning_params=pruning_params,
+                                   exec_params=exec_params,
+                                   dataset_params=dataset_params)
+    return history
+
+
 def exec_dense_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
     print("*** ", exec_name)
 
@@ -321,6 +336,16 @@ def run_strategy_prune_compare(dataset_params):
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.3)
 
     multi_history = MultiHistory()
+    # exec_name = "SqueezeNet-0"
+    # h = exec_squeeze_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
+    #                      dataset_params=dataset_params)
+    # multi_history.append_history(exec_name, h)
+    exec_name = "SqueezeNet-30"
+    h = exec_squeeze_net(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
+                         dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
+
     exec_name = "densenet 121-0"
     h = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_large,
                        dataset_params=dataset_params)
@@ -329,17 +354,7 @@ def run_strategy_prune_compare(dataset_params):
     h = exec_dense_net(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_large,
                        dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
-    multi_history.display_single_key(History.VAL_ACC_KEY)
-
-    exec_name = "Resnet 18-0"
-    h = exec_resnet18(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
-                      dataset_params=dataset_params, out_count=10)
-    multi_history.append_history(exec_name, h)
-    exec_name = "Resnet 18-30"
-    h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
-                      dataset_params=dataset_params, out_count=10)
-    multi_history.append_history(exec_name, h)
-    multi_history.display_single_key(History.VAL_ACC_KEY)
+    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
 
     exec_name = "Resnet 50-0"
     h = exec_resnet50(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_medium,
@@ -349,7 +364,16 @@ def run_strategy_prune_compare(dataset_params):
     h = exec_resnet50(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_medium,
                       dataset_params=dataset_params, out_count=10)
     multi_history.append_history(exec_name, h)
-    multi_history.display_single_key(History.VAL_ACC_KEY)
+    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
+
+    exec_name = "Resnet 18-0"
+    h = exec_resnet18(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
+                      dataset_params=dataset_params, out_count=10)
+    multi_history.append_history(exec_name, h)
+    exec_name = "Resnet 18-30"
+    h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
+                      dataset_params=dataset_params, out_count=10)
+    multi_history.append_history(exec_name, h)
 
     exec_name = "Alexnet 0"
     h = exec_alexnet(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
@@ -370,7 +394,7 @@ def run_strategy_prune_compare(dataset_params):
     multi_history.append_history(exec_name, h)
 
     save_obj(multi_history, "history_compare")
-    multi_history.display_single_key(History.VAL_ACC_KEY)
+    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
 
 
 def run_alex_prune_compare(dataset_params):
@@ -402,7 +426,7 @@ def run_alex_prune_compare(dataset_params):
                      dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
     save_obj(multi_history, "history_alex")
-    multi_history.display_single_key(History.VAL_ACC_KEY)
+    multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing AlexNet by Level of Pruning")
 
 
 def run_fast_validation(dataset_params):
@@ -413,7 +437,7 @@ def run_fast_validation(dataset_params):
     h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.2, prune_ratio=0.2), exec_params=exec_param,
                      dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
-    multi_history.display_single_key(History.VAL_ACC_KEY)
+    multi_history.display_single_key(History.VAL_ACC_KEY, title="TEST_RUN")
 
 
 def run_compare_model_and_prune_alexnet():
@@ -450,7 +474,7 @@ def run_test_using_image_net():
     h = exec_resnet18(pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
                       dataset_params=dataset_params)
     multi_history.append_history("Resnet18 20%", h)
-    multi_history.display_single_key(History.VAL_ACC_KEY)
+    multi_history.display_single_key(History.VAL_ACC_KEY, title="Image_net")
 
 
 def run_validation():
@@ -466,6 +490,6 @@ def run_validation():
 
 
 if __name__ == '__main__':
-    run_validation()
-    # run_compare_model_and_prune_alexnet()
+    # run_validation()
+    run_compare_model_and_prune_alexnet()
     # run_test_using_image_net()
