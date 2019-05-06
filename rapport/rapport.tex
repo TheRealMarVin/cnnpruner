@@ -18,6 +18,7 @@
 \usepackage{enumitem}
 \usepackage{float}
 \usepackage{graphicx}
+\usepackage{subcaption}
 
 % The preamble here sets up a lot of new/revised commands and
 % environments.  It's annoying, but please do *not* try to strip these
@@ -162,7 +163,7 @@ Dans la solution proposée, il est important de ne pas appliquer de réduction d
 \end{figure}
 
 Un autre problème potentiel survient lorsqu'une couche est réutilisée. Dans ce cas il faut que l'input de notre couche soit compatible avec la sortie de la couche que nous traitons. Cependant nous devons affecter les couches précédentes pour que les dimensions concordent aussi.
-
+\newpage
 Il est à noter qu'il est possible qu'il existe un algorithme fiable qui permet de gérer ces cas, mais l'article présent n'explore pas ces options.
 
 \subsection{Pratiques à éviter}
@@ -176,18 +177,62 @@ Lors de la construction du modèle il est très important d’éviter au maximum
 
 
 \subsection{Propagation de l’effet}
-Lorsqu’on retire un filtre de convolution d’une couche, il faut prendre plusieurs précautions pour assurer la stabilité du système. Par exemple, il faut ajuster les poids, le nombre de biais dans la couche et ajuster les gradients lorsque ces derniers sont contenus dans la couche elle-même. Ce qui est le cas de PyTorch.
+Lorsque nous retirons un filtre de convolution d’une couche, il faut prendre plusieurs précautions pour assurer la stabilité du système. Par exemple, il faut ajuster les poids, le nombre de biais dans la couche et ajuster les gradients lorsque ces derniers sont contenus dans la couche elle-même. Ce qui est le cas de PyTorch.
 
 Par la suite, il faut ajuster les couches suivantes en fonction de leur type.
-Pour les couches de convolutions suivantes. Il est nécessaire d’ajuster le nombre de couches en entrées pour concorder avec la couche de convolution que nous traitons. Il faut aussi ajuster les poids de cette couche. 
-Pour les couches de batch Norm, il faut ajuster les biais lorsqu'ils sont utilisés et nous effectuons un reset sur les variables utilisées à l’exécution. Dans PyTorch, nous parlons de running means et running vars. 
-Finalement, nous devons ajuster les couches pleinement connectées. Dans le cas de ces couches, nous ajustons les poids et nous appliquons la weight inference rule\cite{weightinference} afin de simuler le retrait des poids par dropout. 
+\begin{itemize}[noitemsep, noitemsep, label={}]
+	\item Pour les couches de \textbf{convolutions suivantes}. Il est nécessaire d’ajuster le nombre de couches en entrées pour concorder avec la couche de convolution que nous traitons. Il faut aussi ajuster les poids de cette couche. 
+	\newpage
+	\item Pour les couches de \textbf{Batchnorm}, il faut ajuster les biais lorsqu'ils sont utilisés et nous effectuons un reset sur les variables utilisées à l’exécution. Dans PyTorch, nous parlons de running means et running vars. 
+	\item Finalement, nous devons ajuster les couches \textbf{pleinement connectées}. Dans le cas de ces couches, nous ajustons les poids et nous appliquons la \textit{weight inference rule}\cite{weightinference} afin de simuler le retrait des poids par \textit{dropout}. 
+\end{itemize}
+
 Les autres couches semblent bien supporter la réduction de couches de convolution. Il est à noter que nous avons uniquement essayé les modèles proposés dans PyTorch et que d'autres travail pourrait être nécessaire pour des couches plus complexes. 
 
 \section*{Résultats}
+Dans un premier temps, nous évaluons l’effet de la réduction des filtres de convolution sur le modèle AlexNet. La figure 3 montre les effets de la réduction. Le premier résultat que nous pouvons remarquer c’est qu’une succession de réduction trop prononcer réduit considérablement l’effet de pré-entrainement. 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.5\textwidth}            
+		\includegraphics[width=\textwidth]{prune_ratio_rough}
+		\caption{Description}
+		\label{fig:pruneratiorough}
+	\end{subfigure}%
+	%add desired spacing between images, e. g. ~, \quad, \qquad etc.
+	%(or a blank line to force the subfigure onto a new line)
+	\begin{subfigure}[b]{0.5\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{prune_ratio_slow}
+		\caption{Description}
+		\label{fig:pruneratioslow}
+	\end{subfigure}
+\end{figure}
+
+Par la suite, nous comparons la différence d’efficacité entre les modèles. Cette différence est visible dans la figuredans la figure 4 pour les modèles peu profonds et dans la figure 5 pour les modèles profonds de Pytorch. Dans tous les cas, on remarque que même avec une réduction de 30\% pouvant être coupé il est possible de réduire significativement le réseau et maintenir un niveau de performance.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.5\textwidth}            
+		\includegraphics[width=\textwidth]{various_models_shallow}
+		\caption{Description}
+		\label{fig:SRl}
+	\end{subfigure}%
+	%add desired spacing between images, e. g. ~, \quad, \qquad etc.
+	%(or a blank line to force the subfigure onto a new line)
+	\begin{subfigure}[b]{0.5\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{various_models_deep}
+		\caption{Description}
+		\label{fig:D-Imager}
+	\end{subfigure}
+\end{figure}
+
+
+En examinant l’effet de la réduction sur les paramètres dans la figure[XXX] et le nombre de FLOPs on voit qu’il y a un lien entre ABC et XYZ. 
+Finalement nous allons examiner les effets de la réduction sur le modèle Resnet18 par increment pour avoir une bonne de la perte d’efficacité. 
 
 \section*{Conclusion}
 
+\newpage
 \bibliography{scibib}
 
 \bibliographystyle{Science}

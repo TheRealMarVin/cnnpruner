@@ -19,7 +19,8 @@ A Survey on Deep Transfer Learning https://arxiv.org/pdf/1808.01974.pdf .
 Bandwidth-efficient deep learning https://dl.acm.org/citation.cfm?id=3199847 .
 
 \bibitem{molchanov}
-Bandwidth-efficient deep learning: https://dl.acm.org/citation.cfm?id=3199847 .
+PRUNING CONVOLUTIONAL NEURAL NETWORKS FOR RESOURCE EFFICIENT INFERENCE :
+  https://arxiv.org/pdf/1611.06440.pdf .
 
 \bibitem{pytorchmodel}
 Https://pytorch.org/docs/stable/torchvision/models.html .

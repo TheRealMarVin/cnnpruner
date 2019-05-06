@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  5 MAY 2019 19:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  5 MAY 2019 20:54
 entering extended mode
 **./rapport.tex
 (rapport.tex
@@ -75,23 +75,50 @@ File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
 \Gin@req@height=\dimen104
 \Gin@req@width=\dimen105
 )
-\c@lastnote=\count91
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/caption\subcaption
+.sty"
+Package: subcaption 2018/05/01 v1.1-162 Sub-captions (AR)
+
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/caption\caption.st
+y"
+Package: caption 2018/10/06 v3.3-154 Customizing captions (AR)
+
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/caption\caption3.s
+ty"
+Package: caption3 2018/09/12 v1.8c caption3 kernel (AR)
+Package caption3 Info: TeX engine: e-TeX on input line 64.
+\captionmargin=\dimen106
+\captionmargin@=\dimen107
+\captionwidth=\dimen108
+\caption@tempdima=\dimen109
+\caption@indent=\dimen110
+\caption@parindent=\dimen111
+\caption@hangindent=\dimen112
+)
+\c@caption@flags=\count91
+\c@ContinuedFloat=\count92
+Package caption Info: float package is loaded.
+)
+\c@subfigure=\count93
+\c@subtable=\count94
+)
+\c@lastnote=\count95
  (rapport.aux)
 \openout1 = `rapport.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 97.
-LaTeX Font Info:    ... okay on input line 97.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 97.
-LaTeX Font Info:    ... okay on input line 97.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 97.
-LaTeX Font Info:    ... okay on input line 97.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 97.
-LaTeX Font Info:    ... okay on input line 97.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 97.
-LaTeX Font Info:    ... okay on input line 97.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 97.
-LaTeX Font Info:    ... okay on input line 97.
-LaTeX Font Info:    Try loading font information for OT1+ptm on input line 97.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 98.
+LaTeX Font Info:    ... okay on input line 98.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 98.
+LaTeX Font Info:    ... okay on input line 98.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 98.
+LaTeX Font Info:    ... okay on input line 98.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 98.
+LaTeX Font Info:    ... okay on input line 98.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 98.
+LaTeX Font Info:    ... okay on input line 98.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 98.
+LaTeX Font Info:    ... okay on input line 98.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 98.
 
 ("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/psnfss\ot1ptm.fd"
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
@@ -99,16 +126,16 @@ File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 ("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/context/base\supp-pdf.mk
 ii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count92
-\scratchdimen=\dimen106
+\scratchcounter=\count96
+\scratchdimen=\dimen113
 \scratchbox=\box30
-\nofMPsegments=\count93
-\nofMParguments=\count94
+\nofMPsegments=\count97
+\nofMParguments=\count98
 \everyMPshowfont=\toks19
-\MPscratchCnt=\count95
-\MPscratchDim=\dimen107
-\MPnumerator=\count96
-\makeMPintoPDFobject=\count97
+\MPscratchCnt=\count99
+\MPscratchDim=\dimen114
+\MPnumerator=\count100
+\makeMPintoPDFobject=\count101
 \everyMPtoPDFconversion=\toks20
 )
 ("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\epstopdf-
@@ -169,53 +196,83 @@ Package grfext Info: Graphics extension search list:
 G,.JBIG2,.JB2,.eps]
 (grfext)             \AppendGraphicsExtensions on input line 456.
 )
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 105.
+(Font)              <14.4> on input line 106.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 105.
+(Font)              <7> on input line 106.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 105.
+(Font)              <12> on input line 106.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 105.
+(Font)              <8> on input line 106.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 105.
+(Font)              <6> on input line 106.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 111.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 112.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17.28> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 127.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 128.
  [1
 
 {C:/Users/naked/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 132.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 133.
 
 [2]
 <residual_add.png, id=15, 414.04688pt x 146.79843pt>
 File: residual_add.png Graphic file (type png)
 <use residual_add.png>
-Package pdftex.def Info: residual_add.png  used on input line 159.
+Package pdftex.def Info: residual_add.png  used on input line 160.
 (pdftex.def)             Requested size: 414.04585pt x 146.79807pt.
  [3 <./residual_add.png>]
 <mistake.png, id=21, 426.84468pt x 65.49469pt>
 File: mistake.png Graphic file (type png)
 <use mistake.png>
-Package pdftex.def Info: mistake.png  used on input line 172.
+Package pdftex.def Info: mistake.png  used on input line 173.
 (pdftex.def)             Requested size: 426.84364pt x 65.4945pt.
- [4 <./mistake.png>] (rapport.bbl
+
+Overfull \hbox (0.62032pt too wide) in paragraph at lines 180--181
+\OT1/ptm/m/n/12 Lorsque nous re-tirons un fil-tre de con-vo-lu-tion d'une couch
+e, il faut pren-dre plusieurs pr[]ecautions
+ []
+
+[4 <./mistake.png>]
+<prune_ratio_rough.png, id=25, 481.8pt x 361.35pt>
+File: prune_ratio_rough.png Graphic file (type png)
+<use prune_ratio_rough.png>
+Package pdftex.def Info: prune_ratio_rough.png  used on input line 197.
+(pdftex.def)             Requested size: 227.62204pt x 170.71672pt.
+<prune_ratio_slow.png, id=26, 481.8pt x 361.35pt>
+File: prune_ratio_slow.png Graphic file (type png)
+<use prune_ratio_slow.png>
+Package pdftex.def Info: prune_ratio_slow.png  used on input line 205.
+(pdftex.def)             Requested size: 227.62204pt x 170.71672pt.
+<various_models_shallow.png, id=27, 442.65375pt x 361.35pt>
+File: various_models_shallow.png Graphic file (type png)
+<use various_models_shallow.png>
+Package pdftex.def Info: various_models_shallow.png  used on input line 215.
+(pdftex.def)             Requested size: 227.62204pt x 185.81888pt.
+<various_models_deep.png, id=28, 442.65375pt x 361.35pt>
+File: various_models_deep.png Graphic file (type png)
+<use various_models_deep.png>
+Package pdftex.def Info: various_models_deep.png  used on input line 223.
+(pdftex.def)             Requested size: 227.62204pt x 185.81888pt.
+ [5 <./prune_ratio_rough.png> <./prune_ratio_slow.png>]
+[6 <./various_models_shallow.png> <./various_models_deep.png>] (rapport.bbl
 Underfull \hbox (badness 10000) in paragraph at lines 4--6
 []\OT1/ptm/m/n/12 Backpropagation Ap-plied to Hand-writ-ten Zip Code Recog-ni-t
 ion:
  []
 
-) [5] (rapport.aux) ) 
+) [7] (rapport.aux) ) 
 Here is how much of TeX's memory you used:
- 1964 strings out of 492946
- 29608 string characters out of 3126267
- 94624 words of memory out of 3000000
- 5843 multiletter control sequences out of 15000+200000
- 19113 words of font info for 41 fonts, out of 3000000 for 9000
+ 3156 strings out of 492946
+ 51313 string characters out of 3126267
+ 116484 words of memory out of 3000000
+ 7021 multiletter control sequences out of 15000+200000
+ 20698 words of font info for 43 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,8n,25p,724b,283s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 42i,8n,40p,724b,445s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/en
 c/dvips/base/8r.enc}<C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/typ
 e1/public/amsfonts/cm/cmr10.pfb><C:/Users/naked/AppData/Local/Programs/MiKTeX 2
@@ -226,9 +283,9 @@ aked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Use
 rs/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:
 /Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pf
 b>
-Output written on rapport.pdf (5 pages, 92733 bytes).
+Output written on rapport.pdf (7 pages, 266630 bytes).
 PDF statistics:
- 51 PDF objects out of 1000 (max. 8388607)
+ 67 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
 
