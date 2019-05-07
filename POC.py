@@ -457,25 +457,25 @@ def run_alex_prune_compare_midway(dataset_params):
     multi_history.append_history(exec_name, h)
 
     exec_name = "Alexnet 10%"
-    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.02, prune_ratio=0.1), exec_params=exec_param,
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.025, prune_ratio=0.1), exec_params=exec_param,
                      dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
 
     exec_name = "Alexnet 30%"
-    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.06, prune_ratio=0.3), exec_params=exec_param,
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.075, prune_ratio=0.3), exec_params=exec_param,
                      dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
 
     exec_name = "Alexnet 50%"
-    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.1, prune_ratio=0.5), exec_params=exec_param,
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.125, prune_ratio=0.5), exec_params=exec_param,
                      dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
 
     exec_name = "Alexnet 75%"
-    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.15, prune_ratio=0.75), exec_params=exec_param,
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.1875, prune_ratio=0.75), exec_params=exec_param,
                      dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
-    save_obj(multi_history, "history_alex_soft")
+    save_obj(multi_history, "history_alex_midway")
     multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing AlexNet by Level of Pruning")
 
 
