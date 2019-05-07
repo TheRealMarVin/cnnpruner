@@ -161,7 +161,7 @@ In the proposed solution, it is important not to apply filter reduction just bef
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{residual_add}
+	\includegraphics{fig/residual_add}
 	\caption{In the following figure it is impossible to reduce the second convolution layer for the bottom branch since it would also be necessary to modify the layer preceding this ResNet block so that the residual connection has the right size.}
 	\label{fig:residualadd}
 \end{figure}
@@ -177,7 +177,7 @@ Finally, it is crucial not to affect a layer if it directly influences the numbe
 When a model is created it is important to avoid hardcoded value in the inference function. For example, in the AlexNet model, there is the code on the left side of Figure 2 that prevents us from reducing the last convolution layer before the fully connected layer. By performing the modification shown in Figure 2, it is now possible to reduce the convolution layer before the fully connected layer.
 \begin{figure}[H]
 	\centering
-	\includegraphics{mistake}
+	\includegraphics{fig/mistake}
 	\caption{Note in the left-hand section that the original code assumes a fixed size for the last convolution layer. In addition to limiting the model to a certain input image size, the last convolution layer can not be reduced. The proposed solution requires the modification in the right section of the image that allows a variable size of the last convolution layer.}
 	\label{fig:mistake}
 \end{figure}
@@ -200,19 +200,19 @@ First, we evaluate the effect of reducing convolution filters on the AlexNet mod
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.33\textwidth}            
-		\includegraphics[width=\textwidth]{prune_ratio_rough}
+		\includegraphics[width=\textwidth]{fig/prune_ratio_rough}
 		\label{fig:pruneratiorough}
 	\end{subfigure}%
 	%add desired spacing between images, e. g. ~, \quad, \qquad etc.
 	%(or a blank line to force the subfigure onto a new line)
 	\begin{subfigure}[b]{0.33\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{prune_ratio_medium}
+		\includegraphics[width=\textwidth]{fig/prune_ratio_medium}
 		\label{fig:pruneratioslow}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.33\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{prune_ratio_slow}
+		\includegraphics[width=\textwidth]{fig/prune_ratio_slow}
 		\label{fig:pruneratioslow}
 	\end{subfigure}
 	\caption{In the figure on the left, there is a significant reduction of the weights at each iteration over two iterations (epoch 4 and 7). The figure of the center represents a reduction on 5 iterations with 2 steps of leveling. In the figure on the right, we see a more gradual reduction made over 10 iterations.}
@@ -236,14 +236,14 @@ Then we compare the difference in efficiency between the models. This difference
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.5\textwidth}            
-		\includegraphics[width=\textwidth]{various_models_shallow}
+		\includegraphics[width=\textwidth]{fig/various_models_shallow}
 		\label{fig:SRl}
 	\end{subfigure}%
 	%add desired spacing between images, e. g. ~, \quad, \qquad etc.
 	%(or a blank line to force the subfigure onto a new line)
 	\begin{subfigure}[b]{0.5\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{various_models_deep}
+		\includegraphics[width=\textwidth]{fig/various_models_deep}
 		\label{fig:D-Imager}
 	\end{subfigure}
 	\caption{In the image on the left we can see the effect of the reduction on shallow models. In the image on the right we see the effect of the reduction on the deep networks of PyTorch.}
