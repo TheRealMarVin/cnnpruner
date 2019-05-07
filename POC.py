@@ -414,10 +414,12 @@ def run_strategy_prune_compare(dataset_params):
 def run_alex_prune_compare_rough(dataset_params):
     multi_history = MultiHistory()
     exec_param = ExecParams(n_pretrain_epoch=3, n_epoch_retrain=3, n_epoch_total=15, pruner=TaylorExpensionFilterPruner)
+    exec_param_no_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15,
+                                     pruner=TaylorExpensionFilterPruner)
 
     exec_name = "Alexnet 0%"
-    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.0, prune_ratio=None), exec_params=exec_param,
-                     dataset_params=dataset_params)
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.0, prune_ratio=None),
+                     exec_params=exec_param_no_prune, dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
 
     exec_name = "Alexnet 10%"
@@ -446,10 +448,12 @@ def run_alex_prune_compare_rough(dataset_params):
 def run_alex_prune_compare_soft(dataset_params):
     multi_history = MultiHistory()
     exec_param = ExecParams(n_pretrain_epoch=3, n_epoch_retrain=1, n_epoch_total=15, pruner=TaylorExpensionFilterPruner)
+    exec_param_no_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15,
+                                     pruner=TaylorExpensionFilterPruner)
 
     exec_name = "Alexnet 0%"
-    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.0, prune_ratio=None), exec_params=exec_param,
-                     dataset_params=dataset_params)
+    h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.0, prune_ratio=None),
+                     exec_params=exec_param_no_prune, dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
 
     exec_name = "Alexnet 10%"
