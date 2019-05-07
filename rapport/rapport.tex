@@ -207,6 +207,9 @@ Dans un premier temps, nous évaluons l’effet de la réduction des filtres de 
 	\caption{Dans la figure de gauche, on constate une réduction importante des poids à chaque itération. C'est à dire que la réduction des poids est fait en seulement 3 itérations. Sur la figure de droite, on voit une réduction beaucoup plus progressive fait sur 10 itérations.}
 \end{figure}
 
+La figure 3 montre aussi un aspect important. Elle montre que la manière de réduire les poids est importante. Une réduction trop rapide des poids va causer une réduction marquée des performances. À l'opposer, nous remarquons qu'une réduction graduelle appliquée plus longtemps peut apporter la même réduction, mais avec de bien meilleurs résultats.
+
+
 Par la suite, nous comparons la différence d’efficacité entre les modèles. Cette différence est visible dans la figure 4 qui compare les modèles peu profonds dans la section de gauche et les modèles profonds de Pytorch dans le graphique de droite. Dans tous les cas, on remarque que même avec une réduction de 30\% pouvant être coupé il est possible de réduire significativement le réseau et maintenir un niveau de performance.
 
 \begin{figure}[H]
@@ -247,6 +250,7 @@ En examinant l’effet de la réduction sur les paramètres et le nombre de FLOP
 Nous remarquons aussi une perte allant jusqu’à 2\% pour la plupart des modèles. Dans certains cas on remarque même un gain sur l’ensemble de tests. Cependant la perte ne semble pas directement relié au pourcentage de paramètres retirés du réseau. 
 
 \section*{Conclusion}
+En conclusion nous remarquons: 1- la technique de réduction des filtres de convolution peut être appliqués sur des modèles plus complexes en créant un module analysant l’exécution du modèle. 2 - Les gains en réduction peuvent permettre de réduire les besoins matériels pour beaucoup d’architectures. 3 - La réduction de filtres de convolution offre une forme de régularisation pouvant servir à l’entrainement d'un modèle lorsque appliqué modérément. 4 - La manière d’appliquer la réduction est important afin d'obtenir de bons résultats. 
 
 \newpage
 \bibliography{scibib}
