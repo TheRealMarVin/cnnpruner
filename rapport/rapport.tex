@@ -1,4 +1,4 @@
-% Use only LaTeX2e, calling the article.cls class and 12-point type.
+ % Use only LaTeX2e, calling the article.cls class and 12-point type.
 
 \documentclass[12pt]{article}
 
@@ -111,7 +111,7 @@
 % Place your abstract within the special {sciabstract} environment.
 
 \begin{sciabstract}
-  Il y a eu des recherches expliquant comment réduire les couches de convolution dans les réseaux de neurones. Cependant dans les articles proposés les modèles utilisés sont généralement AlexNet et VGG. Lorsque ssayé sur des réseaux plus complexes tels que ResNet et DenseNet les solutions proposées ne fonctionnent pas. Le but ici est d'explorer les limites de cette approche et de proposer une solution afin de pouvoir généraliser à des réseaux plus complexes et profonds que ceux dans l'article original de Molchanov. Les expérimentations seront faites sur le transfert de modèle entre ImageNet vers Cifar10 et nous verrons les gains pouvant être faits sur des réseaux profonds. 
+  Il y a eu des recherches expliquant comment réduire les couches de convolution dans les réseaux de neurones. Cependant dans les articles proposés les modèles utilisés sont généralement AlexNet et VGG. Lorsqu'essayé sur des réseaux plus complexes tels que ResNet et DenseNet les solutions proposées ne fonctionnent pas. Le but est d'explorer les limites de cette approche et de proposer une solution afin de pouvoir généraliser à des réseaux plus complexes et profonds que ceux dans l'article original de Molchanov. Les expérimentations seront faites sur le transfert de modèle entre ImageNet vers Cifar10 et nous verrons les gains pouvant être faits sur des réseaux profonds. 
 \end{sciabstract}
 
 
@@ -127,34 +127,38 @@
 % suppress numbering.
 
 \section*{Introduction}
-Les réseaux CNN sont parmis nous depuis très longtemps\cite{lecunn1}. Ces réseaux sont très utilisés dans le traitement de l'image dans une grande variété de domaines. Ils sont très utilisé dans la classification ou la localisation d'objets. Que ce soit avec les systèmes de surveillance, les voitures automomes ou les appareils intelligents, ce type de réseaux fait maintenant partie de notre quotidien\cite{daily}.
+Les réseaux CNN sont parmi nous depuis très longtemps\cite{lecunn1}. Ces réseaux sont très utilisés dans une grande variété de domaines. Que ce soit avec les systèmes de surveillance, les voitures autonomes ou les appareils intelligents, ce type de réseaux fait maintenant partie de notre quotidien\cite{daily}.
 
 Ces réseaux ont montré qu’ils pouvaient obtenir des résultats excédant les capacités humaines\cite{beathuman}. Dans plusieurs cas, ces modèles sont rendus disponibles au grand public et il est possible de les adapter à des problèmes plus simples pour obtenir de très bons résultats\cite{transfer}. 
 
 \subsection{Description du problèmes}
-Afin d'utiliser ces réseaux sûrs de petits appareils des techniques\cite{han1} ont été évalué dans le passé. Plus récemment, un article propose de faire la réduction de filtres de convolution\cite{molchanov}. Cependant l'article se concentre essentiellement sur les réseaux AlexNet et VGG et ne fonctionne pas sur les réseaux plus complexes présent dans PyTorch\cite{pytorchmodel}.
+Afin d'utiliser ces réseaux sûrs de petits appareils, certaines techniques\cite{han1} ont été évalué dans le passé. Plus récemment, un article propose de faire la réduction de filtres de convolution\cite{molchanov}. Cependant l'article se concentre sur les réseaux AlexNet et VGG et ne fonctionne pas sur les réseaux plus complexes présent dans PyTorch\cite{pytorchmodel}.
 
 Le but de cet article sera d'évaluer le travail nécessaire pour pouvoir pousser cette logique vers des réseaux plus complexes tels que ResNet, DenseNet et SqueezeNet. 
 
 \section*{Méthode}
-La méthode utilisée est une variante de la méthode proposée dans l'article Pruning Convolutional Neural networks for Ressource efficient inference\cite{molchanov}. Le but des modifications est d'étendre les capacités de notre modèle à des réseaux beaucoup plus complexes tels que Res Net, DenseNet et Squeeze net. 
+\setcounter{subsection}{0}
+La méthode utilisée est une variante de la méthode proposée dans l'article Pruning Convolutional Neural networks for Ressource efficient inference\cite{molchanov}. Le but des modifications est d'étendre les capacités de notre modèle à des réseaux beaucoup plus complexes tels que Res Net, DenseNet et SqueezeNet. 
 
 Voici une liste des étapes à suivre pour obtenir une réduction intéressante: 
 \begin{enumerate}[noitemsep, noitemsep]
-\item appliquer le fine tuning sur un réseau pré-entrainé. 
+\item Appliquer le fine tuning sur un réseau pré-entrainé. 
 \item Extraire le graphe d'exécution de notre modèle 
-\item à partir de notre graphe d'exécution, exclure les couches de convolution que nous ne voulons pas affecter. 
-\item Réduire les filtres en fonction du critère de réduction 
-\item Appliquer le fine tuning afin de restabiliser le réseau 
+\item À partir de notre graphe d'exécution, exclure les couches de convolution que nous ne voulons pas affecter. Ces couches sont détaillées plus tard dans cet article.
+\item Réduire les filtres en fonction du critère de réduction. Une description du critère est fournie dans une section futur de cet article. 
+\item Réinitialiser l'optimiseur utilisé pour l'entrainement.
+\item Appliquer le fine tuning afin de restabiliser le réseau.
 \item Recommencer la réduction tant que le réseau ne possède pas la taille voulue. 
 \end{enumerate}
 
-Dans cette procédure le critère de sélection est très important pour avoir de bons résultats. Pour cette expérimentation, nous avons utilisé les Taylor Expansions qui ont prouvé leur efficacité dans l'article et les activations moyennes. 
+Dans cette procédure le critère de sélection est très important pour avoir de bons résultats. Pour cette expérimentation, nous avons utilisé les Taylor Expansions tel que mentionné dans l'article de Molchanov.
 
-Afin de pouvoir exécuter sur des modèles plus complexes, nous avons choisi de ne pas explorer d'autres critères de sélection, mais bien de se concentrer sur l'algorithme nécessaire pour supporter des modèles plus complexes. 
+Afin de pouvoir exécuter sur des modèles plus complexes, nous avons choisi de ne pas explorer d'autres critères de sélection, mais bien de se concentrer sur l'algorithme nécessaire pour supporter ces modèles. Certains essaies ont aussi été effectué avec l'activation moyenne des filtres et les résultats vont dans la même direction que l'article original.
 
-\subsection{Les pratiques à éviter }
-Dans la solution proposée, il est important de ne pas appliquer de réduction de filtres juste avant une addition de flow tel que vu dans plusieurs modèles complexes. La figure Figure1 représente cette situation. Le problème dans ce cas est qu’il est nécessaire d’appliquer une réduction équivalente sur toutes les branches entrantes.  Il est possible qu’il existe un critère de sélection permettant d’inclure ces couches dans le futur. 
+Une des limitations importante dans notre solution est le besoin de réinitialisé l'optimiseur. Il s'agit d'une restriction majeur de notre proposition et des solutions devront être envisagées.
+
+\subsection{Les couches à ignorer }
+Dans la solution proposée, il est important de ne pas appliquer de réduction de filtres juste avant une addition tel que vu dans plusieurs modèles complexes. La figure Figure1 représente cette situation. Le problème dans ce cas est qu’il est nécessaire d’appliquer une réduction équivalente sur toutes les branches entrantes de l'addition. Dans le cas présent, il faudrait donc modifier ce qui vient avant la couche relu et l'entrée de la première convolution du bloc présenté. 
 
 \begin{figure}[H]
 	\centering
@@ -163,16 +167,17 @@ Dans la solution proposée, il est important de ne pas appliquer de réduction d
 	\label{fig:residualadd}
 \end{figure}
 
-Un autre problème potentiel survient lorsqu'une couche est réutilisée. Dans ce cas il faut que l'input de notre couche soit compatible avec la sortie de la couche que nous traitons. Cependant nous devons affecter les couches précédentes pour que les dimensions concordent aussi.
+Un autre problème potentiel survient lorsqu'une couche est réutilisée. Dans ce cas il faut que l'entrée de notre couche soit compatible avec la sortie de la couche que nous traitons. du coup, nous devons affecter les couches précédentes pour que les dimensions concordent aussi. Ce qui revient au même problème que l'addition.
 \newpage
 Il est à noter qu'il est possible qu'il existe un algorithme fiable qui permet de gérer ces cas, mais l'article présent n'explore pas ces options.
+Finalement, il est crucial de ne pas affecter une couche si elle influence directement le nombre de sorties du réseau. Une telle pratique affecterait directement la performance et l'entrainement du modèle. Il pourrait y avoir un décalage entre les classes lors de la classification et la fonction de perte pourrait devenir invalide.
 
 \subsection{Pratiques à éviter}
-Lors de la construction du modèle il est très important d’éviter au maximum les valeurs fixes lors de l’inférence. Par exemple, dans le modèle AlexNet, il y a le code de la partie gauche de la figure 2 qui nous empêche de réduire la dernière couche de convolution avant la couche pleinement connectée. En effectuant la modification présenté dans la figure 2, il est maintenant possible de réduire la couche de convolution avant la couche pleinement connectée. 
+Lors de la construction du modèle, il est très important d’éviter les valeurs fixes lors de l’inférence. Par exemple, dans le modèle AlexNet, il y a le code de la partie gauche de la figure 2 qui nous empêche de réduire la dernière couche de convolution avant la couche pleinement connectée. En effectuant la modification présenté dans la figure 2, il est maintenant possible de réduire cette couche de convolution. 
 \begin{figure}[H]
 	\centering
 	\includegraphics{mistake}
-	\caption{On remarque dans la partie de gauche que le code original assume une taille fixe pour la dernière couche de convolution. En plus de limiter le modèle à une certaine taille d'image en entrée on ne peut réduire la dernière couche de convolution. La solution proposée demande la modification dans le section de droite dans l'image qui permet une taille variable de la dernière couche de convolution.}
+	\caption{On remarque dans la partie de gauche que le code original assume une taille fixe pour la dernière couche de convolution. En plus de limiter le modèle à une certaine taille d'image en entrée on ne peut réduire la dernière couche de convolution. La solution proposée demande la modification dans le section de droite de l'image qui permet une taille variable de la dernière couche de convolution.}
 	\label{fig:mistake}
 \end{figure}
 
@@ -182,15 +187,19 @@ Lorsque nous retirons un filtre de convolution d’une couche, il faut prendre p
 \newpage
 Par la suite, il faut ajuster les couches suivantes en fonction de leur type.
 \begin{itemize}[noitemsep, noitemsep, label={}]
-	\item Pour les couches de \textbf{convolutions suivantes}. Il est nécessaire d’ajuster le nombre de couches en entrées pour concorder avec la couche de convolution que nous traitons. Il faut aussi ajuster les poids de cette couche. 
+	\item Pour les couches de \textbf{convolutions suivantes}. Il est nécessaire d’ajuster le nombre de filtres en entrées pour concorder avec la couche de convolution que nous traitons. Il faut aussi ajuster les poids de cette couche. 
 	\item Pour les couches de \textbf{Batchnorm}, il faut ajuster les biais lorsqu'ils sont utilisés et nous effectuons un reset sur les variables utilisées à l’exécution. Dans PyTorch, nous parlons de running means et running vars. 
 	\item Finalement, nous devons ajuster les couches \textbf{pleinement connectées}. Dans le cas de ces couches, nous ajustons les poids et nous appliquons la \textit{weight inference rule}\cite{weightinference} afin de simuler le retrait des poids par \textit{dropout}. 
 \end{itemize}
 
-Les autres couches semblent bien supporter la réduction de couches de convolution. Il est à noter que nous avons uniquement essayé les modèles proposés dans PyTorch et que d'autres travail pourrait être nécessaire pour des couches plus complexes. 
+Les autres couches semblent bien supporter la réduction de couches de convolution. Il est à noter que nous avons uniquement essayé les modèles proposés dans PyTorch et que plus de travail pourrait être nécessaire pour des couches plus complexes. 
+
+\subsection{Description des paramètres}
+Afin d'obtenir les résultat présentés. Les tests ont été fait sur l'ensemble de données CIFAR10 et les poids pré entrainé de PyTorch ont été utilisé. La seule transformation appliquée aux images a été d'appliqué une normalization avec moyenne de [0.485, 0.456, 0.406] et une déviation standard de [0.229, 0.224, 0.225].
+L'optimiseur utilisé était SGD, sans momentum, ni utilisation de Nesterov. Ainsi qu'un learning rate constant de 0.01.
 
 \section*{Résultats}
-Dans un premier temps, nous évaluons l’effet de la réduction des filtres de convolution sur le modèle AlexNet. La figure 3 montre les effets de la réduction. Le premier résultat que nous pouvons remarquer c’est qu’une succession de réduction trop prononcer réduit considérablement l’effet de pré-entrainement. 
+Dans un premier temps, nous évaluons l’effet de la réduction des filtres de convolution sur le modèle AlexNet. La figure 3 montre les effets de la réduction.
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.33\textwidth}            
@@ -209,7 +218,7 @@ Dans un premier temps, nous évaluons l’effet de la réduction des filtres de 
 		\includegraphics[width=\textwidth]{prune_ratio_slow}
 		\label{fig:pruneratioslow}
 	\end{subfigure}
-	\caption{Dans la figure de gauche, on constate une réduction importante des poids à chaque itération sur deux itérations(epoch 4 et 7). La figure du centre représente une réduction sur 5 itérations avec 2 étapes de remise à niveau. Sur la figure de droite, on voit une réduction plus progressive faite sur 10 itérations.}
+	\caption{Dans la figure de gauche, on constate une réduction importante des poids à chaque itération(epoch 4 et 7). La figure du centre représente une réduction sur 4 itérations avec 2 étapes de remise à niveau. Sur la figure de droite, on voit une réduction plus progressive faite sur 10 itérations.}
 \end{figure}
 
 \begin{table}[H]
@@ -223,10 +232,10 @@ Dans un premier temps, nous évaluons l’effet de la réduction des filtres de 
 	\end{tabular}
 \end{table}
 
-La figure 3 montre aussi un aspect important. Elle montre que la manière de réduire les poids est importante. Une réduction trop rapide des poids va causer un plus grand bruit dans l'entrainement. Cependant le nombre d'epochs d'entrainement effectué après la dernière réduction semble essentiel pour obtenir de bons résultats. À l'opposé, nous remarquons qu'une réduction graduelle appliquée sur une plus longue période apporte plus de stabilité dans le modèle pour un certain temps, mais que le nombre d'itérations de réduction finit par réduire les performances finales du modèle. Une approche entre les deux obtient une bonne stabilité dans le modèle et les résultats finaux sont plus consistants.
+La figure 3 montre un aspect important. Nous remarquons que la manière de réduire les poids est importante. Une réduction trop rapide des poids va causer un plus grand bruit dans l'entrainement. Cependant le nombre d'epochs d'entrainement effectué après la dernière réduction semble essentiel pour obtenir de bons résultats. À l'opposé, nous remarquons qu'une réduction graduelle appliquée sur une plus longue période apporte plus de stabilité dans le modèle pour un certain temps, mais que le nombre d'itérations de réduction finit par réduire les performances finales du modèle. Une approche entre les deux obtient une bonne stabilité dans le modèle et les résultats finaux sont plus consistants.
 
 
-Par la suite, nous comparons la différence d’efficacité entre les modèles. Cette différence est visible dans la figure 4 qui compare les modèles peu profonds dans la section de gauche et les modèles profonds de Pytorch dans le graphique de droite. Dans tous les cas, on remarque que même avec une réduction de 30\% pouvant être coupé il est possible de réduire significativement le réseau et maintenir un niveau de performance.
+Par la suite, nous comparons la différence d’efficacité entre les modèles. Cette différence est visible dans la figure 4 qui compare les modèles peu profonds dans la section de gauche et les modèles profonds de Pytorch dans le graphique de droite. Dans tous les cas, on remarque que même avec une réduction de 30\%. Il est possible de réduire significativement le réseau et maintenir un niveau de performance.
 
 \begin{figure}[H]
 	\centering
@@ -243,7 +252,7 @@ Par la suite, nous comparons la différence d’efficacité entre les modèles. 
 	\end{subfigure}
 	\caption{Dans l'image de gauche on peut observer l'effet de la réduction sur les modèles peu profonds. Dans l'image de droite on voit l'effet de la réduction sur les réseaux profonds de PyTorch.}
 \end{figure}
-La stratégie utilisé pour la réduction est de faire une réduction progressive. C'est à dire couper 5\% filtres pouvant être réduit et répéter pour 6 itérations. On voir que cette stratégie donne de meilleurs résultats sur tous les modèles au niveau de la validation. Cependant on remarque que les score finaux sont légèrement inférieurs.
+La stratégie utilisée pour la réduction est de faire une réduction progressive. C'est à dire couper 5\% filtres pouvant être réduit et répéter pour 6 itérations. Nous observons que cette stratégie donne de meilleurs résultats sur tous les modèles au niveau de la validation. Cependant on remarque que les score finaux sont légèrement inférieurs dans la majorité des cas.
 \begin{table}[H]
 	\caption {\textbf{Comparaison de la réduction en fonction du modèle}}
 \begin{tabular}{cccccccccc}
@@ -261,12 +270,12 @@ La stratégie utilisé pour la réduction est de faire une réduction progressiv
 \end{tabular}
 \end{table}
 \newpage
-En examinant l’effet de la réduction sur les paramètres et le nombre de FLOPs dans la table1.  Nous remarquons qu'une réduction de 30\% des filtres disponibles varie grandement d’un modèle à l’autre. Par exemple, dans Squeeze Net, il n’y a que la première couche de convolution qui peut être réduite. À l’opposé, les réseaux du type ResNet et VGG offrent une excellente réduction. 
+En examinant l’effet de la réduction sur les paramètres et le nombre de FLOPs dans la table1.  Nous remarquons qu'une réduction de 30\% des filtres disponibles varie grandement d’un modèle à l’autre. Par exemple, dans SqueezeNet, il n’y a que la première couche de convolution qui peut être réduite. Ce qui explique une aussi petite réduction. À l’opposé, les réseaux du type ResNet offrent une excellente réduction, mais ont une dégradation de leur performance. 
 
-Nous remarquons aussi une perte allant jusqu’à 2\% pour la plupart des modèles. Dans certains cas on remarque même un gain sur l’ensemble de tests. Cependant la perte ne semble pas directement relié au pourcentage de paramètres retirés du réseau. 
+La perte ne semble pas directement relié au pourcentage de paramètres ou le nombre d'opérations flottantes retirés du réseau. Pour une réduction similaire VGG n'a aucune dégradation alors que ResNet18 montre une perte de 1.69\%.
 
 \section*{Conclusion}
-En conclusion nous remarquons: 1- la technique de réduction des filtres de convolution peut être appliqués sur des modèles plus complexes en créant un module analysant l’exécution du modèle. 2 - Les gains en réduction peuvent permettre de réduire les besoins matériels pour beaucoup d’architectures. 3 - La réduction de filtres de convolution offre une forme de régularisation pouvant servir à l’entrainement d'un modèle lorsque appliqué modérément. 4 - La manière d’appliquer la réduction est important afin d'obtenir de bons résultats. 
+En conclusion nous remarquons: 1- La technique de réduction des filtres de convolution peut être appliqués sur des modèles plus complexes en créant un module analysant l’exécution du modèle. 2 - Les gains en réduction peuvent permettre de réduire les besoins matériels pour beaucoup d’architectures. 3 - La réduction de filtres de convolution offre une forme de régularisation pouvant servir à l’entrainement d'un modèle lorsque appliqué modérément. 4 - La manière d’appliquer la réduction est important afin d'obtenir de bons résultats. 5 - Certains modèles offrent très peu de réduction. 6 - Il reste du travail afin de supporter adéquatement les optimiseurs.
 
 \newpage
 \bibliography{scibib}
@@ -275,23 +284,3 @@ En conclusion nous remarquons: 1- la technique de réduction des filtres de conv
 
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
