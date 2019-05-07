@@ -193,21 +193,37 @@ Les autres couches semblent bien supporter la réduction de couches de convoluti
 Dans un premier temps, nous évaluons l’effet de la réduction des filtres de convolution sur le modèle AlexNet. La figure 3 montre les effets de la réduction. Le premier résultat que nous pouvons remarquer c’est qu’une succession de réduction trop prononcer réduit considérablement l’effet de pré-entrainement. 
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[b]{0.5\textwidth}            
+	\begin{subfigure}[b]{0.33\textwidth}            
 		\includegraphics[width=\textwidth]{prune_ratio_rough}
 		\label{fig:pruneratiorough}
 	\end{subfigure}%
 	%add desired spacing between images, e. g. ~, \quad, \qquad etc.
 	%(or a blank line to force the subfigure onto a new line)
-	\begin{subfigure}[b]{0.5\textwidth}
+	\begin{subfigure}[b]{0.33\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{prune_ratio_medium}
+		\label{fig:pruneratioslow}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.33\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{prune_ratio_slow}
 		\label{fig:pruneratioslow}
 	\end{subfigure}
-	\caption{Dans la figure de gauche, on constate une réduction importante des poids à chaque itération. C'est à dire que la réduction des poids est fait en seulement 3 itérations. Sur la figure de droite, on voit une réduction beaucoup plus progressive fait sur 10 itérations.}
+	\caption{Dans la figure de gauche, on constate une réduction importante des poids à chaque itération sur deux itérations(epoch 4 et 7). La figure du centre représente une réduction sur 5 itérations avec 2 étapes de remise à niveau. Sur la figure de droite, on voit une réduction plus progressive faite sur 10 itérations.}
 \end{figure}
 
-La figure 3 montre aussi un aspect important. Elle montre que la manière de réduire les poids est importante. Une réduction trop rapide des poids va causer une réduction marquée des performances. À l'opposer, nous remarquons qu'une réduction graduelle appliquée plus longtemps peut apporter la même réduction, mais avec de bien meilleurs résultats.
+\begin{table}[H]
+	\centering
+	\caption {\textbf{Comparaison des résultats après la réduction des modèles}}
+	\begin{tabular}{clllll}
+		\textbf{}                & \multicolumn{1}{c}{\textbf{0\%}} & \multicolumn{1}{c}{\textbf{10\%}} & \multicolumn{1}{c}{\textbf{30\%}} & \multicolumn{1}{c}{\textbf{50\%}} & \multicolumn{1}{c}{\textbf{75\%}} \\
+		\textbf{Fast Pruning}    & 91.02                            & 88.94                             & 89.94                             & 88.01                             & 88.79                             \\
+		\textbf{Average Pruning} &                                  &                                   &                                   &                                   &                                   \\
+		\textbf{Slow Pruning}    & 90.74                            & 90.14                             & 89.43                             & 87.84                             & 81.02                            
+	\end{tabular}
+\end{table}
+
+La figure 3 montre aussi un aspect important. Elle montre que la manière de réduire les poids est importante. Une réduction trop rapide des poids va causer un plus grand bruit dans l'entrainement. Cependant le nombre d'epochs d'entrainement effectué après la dernière réduction semble essentiel pour obtenir de bons résultats. À l'opposé, nous remarquons qu'une réduction graduelle appliquée sur une plus longue période apporte plus de stabilité dans le modèle pour un certain temps, mais que le nombre d'itérations de réduction finit par réduire les performances finales du modèle. Une approche entre les deux obtient une bonne stabilité dans le modèle et les résultats finaux sont plus consistants.
 
 
 Par la suite, nous comparons la différence d’efficacité entre les modèles. Cette différence est visible dans la figure 4 qui compare les modèles peu profonds dans la section de gauche et les modèles profonds de Pytorch dans le graphique de droite. Dans tous les cas, on remarque que même avec une réduction de 30\% pouvant être coupé il est possible de réduire significativement le réseau et maintenir un niveau de performance.
