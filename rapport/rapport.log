@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  7 MAY 2019 18:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  7 MAY 2019 19:35
 entering extended mode
 **./rapport.tex
 (rapport.tex
@@ -262,16 +262,16 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 134.
 
 [2]
-<residual_add.png, id=15, 414.04688pt x 146.79843pt>
-File: residual_add.png Graphic file (type png)
-<use residual_add.png>
-Package pdftex.def Info: residual_add.png  used on input line 165.
+<fig/residual_add.png, id=15, 414.04688pt x 146.79843pt>
+File: fig/residual_add.png Graphic file (type png)
+<use fig/residual_add.png>
+Package pdftex.def Info: fig/residual_add.png  used on input line 165.
 (pdftex.def)             Requested size: 414.04585pt x 146.79807pt.
  [3]
-<mistake.png, id=20, 426.84468pt x 65.49469pt>
-File: mistake.png Graphic file (type png)
-<use mistake.png>
-Package pdftex.def Info: mistake.png  used on input line 179.
+<fig/mistake.png, id=20, 426.84468pt x 65.49469pt>
+File: fig/mistake.png Graphic file (type png)
+<use fig/mistake.png>
+Package pdftex.def Info: fig/mistake.png  used on input line 179.
 (pdftex.def)             Requested size: 426.84364pt x 65.4945pt.
 
 Overfull \hbox (8.81488pt too wide) in paragraph at lines 176--182
@@ -279,42 +279,45 @@ Overfull \hbox (8.81488pt too wide) in paragraph at lines 176--182
 t d'[]eviter les valeurs fixes lors de l'inf[]erence.
  []
 
-[4 <./residual_add.png>]
+[4 <./fig/residual_add.png>]
 Overfull \hbox (0.62032pt too wide) in paragraph at lines 186--187
 \OT1/ptm/m/n/12 Lorsque nous re-tirons un fil-tre de con-vo-lu-tion d'une couch
 e, il faut pren-dre plusieurs pr[]ecautions
  []
 
-[5 <./mistake.png>]
-<prune_ratio_rough.png, id=28, 481.8pt x 361.35pt>
-File: prune_ratio_rough.png Graphic file (type png)
-<use prune_ratio_rough.png>
-Package pdftex.def Info: prune_ratio_rough.png  used on input line 206.
+[5 <./fig/mistake.png>]
+<fig/prune_ratio_rough_fr.png, id=28, 481.8pt x 361.35pt>
+File: fig/prune_ratio_rough_fr.png Graphic file (type png)
+<use fig/prune_ratio_rough_fr.png>
+Package pdftex.def Info: fig/prune_ratio_rough_fr.png  used on input line 206.
 (pdftex.def)             Requested size: 150.23137pt x 112.67348pt.
-<prune_ratio_medium.png, id=29, 481.8pt x 361.35pt>
-File: prune_ratio_medium.png Graphic file (type png)
-<use prune_ratio_medium.png>
-Package pdftex.def Info: prune_ratio_medium.png  used on input line 213.
+<fig/prune_ratio_medium_fr.png, id=29, 481.8pt x 361.35pt>
+File: fig/prune_ratio_medium_fr.png Graphic file (type png)
+<use fig/prune_ratio_medium_fr.png>
+Package pdftex.def Info: fig/prune_ratio_medium_fr.png  used on input line 213.
+
 (pdftex.def)             Requested size: 150.23137pt x 112.67348pt.
-<prune_ratio_slow.png, id=30, 481.8pt x 361.35pt>
-File: prune_ratio_slow.png Graphic file (type png)
-<use prune_ratio_slow.png>
-Package pdftex.def Info: prune_ratio_slow.png  used on input line 218.
+<fig/prune_ratio_slow_fr.png, id=30, 481.8pt x 361.35pt>
+File: fig/prune_ratio_slow_fr.png Graphic file (type png)
+<use fig/prune_ratio_slow_fr.png>
+Package pdftex.def Info: fig/prune_ratio_slow_fr.png  used on input line 218.
 (pdftex.def)             Requested size: 150.23137pt x 112.67348pt.
- [6 <./prune_ratio_rough.png> <./prune_ratio_medium.png> <./prune_ratio_slow.pn
-g>]
-<various_models_shallow.png, id=37, 642.4pt x 481.8pt>
-File: various_models_shallow.png Graphic file (type png)
-<use various_models_shallow.png>
-Package pdftex.def Info: various_models_shallow.png  used on input line 243.
-(pdftex.def)             Requested size: 227.62204pt x 170.71304pt.
-<various_models_deep.png, id=38, 642.4pt x 481.8pt>
-File: various_models_deep.png Graphic file (type png)
-<use various_models_deep.png>
-Package pdftex.def Info: various_models_deep.png  used on input line 250.
-(pdftex.def)             Requested size: 227.62204pt x 170.71304pt.
- [7] [8 <./various_models_shallow.png (PNG copy)> <./various_models_deep.png (P
-NG copy)>]
+ [6 <./fig/prune_ratio_rough_fr.png> <./fig/prune_ratio_medium_fr.png> <./fig/p
+rune_ratio_slow_fr.png>]
+<fig/various_models_shallow_fr.png, id=37, 481.8pt x 361.35pt>
+File: fig/various_models_shallow_fr.png Graphic file (type png)
+<use fig/various_models_shallow_fr.png>
+Package pdftex.def Info: fig/various_models_shallow_fr.png  used on input line 
+243.
+(pdftex.def)             Requested size: 227.62204pt x 170.71672pt.
+<fig/various_models_deep_fr.png, id=38, 481.8pt x 361.35pt>
+File: fig/various_models_deep_fr.png Graphic file (type png)
+<use fig/various_models_deep_fr.png>
+Package pdftex.def Info: fig/various_models_deep_fr.png  used on input line 250
+.
+(pdftex.def)             Requested size: 227.62204pt x 170.71672pt.
+ [7] [8 <./fig/various_models_shallow_fr.png> <./fig/various_models_deep_fr.png
+>]
 Overfull \hbox (21.49629pt too wide) in paragraph at lines 275--276
 []\OT1/ptm/m/n/12 La perte ne sem-ble pas di-recte-ment reli[]e au pour-cent-ag
 e de param[]etres ou le nom-bre d'op[]erations
@@ -326,8 +329,8 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 3731 strings out of 492946
- 58224 string characters out of 3126267
+ 3732 strings out of 492946
+ 58415 string characters out of 3126267
  134377 words of memory out of 3000000
  7583 multiletter control sequences out of 15000+200000
  19113 words of font info for 41 fonts, out of 3000000 for 9000
@@ -342,9 +345,9 @@ TeX 2.9/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/naked/AppData/Local/
 Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Users/naked/AppData/Lo
 cal/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Users/naked/AppDat
 a/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on rapport.pdf (10 pages, 335430 bytes).
+Output written on rapport.pdf (10 pages, 329157 bytes).
 PDF statistics:
- 76 PDF objects out of 1000 (max. 8388607)
+ 78 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
