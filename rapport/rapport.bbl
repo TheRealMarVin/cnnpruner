@@ -1,26 +1,27 @@
 \begin{thebibliography}{1}
 
 \bibitem{lecunn1}
-Backpropagation Applied to Handwritten Zip Code Recognition:
-  http://yann.lecun.com/exdb/publis/pdf/lecun-89e.pdf .
+Y. LeCun et al. (1989). Backpropagation Applied to Handwritten Zip Code
+  Recognition.
 
 \bibitem{daily}
 30 amazing applications of deep learning:
   http://www.yaronhadad.com/deep-learning-most-amazing-applications/ .
 
 \bibitem{beathuman}
-K. He, X. Zhang, S. Ren, and J. Sun. Delving deep into rectifiers: Surpassing
-  human-level performance on imagenet classification. In ICCV, 2015.
+K. He, X. Zhang, S. Ren, and J. Sun (2015). Delving deep into rectifiers:
+  Surpassing human-level performance on imagenet classification..
 
 \bibitem{transfer}
-A Survey on Deep Transfer Learning https://arxiv.org/pdf/1808.01974.pdf .
+Chuanqi Tan, Fuchun Sun, Tao Kong, Wenchang Zhang, Chao Yang, Chunfang Liu
+  (2018). A Survey on Deep Transfer Learning.
 
 \bibitem{han1}
-Bandwidth-efficient deep learning https://dl.acm.org/citation.cfm?id=3199847 .
+Song Han, William J. Dally (2018). Bandwidth-Efficient Deep Learning.
 
 \bibitem{molchanov}
-PRUNING CONVOLUTIONAL NEURAL NETWORKS FOR RESOURCE EFFICIENT INFERENCE :
-  https://arxiv.org/pdf/1611.06440.pdf .
+Pavlo Molchanov, Stephen Tyree, Tero Karras, Timo Aila, Jan Kautz (2017).
+  Pruning Convolutional Neural Networks for Resource Efficient Inference.
 
 \bibitem{pytorchmodel}
 Https://pytorch.org/docs/stable/torchvision/models.html .
