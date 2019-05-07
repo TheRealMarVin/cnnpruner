@@ -78,7 +78,7 @@ def common_training_code(model,
     print("number of flops: {} \tnumber of params: {}".format(flops, params))
 
     use_gpu = True
-
+    n_epoch_total = exec_params.n_epoch_total
     history = History()
 
     optimizer = torch.optim.SGD(model.parameters(), exec_params.learning_rate)
@@ -99,7 +99,7 @@ def common_training_code(model,
                               exec_params.batch_size, use_gpu=use_gpu, criterion=criterion,
                               scheduler=scheduler, best_result_save_path=best_result_save_path)
         history.append(local_history)
-        exec_params.n_epoch_total = exec_params.n_epoch_total - exec_params.n_pretrain_epoch
+        n_epoch_total = n_epoch_total - exec_params.n_pretrain_epoch
 
     test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
     print('Test:\n\tScore: {}'.format(test_score))
@@ -170,10 +170,11 @@ def common_training_code(model,
             # torch.save(model, pruned_save_path)
 
             print("Fine tuning to recover from prunning iteration.")
-            local_history = train(model, optimizer, dataset_params.train_dataset, exec_params.n_epoch_retrain, exec_params.batch_size, use_gpu=use_gpu,
+            local_history = train(model, optimizer, dataset_params.train_dataset,
+                                  exec_params.n_epoch_retrain, exec_params.batch_size, use_gpu=use_gpu,
                                   criterion=None, scheduler=scheduler, pruner=None,
                                   best_result_save_path=pruned_best_result_save_path)
-            exec_params.n_epoch_total = exec_params.n_epoch_total - exec_params.n_epoch_retrain
+            n_epoch_total = n_epoch_total - exec_params.n_epoch_retrain
             history.append(local_history)
             # local_history.display()
             test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
@@ -185,8 +186,8 @@ def common_training_code(model,
                       criterion=criterion, scheduler=scheduler, pruner=pruner, batch_count=1, should_validate=False)
     ###
 
-    if exec_params.n_epoch_total > 0:
-        local_history = train(model, optimizer, dataset_params.train_dataset, exec_params.n_epoch_total,
+    if n_epoch_total > 0:
+        local_history = train(model, optimizer, dataset_params.train_dataset, n_epoch_total,
                               exec_params.batch_size, use_gpu=use_gpu, criterion=criterion,
                               scheduler=scheduler, best_result_save_path=pruned_best_result_save_path)
         history.append(local_history)
@@ -372,6 +373,17 @@ def run_strategy_prune_compare(dataset_params):
 
     #create a second history since I am not sure it will look nice in one graph
     multi_history2 = MultiHistory()
+    exec_name = "vgg16 0"
+    h = exec_vgg16(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_medium,
+                   dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+    multi_history2.append_history(exec_name, h)
+    exec_name = "vgg16 30"
+    h = exec_vgg16(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_medium,
+                   dataset_params=dataset_params)
+    multi_history.append_history(exec_name, h)
+    multi_history2.append_history(exec_name, h)
+
     exec_name = "Resnet 18-0"
     h = exec_resnet18(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
                       dataset_params=dataset_params, out_count=10)
@@ -391,17 +403,6 @@ def run_strategy_prune_compare(dataset_params):
     exec_name = "Alexnet 30"
     h = exec_alexnet(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
                      dataset_params=dataset_params)
-    multi_history.append_history(exec_name, h)
-    multi_history2.append_history(exec_name, h)
-
-    exec_name = "vgg16 0"
-    h = exec_vgg16(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
-                   dataset_params=dataset_params)
-    multi_history.append_history(exec_name, h)
-    multi_history2.append_history(exec_name, h)
-    exec_name = "vgg16 30"
-    h = exec_vgg16(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune,
-                   dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
     multi_history2.append_history(exec_name, h)
 
