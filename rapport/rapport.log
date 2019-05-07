@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  7 MAY 2019 15:55
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  7 MAY 2019 18:24
 entering extended mode
 **./rapport.tex
 (rapport.tex
@@ -267,8 +267,8 @@ File: residual_add.png Graphic file (type png)
 <use residual_add.png>
 Package pdftex.def Info: residual_add.png  used on input line 165.
 (pdftex.def)             Requested size: 414.04585pt x 146.79807pt.
- [3] [4 <./residual_add.png>]
-<mistake.png, id=24, 426.84468pt x 65.49469pt>
+ [3]
+<mistake.png, id=20, 426.84468pt x 65.49469pt>
 File: mistake.png Graphic file (type png)
 <use mistake.png>
 Package pdftex.def Info: mistake.png  used on input line 179.
@@ -279,7 +279,7 @@ Overfull \hbox (8.81488pt too wide) in paragraph at lines 176--182
 t d'[]eviter les valeurs fixes lors de l'inf[]erence.
  []
 
-
+[4 <./residual_add.png>]
 Overfull \hbox (0.62032pt too wide) in paragraph at lines 186--187
 \OT1/ptm/m/n/12 Lorsque nous re-tirons un fil-tre de con-vo-lu-tion d'une couch
 e, il faut pren-dre plusieurs pr[]ecautions
@@ -291,30 +291,30 @@ File: prune_ratio_rough.png Graphic file (type png)
 <use prune_ratio_rough.png>
 Package pdftex.def Info: prune_ratio_rough.png  used on input line 206.
 (pdftex.def)             Requested size: 150.23137pt x 112.67348pt.
-<prune_ratio_medium.png, id=29, 642.4pt x 481.8pt>
+<prune_ratio_medium.png, id=29, 481.8pt x 361.35pt>
 File: prune_ratio_medium.png Graphic file (type png)
 <use prune_ratio_medium.png>
 Package pdftex.def Info: prune_ratio_medium.png  used on input line 213.
-(pdftex.def)             Requested size: 150.23137pt x 112.67163pt.
+(pdftex.def)             Requested size: 150.23137pt x 112.67348pt.
 <prune_ratio_slow.png, id=30, 481.8pt x 361.35pt>
 File: prune_ratio_slow.png Graphic file (type png)
 <use prune_ratio_slow.png>
 Package pdftex.def Info: prune_ratio_slow.png  used on input line 218.
 (pdftex.def)             Requested size: 150.23137pt x 112.67348pt.
- [6]
-<various_models_shallow.png, id=34, 642.4pt x 481.8pt>
+ [6 <./prune_ratio_rough.png> <./prune_ratio_medium.png> <./prune_ratio_slow.pn
+g>]
+<various_models_shallow.png, id=37, 642.4pt x 481.8pt>
 File: various_models_shallow.png Graphic file (type png)
 <use various_models_shallow.png>
 Package pdftex.def Info: various_models_shallow.png  used on input line 243.
 (pdftex.def)             Requested size: 227.62204pt x 170.71304pt.
-<various_models_deep.png, id=35, 642.4pt x 481.8pt>
+<various_models_deep.png, id=38, 642.4pt x 481.8pt>
 File: various_models_deep.png Graphic file (type png)
 <use various_models_deep.png>
 Package pdftex.def Info: various_models_deep.png  used on input line 250.
 (pdftex.def)             Requested size: 227.62204pt x 170.71304pt.
- [7 <./prune_ratio_rough.png> <./prune_ratio_medium.png (PNG copy)> <./prune_ra
-tio_slow.png>] [8 <./various_models_shallow.png (PNG copy)> <./various_models_d
-eep.png (PNG copy)>]
+ [7] [8 <./various_models_shallow.png (PNG copy)> <./various_models_deep.png (P
+NG copy)>]
 Overfull \hbox (21.49629pt too wide) in paragraph at lines 275--276
 []\OT1/ptm/m/n/12 La perte ne sem-ble pas di-recte-ment reli[]e au pour-cent-ag
 e de param[]etres ou le nom-bre d'op[]erations
@@ -342,9 +342,9 @@ TeX 2.9/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/naked/AppData/Local/
 Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Users/naked/AppData/Lo
 cal/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Users/naked/AppDat
 a/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on rapport.pdf (10 pages, 335391 bytes).
+Output written on rapport.pdf (10 pages, 335430 bytes).
 PDF statistics:
- 75 PDF objects out of 1000 (max. 8388607)
+ 76 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  36 words of extra memory for PDF output out of 10000 (max. 10000000)
 

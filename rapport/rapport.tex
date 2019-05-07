@@ -168,7 +168,7 @@ Dans la solution proposée, il est important de ne pas appliquer de réduction d
 \end{figure}
 
 Un autre problème potentiel survient lorsqu'une couche est réutilisée. Dans ce cas il faut que l'entrée de notre couche soit compatible avec la sortie de la couche que nous traitons. du coup, nous devons affecter les couches précédentes pour que les dimensions concordent aussi. Ce qui revient au même problème que l'addition.
-\newpage
+
 Il est à noter qu'il est possible qu'il existe un algorithme fiable qui permet de gérer ces cas, mais l'article présent n'explore pas ces options.
 Finalement, il est crucial de ne pas affecter une couche si elle influence directement le nombre de sorties du réseau. Une telle pratique affecterait directement la performance et l'entrainement du modèle. Il pourrait y avoir un décalage entre les classes lors de la classification et la fonction de perte pourrait devenir invalide.
 
@@ -184,14 +184,14 @@ Lors de la construction du modèle, il est très important d’éviter les valeu
 
 \subsection{Propagation de l’effet}
 Lorsque nous retirons un filtre de convolution d’une couche, il faut prendre plusieurs précautions pour assurer la stabilité du système. Par exemple, il faut ajuster les poids, le nombre de biais dans la couche et ajuster les gradients lorsque ces derniers sont contenus dans la couche elle-même. Ce qui est le cas de PyTorch.
-\newpage
+
 Par la suite, il faut ajuster les couches suivantes en fonction de leur type.
 \begin{itemize}[noitemsep, noitemsep, label={}]
 	\item Pour les couches de \textbf{convolutions suivantes}. Il est nécessaire d’ajuster le nombre de filtres en entrées pour concorder avec la couche de convolution que nous traitons. Il faut aussi ajuster les poids de cette couche. 
 	\item Pour les couches de \textbf{Batchnorm}, il faut ajuster les biais lorsqu'ils sont utilisés et nous effectuons un reset sur les variables utilisées à l’exécution. Dans PyTorch, nous parlons de running means et running vars. 
 	\item Finalement, nous devons ajuster les couches \textbf{pleinement connectées}. Dans le cas de ces couches, nous ajustons les poids et nous appliquons la \textit{weight inference rule}\cite{weightinference} afin de simuler le retrait des poids par \textit{dropout}. 
 \end{itemize}
-
+\newpage
 Les autres couches semblent bien supporter la réduction de couches de convolution. Il est à noter que nous avons uniquement essayé les modèles proposés dans PyTorch et que plus de travail pourrait être nécessaire pour des couches plus complexes. 
 
 \subsection{Description des paramètres}
@@ -227,7 +227,7 @@ Dans un premier temps, nous évaluons l’effet de la réduction des filtres de 
 	\begin{tabular}{clllll}
 		\textbf{}                & \multicolumn{1}{c}{\textbf{0\%}} & \multicolumn{1}{c}{\textbf{10\%}} & \multicolumn{1}{c}{\textbf{30\%}} & \multicolumn{1}{c}{\textbf{50\%}} & \multicolumn{1}{c}{\textbf{75\%}} \\
 		\textbf{Fast Pruning}    & 91.02                            & 88.94                             & 89.94                             & 88.01                             & 88.79                             \\
-		\textbf{Average Pruning} &                                  &                                   &                                   &                                   &                                   \\
+		\textbf{Average Pruning} & 90.78                            & 90.85                             & 90.39                             & 87.17                             & 83.58                             \\
 		\textbf{Slow Pruning}    & 90.74                            & 90.14                             & 89.43                             & 87.84                             & 81.02                            
 	\end{tabular}
 \end{table}
