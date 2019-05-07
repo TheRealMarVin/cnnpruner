@@ -244,7 +244,7 @@ La stratégie utilisé pour la réduction est de faire une réduction progressiv
 	\multicolumn{1}{c|}{\textbf{Score (\%)}} & 88.22                     & 88.87                     & \multicolumn{1}{c|}{{\color[HTML]{009901} 0.65}}    & 95.99                     & 95.31                     & \multicolumn{1}{c|}{{\color[HTML]{9A0000} -0.68}}   & 96.32                     & 94.76                     & {\color[HTML]{9A0000} -1.56}                      
 \end{tabular}
 \end{table}
-
+\newpage
 En examinant l’effet de la réduction sur les paramètres et le nombre de FLOPs dans la table1.  Nous remarquons qu'une réduction de 30\% des filtres disponibles varie grandement d’un modèle à l’autre. Par exemple, dans Squeeze Net, il n’y a que la première couche de convolution qui peut être réduite. À l’opposé, les réseaux du type ResNet et VGG offrent une excellente réduction. 
 
 Nous remarquons aussi une perte allant jusqu’à 2\% pour la plupart des modèles. Dans certains cas on remarque même un gain sur l’ensemble de tests. Cependant la perte ne semble pas directement relié au pourcentage de paramètres retirés du réseau. 
