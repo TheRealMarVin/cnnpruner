@@ -191,9 +191,9 @@ Par la suite, il faut ajuster les couches suivantes en fonction de leur type.
 	\item Pour les couches de \textbf{Batchnorm}, il faut ajuster les biais lorsqu'ils sont utilisés et nous effectuons un reset sur les variables utilisées à l’exécution. Dans PyTorch, nous parlons de running means et running vars. 
 	\item Finalement, nous devons ajuster les couches \textbf{pleinement connectées}. Dans le cas de ces couches, nous ajustons les poids et nous appliquons la \textit{weight inference rule}\cite{weightinference} afin de simuler le retrait des poids par \textit{dropout}. 
 \end{itemize}
-\newpage
-Les autres couches semblent bien supporter la réduction de couches de convolution. Il est à noter que nous avons uniquement essayé les modèles proposés dans PyTorch et que plus de travail pourrait être nécessaire pour des couches plus complexes. 
 
+Les autres couches semblent bien supporter la réduction de couches de convolution. Il est à noter que nous avons uniquement essayé les modèles proposés dans PyTorch et que plus de travail pourrait être nécessaire pour des couches plus complexes. 
+\newpage
 \subsection{Description des paramètres}
 Afin d'obtenir les résultat présentés. Les tests ont été fait sur l'ensemble de données CIFAR10 et les poids pré entrainé de PyTorch ont été utilisé. La seule transformation appliquée aux images a été d'appliqué une normalization avec moyenne de [0.485, 0.456, 0.406] et une déviation standard de [0.229, 0.224, 0.225].
 L'optimiseur utilisé était SGD, sans momentum, ni utilisation de Nesterov. Ainsi qu'un learning rate constant de 0.01.
@@ -231,7 +231,7 @@ Dans un premier temps, nous évaluons l’effet de la réduction des filtres de 
 		\textbf{Slow Pruning}    & 90.74                            & 90.14                             & 89.43                             & 87.84                             & 81.02                            
 	\end{tabular}
 \end{table}
-
+\newpage
 La figure 3 montre un aspect important. Nous remarquons que la manière de réduire les poids est importante. Une réduction trop rapide des poids va causer un plus grand bruit dans l'entrainement. Cependant le nombre d'epochs d'entrainement effectué après la dernière réduction semble essentiel pour obtenir de bons résultats. À l'opposé, nous remarquons qu'une réduction graduelle appliquée sur une plus longue période apporte plus de stabilité dans le modèle pour un certain temps, mais que le nombre d'itérations de réduction finit par réduire les performances finales du modèle. Une approche entre les deux obtient une bonne stabilité dans le modèle et les résultats finaux sont plus consistants.
 
 
@@ -252,6 +252,7 @@ Par la suite, nous comparons la différence d’efficacité entre les modèles. 
 	\end{subfigure}
 	\caption{Dans l'image de gauche on peut observer l'effet de la réduction sur les modèles peu profonds. Dans l'image de droite on voit l'effet de la réduction sur les réseaux profonds de PyTorch.}
 \end{figure}
+\newpage
 La stratégie utilisée pour la réduction est de faire une réduction progressive. C'est à dire couper 5\% filtres pouvant être réduit et répéter pour 6 itérations. Nous observons que cette stratégie donne de meilleurs résultats sur tous les modèles au niveau de la validation. Cependant on remarque que les score finaux sont légèrement inférieurs dans la majorité des cas.
 \begin{table}[H]
 	\caption {\textbf{Comparaison de la réduction en fonction du modèle}}
@@ -269,7 +270,7 @@ La stratégie utilisée pour la réduction est de faire une réduction progressi
 	\multicolumn{1}{c|}{\textbf{Score (\%)}} & 88.22                     & 88.87                     & \multicolumn{1}{c|}{{\color[HTML]{009901} 0.65}}    & 95.99                     & 95.31                     & \multicolumn{1}{c|}{{\color[HTML]{9A0000} -0.68}}   & 96.32                     & 94.76                     & {\color[HTML]{9A0000} -1.56}                      
 \end{tabular}
 \end{table}
-\newpage
+
 En examinant l’effet de la réduction sur les paramètres et le nombre de FLOPs dans la table1.  Nous remarquons qu'une réduction de 30\% des filtres disponibles varie grandement d’un modèle à l’autre. Par exemple, dans SqueezeNet, il n’y a que la première couche de convolution qui peut être réduite. Ce qui explique une aussi petite réduction. À l’opposé, les réseaux du type ResNet offrent une excellente réduction, mais ont une dégradation de leur performance. 
 
 La perte ne semble pas directement relié au pourcentage de paramètres ou le nombre d'opérations flottantes retirés du réseau. Pour une réduction similaire VGG n'a aucune dégradation alors que ResNet18 montre une perte de 1.69\%.
