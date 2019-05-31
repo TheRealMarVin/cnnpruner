@@ -62,6 +62,8 @@ class FilterPruner:
             else:
                 out = self.forward_res[node_id]
         else:
+            # self._pre_parse_internal(node_id)
+
             x = self.forward_res[node_id]
             if isinstance(curr_module, torch.nn.modules.Linear):
                 x = x.view(x.size(0), -1)
@@ -130,7 +132,7 @@ class FilterPruner:
     def extract_filter_activation_mean(self, out):
         with torch.no_grad():
             for node_name, curr_module in self.conv_layer.items():
-                if self.is_before_merge(node_name):
+                if self.should_ignore_layer(node_name):
                     continue
 
                 if node_name not in self.filter_ranks:
@@ -155,6 +157,12 @@ class FilterPruner:
     def post_run_cleanup(self):
         pass
 
+    def post_pruning_plan(self, filters_to_prune_per_layer):
+        pass
+
+    # def _pre_parse_internal(self, node_id):
+    #     pass
+
     def sort_filters(self, num):
         raise NotImplementedError
 
@@ -164,14 +172,15 @@ class FilterPruner:
     def get_number_of_filter_to_prune(self):
         total_filter_count = 0
         for k, conv in self.conv_layer.items():
-            if self.is_before_merge(k):
+            if self.should_ignore_layer(k):
                 continue
 
             total_filter_count = total_filter_count + conv.out_channels
 
         return total_filter_count
 
-    def is_before_merge(self, layer_id):
+    #TODO here whould not test before merge in this class, maybe only
+    def should_ignore_layer(self, layer_id):
         next_id = self.graph[layer_id]
         if next_id not in self.name_dic:
             return True
@@ -189,7 +198,7 @@ class FilterPruner:
             elif self.connection_count_copy[next_id] > 1:
                 return True
             else:
-                return self.is_before_merge(next_id)
+                return self.should_ignore_layer(next_id)
 
     def normalize_layer(self):
         for i in self.filter_ranks:
@@ -197,7 +206,7 @@ class FilterPruner:
             v = v / torch.sqrt(torch.sum(v * v))
             self.filter_ranks[i] = v
 
-    def plan_prunning(self, num_filters_to_prune):
+    def plan_pruning(self, num_filters_to_prune):
         filters_to_prune = self.sort_filters(num_filters_to_prune)
 
         filters_to_prune_per_layer = {}
@@ -206,17 +215,18 @@ class FilterPruner:
                 filters_to_prune_per_layer[node_id] = []
             filters_to_prune_per_layer[node_id].append(f)
 
-        #test if we fully remove a layer
+        # TODO test if we fully remove a layer
         for node_id in filters_to_prune_per_layer:
             layer_remove_count = len(filters_to_prune_per_layer[node_id])
             in_filter_in_layer = self.conv_layer[node_id].in_channels
             if layer_remove_count == in_filter_in_layer:
                 filters_to_prune_per_layer[node_id] = filters_to_prune_per_layer[node_id][:-1]
 
-        #sorting really makes the pruning faster
+        # sorting really makes the pruning faster
         for node_id in filters_to_prune_per_layer:
             filters_to_prune_per_layer[node_id] = sorted(filters_to_prune_per_layer[node_id])
 
+        self.post_pruning_plan(filters_to_prune_per_layer)
         return filters_to_prune_per_layer
 
     # TODO here we should see what would happen if a layer is fully removed. this is quite annoying

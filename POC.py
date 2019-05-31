@@ -132,7 +132,7 @@ def common_training_code(model,
             print("Perform pruning iteration: {}".format(iteration_idx))
 
             pruner.normalize_layer()
-            prune_targets = pruner.plan_prunning(max_filters_to_prune_on_iteration)
+            prune_targets = pruner.plan_pruning(max_filters_to_prune_on_iteration)
             # pruner.reset()
 
             # prune_targets = None

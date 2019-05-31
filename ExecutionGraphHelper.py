@@ -3,14 +3,6 @@ import torch
 import re
 
 
-def get_childs(graph_edges, name):
-    res = []
-    if name in graph_edges:
-        for name, _ in graph_edges[name]:
-            res.append(name)
-    return res
-
-
 def get_input_connection_count_per_entry(graph_edges, node, res):
     # print("get_input_connection_count_per_entry: {}".format(str(node)))
     if node in graph_edges:
