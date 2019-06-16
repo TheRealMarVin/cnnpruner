@@ -198,8 +198,9 @@ def common_training_code(model,
     torch.save(model, pruned_save_path)
 
     history.display()
-    flops, params = profile(model, input_size=(1, 3, 224, 224))
-    print("end number of flops: {} \tnumber of params: {}".format(flops, params))
+    end_flops, end_params = profile(model, input_size=(1, 3, 224, 224))
+    print("end number of flops: {} \tnumber of params: {}".format(end_flops, end_params))
+    print("diff number of flops: {} \tdiff number of params: {}".format((flops - end_flops)/flops, (params - end_params)/params))
 
     test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
     print('Final Test:\n\tScore: {}'.format(test_score))
@@ -349,7 +350,7 @@ def run_strategy_prune_compare(dataset_params):
     h = exec_squeeze_net(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_squeeze,
                          dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
-    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
+    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models at 30% Pruning")
 
     exec_name = "densenet 121-0"
     h = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_large,
@@ -359,7 +360,7 @@ def run_strategy_prune_compare(dataset_params):
     h = exec_dense_net(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_large,
                        dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
-    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
+    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models at 30% Pruning")
 
     exec_name = "Resnet 50-0"
     h = exec_resnet50(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune_medium,
@@ -369,7 +370,7 @@ def run_strategy_prune_compare(dataset_params):
     h = exec_resnet50(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_medium,
                       dataset_params=dataset_params, out_count=10)
     multi_history.append_history(exec_name, h)
-    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
+    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models at 30% Pruning")
 
     #create a second history since I am not sure it will look nice in one graph
     multi_history2 = MultiHistory()
@@ -407,8 +408,8 @@ def run_strategy_prune_compare(dataset_params):
     multi_history2.append_history(exec_name, h)
 
     save_obj(multi_history, "history_compare")
-    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models ar 30% Pruning")
-    multi_history2.display_single_key(History.VAL_ACC_KEY, title="Comparing Models ar 30% Pruning")
+    multi_history.display_single_key(History.VAL_ACC_KEY,  title="Comparing Models at 30% Pruning")
+    multi_history2.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
 
 
 def run_alex_prune_compare_rough(dataset_params):

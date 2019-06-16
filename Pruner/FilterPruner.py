@@ -27,6 +27,7 @@ class FilterPruner:
         self.connection_count = {}
         self.connection_count_copy = {}
         self.features = []
+        self.special_ops_prune_apply_count = {}
         self.reset()
         model.cpu()
         self.graph, self.name_dic, self.root, self.special_op, self.special_op_params = generate_graph(model, sample_run)
@@ -47,6 +48,7 @@ class FilterPruner:
         self.connection_count = {}
         self.connection_count_copy = {}
         self.test_layer_activation = {} #TODO rename
+        self.special_ops_prune_apply_count = {}
 
     def parse(self, node_id):
         node_name = self.name_dic[node_id]
@@ -59,6 +61,8 @@ class FilterPruner:
                 if self.special_op[node_id] == "AveragePool":
                     shape, pad, stride = self.special_op_params[node_id]
                     out = F.avg_pool2d(self.forward_res[node_id], kernel_size=shape, stride=stride)
+                elif self.special_op[node_id] == "Add":
+                    out = self.forward_res[node_id]
             else:
                 out = self.forward_res[node_id]
         else:
@@ -140,6 +144,7 @@ class FilterPruner:
                 else:
                     self.filter_ranks[node_name] = self.filter_ranks[node_name] + self.test_layer_activation[node_name]
 
+    #TODO fix typo
     def ramdom_filters(self, num):
         data = []
         for i in sorted(self.filter_ranks.keys()):
@@ -157,6 +162,7 @@ class FilterPruner:
     def post_run_cleanup(self):
         pass
 
+    #TODO might not need this one
     def post_pruning_plan(self, filters_to_prune_per_layer):
         pass
 
@@ -179,7 +185,7 @@ class FilterPruner:
 
         return total_filter_count
 
-    #TODO here whould not test before merge in this class, maybe only
+    #TODO we should change this method to only test the most restrictive case
     def should_ignore_layer(self, layer_id):
         next_id = self.graph[layer_id]
         if next_id not in self.name_dic:
@@ -246,6 +252,13 @@ class FilterPruner:
                         if sub_node_id not in effect_applied:
                             self._apply_pruning_effect(sub_node_id, filters_to_remove, initial_filter_count, effect_applied)
 
+    """
+        we apply propagation. One thing that is tricky is that some feature like add should not propagate 
+        more than once. If we take add as an example only one path should propagate effect past his node
+        otherwise the input of the next node will not be right. However some node like concat shoud apply
+        reduction twice and in that case we have to do some magic to offset. Beware of this magic trick!
+        
+    """
     def _apply_pruning_effect(self, layer_id, removed_filter, initial_filter_count, effect_applied):
         if layer_id not in self.name_dic:
             for sub_node_id in layer_id.split(","):
@@ -266,6 +279,19 @@ class FilterPruner:
             self._prune_conv_input_batchnorm(layer, removed_filter, initial_filter_count)
             effect_applied.append(layer_id)
             initial_filter_count = layer.num_features
+        else:
+            if layer_id in self.special_op:
+                if layer_id not in self.special_ops_prune_apply_count.keys():
+                    self.special_ops_prune_apply_count[layer_id] = 0
+                else:
+
+                    size = self.special_ops_prune_apply_count[layer_id]
+                    self.special_ops_prune_apply_count[layer_id] = size + 1
+                    if self.special_op[layer_id] == "Add":
+                        has_more = False
+                    # TODO handle concat properly
+                    # elif self.special_op[layer_id] == "Concat":
+                    #     for
 
         if has_more:
             next_id = self.graph[layer_id]

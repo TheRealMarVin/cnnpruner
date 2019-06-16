@@ -4,21 +4,14 @@ import re
 
 
 def get_input_connection_count_per_entry(graph_edges, node, res):
-    # print("get_input_connection_count_per_entry: {}".format(str(node)))
     if node in graph_edges:
         for name in graph_edges[node].split(","):
-            if node == "253":
-                aa = 0
             if name in res.keys():
-                # print("\tappend: {} \tfrom node: {}".format(name, node))
                 res[name] += 1
                 break
             else:
-                # print("\tadd: {} \tfrom node: {}".format(name, node))
                 res[name] = 1
             if len(name) > 0:
-                if name == "253":
-                    a = 0
                 get_input_connection_count_per_entry(graph_edges, name, res)
 
     else:
@@ -88,7 +81,10 @@ def generate_graph(model, args):
                 else:
                     execution_graph[intersect_as_string] = target_outputs
 
-                # in onnx Gemm is used instead of linear and in case of alexent the name of the
+                if op == "onnx::Add" and intersect_as_string not in special_op.keys():
+                    special_op[intersect_as_string] = "Add"
+
+                # in onnx Gemm is used instead of linear and in case of alexnet the name of the
                 # operation will be the previous one
                 if curr_name in id_name_dict.values() and op == "onnx::Gemm":
                     new_name = try_correct_broken_name(op, shape, curr_name, model)
