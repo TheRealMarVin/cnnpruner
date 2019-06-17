@@ -149,7 +149,7 @@ def common_training_code(model,
             #     if reuse_cut_filter:
             #         save_obj(prune_targets, "filters_dic")
 
-            pruner.display_pruning_log(prune_targets)
+            element_count = pruner.display_pruning_log(prune_targets)
 
             print("Pruning filters.. ")
             model = model.cpu()
@@ -160,7 +160,7 @@ def common_training_code(model,
             optimizer = torch.optim.SGD(model.parameters(), exec_params.learning_rate)
             pruner.reset()
 
-            print("Filters pruned {}%".format(100 * float(max_filters_to_prune_on_iteration) / initial_number_of_filters))
+            print("Filters pruned {}%".format(100 * float(element_count) / initial_number_of_filters))
             new_test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
             print('Test:\n\tpost prune Score: {}'.format(new_test_score))
 

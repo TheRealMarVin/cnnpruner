@@ -369,15 +369,17 @@ class FilterPruner:
     def display_pruning_log(self, pruning_dic):
         layers_pruned = {}
         after_pruning = {}
-        sum = 0
+        element_count = 0
         remain_sum = 0
         for layer_index, filter_index in pruning_dic.items():
             layer_name = self.name_dic[layer_index]
             if layer_name not in layers_pruned:
                 to_remove_count = len(pruning_dic[layer_index])
-                sum = sum + to_remove_count
+                element_count = element_count + to_remove_count
                 remain_sum = remain_sum + self.conv_layer[layer_index].out_channels - to_remove_count
                 layers_pruned[layer_name] = to_remove_count
                 after_pruning[layer_name] = self.conv_layer[layer_index].out_channels - to_remove_count
         print("Layers that will be pruned", layers_pruned)
         print("convolution remaining after pruning", after_pruning)
+
+        return element_count
