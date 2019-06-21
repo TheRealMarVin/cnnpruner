@@ -20,10 +20,11 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
         self.merged_results = {}
         # self.reasign_nodes = {}
         self.sets = []
+        self.ignore_list = []
         # self.sets_processed = []
 
         self.reverse_conv_graph = {}
-        self.conv_graph = copy.deepcopy(self.graph)
+        self.conv_graph = copy.deepcopy(self.graph_res.execution_graph)
         self.compute_conv_graph()
 
     def reset(self):
@@ -32,38 +33,6 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
 
     def sort_filters(self, num):
         data = []
-        #TODO do we need to reset this one maybe we could save some time
-        # self.sets = []
-
-        #TODO not the right place but for a test it is a valid attempt
-        # for curr_set in self.sets:
-        #     if len(curr_set) <= 1:
-        #         continue
-        #     set_as_list = list(curr_set)
-        #     sum = self.test_layer_activation[set_as_list[0]]
-        #     for x in set_as_list[1:]:
-        #         sum += self.test_layer_activation[x]
-        #
-        #     divided = torch.div(sum, len(set_as_list))
-        #     for x in set_as_list:
-        #         self.test_layer_activation[x] = divided
-        # for k, v in self.reverse_conv_graph.items():
-        #     if len(v) == 1:
-        #         continue
-        #
-        #     sum = v[0]
-        #     for x in v[1:]:
-        #         sum += self.test_layer_activation[v]
-        #
-        #     divided = torch.div(v, number_to_divide_by)
-        #
-        #
-        # for k, v in self.merged_results.items():
-        #     number_to_divide_by = self.connection_count_copy[k]
-        #     divided = torch.div(v, number_to_divide_by)
-        #     for _, v2 in self.reasign_nodes.items():
-        #         for i in v2:
-        #             self.test_layer_activation[i] = divided
 
         for i in sorted(self.filter_ranks.keys()):
             for j in range(self.filter_ranks[i].size(0)):
@@ -81,7 +50,8 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
             for x in set_as_list[1:]:
                 sum += self.test_layer_activation[x]
 
-            divided = torch.div(sum, len(set_as_list))
+            divided = sum # TODO just a test
+            # divided = torch.div(sum, len(set_as_list))
             for x in set_as_list:
                 self.test_layer_activation[x] = divided
 
@@ -114,57 +84,6 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
                         continue
                     filters_to_prune_per_layer[elem] = filters_to_prune_per_layer[set_as_list[max_index]]
 
-        # TODO make sure every "split" node has the same result has the sibling
-        pass
-        # to_remove = []
-        # for k, v in self.reasign_nodes.items():
-        #     size = None
-        #     if len(v) == 0:
-        #         #TODO not sure it is supposed to happen... more of a safety for the moment
-        #         to_remove.append(k)
-        #     else:
-        #         for index, elem in enumerate(v):
-        #             if elem not in filters_to_prune_per_layer:
-        #                 size = 0
-        #             elif size is None:
-        #                 size = len(filters_to_prune_per_layer[elem])
-        #             elif len(filters_to_prune_per_layer[elem]) != size:
-        #                 #TODO maybe we should take the biggest or the smallest instead of the previous one
-        #                 filters_to_prune_per_layer[elem] = filters_to_prune_per_layer[v[index - 1]]
-        #
-        # for x in to_remove:
-        #     del self.reasign_nodes[x]
-
-    """
-    The difference with the parent version is that if one of the node in the set was considered. we do not apply
-    effect again. It would make the next input smaller than necessary. Let say we remove 3 elements on each branch 
-    the input should be only smaller by a size of 3 and not 3 + 3. Although in the case of concat we need to apply 
-    effect and reduce the element by the sum of all branches.
-    """
-    # def prune(self, pruning_dic):
-    #     for layer_id, filters_to_remove in pruning_dic.items():
-    #         layer = get_node_in_model(self.model, self.name_dic[layer_id])
-    #         # print("trying to prune for layer: {} \tID: {}".format(self.name_dic[layer_id], layer_id))
-    #         if layer is not None:
-    #             initial_filter_count = 0
-    #             if isinstance(layer, torch.nn.modules.conv.Conv2d):
-    #                 initial_filter_count = self._prune_conv_output_filters(layer, filters_to_remove)
-    #
-    #             if self._is_node_in_set(layer_id):
-    #                 curr_set = self._get_set_for_node(layer_id)
-    #                 if curr_set in self.sets_processed:
-    #                     continue
-    #                 else:
-    #                     self.sets_processed.append(curr_set)
-    #
-    #             if len(filters_to_remove) > 0:
-    #                 effect_applied = []
-    #                 next_id = self.graph[layer_id]
-    #                 for sub_node_id in next_id.split(","):
-    #                     if sub_node_id not in effect_applied:
-    #                         self._apply_pruning_effect(sub_node_id, filters_to_remove, initial_filter_count,
-    #                                                    effect_applied)
-
     def handle_after_conv_in_forward(self, curr_module, node_id, out):
         self.conv_layer[node_id] = curr_module
         average_per_batch_item = torch.tensor([[curr.view(-1).mean() for curr in batch_item] for batch_item in out])
@@ -176,58 +95,25 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
         else:
             raise NotImplementedError
 
-        # merged_node_id = self.get_id_of_merge(node_id)
-        # if node_id is not None:
-        #     if node_id not in self.merged_results:
-        #         self.merged_results[node_id] = val
-        #     else:
-        #         self.merged_results[node_id] = self.merged_results[node_id] + val
-
-            # # TODO this must be moved in a way that we could handle split with no conv on both side
-            # print("\t*** Node id: ", node_id) #TODO remove this print
-            # if node_id not in self.reasign_nodes:
-            #     self.reasign_nodes[node_id] = [node_id]
-            #     print("\t*** ADD Node id: ", node_id)  # TODO remove this print
-            # else:
-            #     print("\t*** APPEND Node id: ", node_id)  # TODO remove this print
-            #     self.reasign_nodes[node_id].append(node_id)
-
     def should_ignore_layer(self, layer_id):
-        next_id = self.graph[layer_id]
-        if next_id not in self.name_dic:
+        next_id = self.graph_res.execution_graph[layer_id]
+        if next_id not in self.graph_res.name_dict:
+            return True
+
+        if layer_id in self.ignore_list:
             return True
 
         # TODO we should do more test like reusing a layer
         return False
 
-    # def get_id_of_merge(self, layer_id):
-    #     next_id = self.graph[layer_id]
-    #     if next_id not in self.name_dic:
-    #         return None
-    #
-    #     layer = get_node_in_model(self.model, self.name_dic[next_id])
-    #
-    #     has_more = True
-    #     if isinstance(layer, torch.nn.modules.conv.Conv2d) or isinstance(layer, torch.nn.modules.Linear):
-    #         has_more = False
-    #
-    #     if has_more:
-    #         next_id = self.graph[next_id]
-    #         if next_id not in self.name_dic:
-    #             return None
-    #         elif self.connection_count_copy[next_id] > 1:
-    #             return next_id
-    #         else:
-    #             return self.get_id_of_merge(next_id)
-
     def compute_conv_graph(self):
         conv_layers = []
         to_delete = []
         for key, val in self.conv_graph.items():
-            module = get_node_in_model(self.model, self.name_dic[key])
+            module = get_node_in_model(self.model, self.graph_res.name_dict[key])
             if isinstance(module, torch.nn.modules.conv.Conv2d):
                 conv_layers.append(key)
-            elif isinstance(module, torch.nn.modules.Linear):
+            elif key == self.graph_res.out_node:
                 conv_layers.append(key)
             else:
                 to_delete.append(key)
@@ -257,24 +143,41 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
         #TODO ca c'est ce qu'on va vouloir garder dans notre classe
         temp = {}
         self.sets = []
+        elem_to_del = None
         for key, val in self.reverse_conv_graph.items():
             if len(val) == 1:
                 continue
 
-            a = 0
-            xx = set(val)
+            array_as_set = set(val)
             found = False
             for i, j in enumerate(self.sets):
-                if len(xx.intersection(j)) > 0:
-                    self.sets[i] = xx.union(j)
-                    # TODO il y a un probleme avec le la valeur
+                if len(array_as_set.intersection(j)) > 0:
+                    self.sets[i] = array_as_set.union(j)
+                    if key == self.graph_res.out_node:
+                        elem_to_del = i
                     temp[key] = i
                     found = True
                     break
 
             if not found:
-                self.sets.append(xx)
+                self.sets.append(array_as_set)
                 temp[key] = len(self.sets) - 1
+                if key == self.graph_res.out_node:
+                    elem_to_del = len(self.sets) - 1
+
+        if elem_to_del is not None:
+            self.ignore_list = list(self.sets[elem_to_del])
+            del self.sets[elem_to_del]
+
+        # print("sets:", self.sets)
+        # print("temp:", temp)
+        # to_remove = []
+        # for i, curr_set in enumerate(self.sets):
+        #     if len(curr_set.intersection(self.graph_res.out_node)) > 0:
+        #         to_remove.append(i)
+        #
+        # for elem_to_remove in to_remove:
+        #     del self.sets[elem_to_remove]
 
         a = 0
 

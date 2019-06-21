@@ -30,7 +30,7 @@ class FilterPruner:
         self.special_ops_prune_apply_count = {}
         self.reset()
         model.cpu()
-        self.graph, self.name_dic, self.root, self.special_op, self.special_op_params = generate_graph(model, sample_run)
+        self.graph_res = generate_graph(model, sample_run)
 
         model.cuda()
 
@@ -51,17 +51,17 @@ class FilterPruner:
         self.special_ops_prune_apply_count = {}
 
     def parse(self, node_id):
-        node_name = self.name_dic[node_id]
+        node_name = self.graph_res.name_dict[node_id]
         if self.connection_count[node_id] > 0:
             return None
 
         curr_module = get_node_in_model(self.model, node_name)
         if curr_module is None:
-            if node_id in self.special_op.keys():
-                if self.special_op[node_id] == "AveragePool":
-                    shape, pad, stride = self.special_op_params[node_id]
+            if node_id in self.graph_res.special_op.keys():
+                if self.graph_res.special_op[node_id] == "AveragePool":
+                    shape, pad, stride = self.graph_res.special_op_params[node_id]
                     out = F.avg_pool2d(self.forward_res[node_id], kernel_size=shape, stride=stride)
-                elif self.special_op[node_id] == "Add":
+                elif self.graph_res.special_op[node_id] == "Add":
                     out = self.forward_res[node_id]
             else:
                 out = self.forward_res[node_id]
@@ -76,12 +76,12 @@ class FilterPruner:
                 self.handle_before_conv_in_forward(curr_module, node_id)
 
             should_not_skip = True
-            if node_id in self.special_op.keys():
-                if self.special_op[node_id] == "Concat":
+            if node_id in self.graph_res.special_op.keys():
+                if self.graph_res.special_op[node_id] == "Concat":
                     should_not_skip = False
                     out = x
-                elif self.special_op[node_id] == "AveragePool":
-                    shape, pad, stride = self.special_op_params[node_id]
+                elif self.graph_res.special_op[node_id] == "AveragePool":
+                    shape, pad, stride = self.graph_res.special_op_params[node_id]
                     out = F.avg_pool2d(x, kernel_size=shape, stride=stride)
                     should_not_skip = False
 
@@ -92,14 +92,14 @@ class FilterPruner:
                 self.handle_after_conv_in_forward(curr_module, node_id, out)
 
         res = None
-        next_nodes = self.graph[node_id]
+        next_nodes = self.graph_res.execution_graph[node_id]
         if len(next_nodes) == 0:
             res = out
         else:
-            for next_id in self.graph[node_id].split(","):
+            for next_id in self.graph_res.execution_graph[node_id].split(","):
                 self.connection_count[next_id] -= 1
                 if next_id in self.forward_res:
-                    if next_id in self.special_op.keys() and self.special_op[next_id] == "Concat":
+                    if next_id in self.graph_res.special_op.keys() and self.graph_res.special_op[next_id] == "Concat":
                         self.forward_res[next_id] = torch.cat((self.forward_res[next_id], out), 1)
                     else:
                         self.forward_res[next_id] = self.forward_res[next_id] + out
@@ -117,18 +117,19 @@ class FilterPruner:
         self.activation_to_layer = {}
         self.forward_res = {}
         self.conv_layer = {}
+        self.special_ops_prune_apply_count = {}
 
         self.activation_index = 0
 
-        get_input_connection_count_per_entry(self.graph, self.root, self.connection_count)
+        get_input_connection_count_per_entry(self.graph_res.execution_graph, self.graph_res.root, self.connection_count)
         self.connection_count_copy = copy.deepcopy(self.connection_count)
-        self.layer_to_parse = self.graph.keys()
+        self.layer_to_parse = self.graph_res.execution_graph.keys()
 
-        self.connection_count[self.root] = 0    # for the root we have everything we need
-        self.forward_res[self.root] = x         # for root we also have the proper input
+        self.connection_count[self.graph_res.root] = 0    # for the root we have everything we need
+        self.forward_res[self.graph_res.root] = x         # for root we also have the proper input
 
         x.requires_grad = True
-        x = self.parse(self.root)
+        x = self.parse(self.graph_res.root)
         if self.force_forward_view:
            x = x.view(x.size(0), x.shape[1])
         return x
@@ -187,19 +188,19 @@ class FilterPruner:
 
     #TODO we should change this method to only test the most restrictive case
     def should_ignore_layer(self, layer_id):
-        next_id = self.graph[layer_id]
-        if next_id not in self.name_dic:
+        next_id = self.graph_res.execution_graph[layer_id]
+        if next_id not in self.graph_res.name_dict:
             return True
 
-        layer = get_node_in_model(self.model, self.name_dic[next_id])
+        layer = get_node_in_model(self.model, self.graph_res.name_dict[next_id])
 
         has_more = True
         if isinstance(layer, torch.nn.modules.conv.Conv2d) or isinstance(layer, torch.nn.modules.Linear):
             has_more = False
 
         if has_more:
-            next_id = self.graph[next_id]
-            if next_id not in self.name_dic:
+            next_id = self.graph_res.execution_graph[next_id]
+            if next_id not in self.graph_res.name_dict:
                 return True
             elif self.connection_count_copy[next_id] > 1:
                 return True
@@ -238,8 +239,8 @@ class FilterPruner:
     # TODO here we should see what would happen if a layer is fully removed. this is quite annoying
     def prune(self, pruning_dic):
         for layer_id, filters_to_remove in pruning_dic.items():
-            layer = get_node_in_model(self.model, self.name_dic[layer_id])
-            # print("trying to prune for layer: {} \tID: {}".format(self.name_dic[layer_id], layer_id))
+            layer = get_node_in_model(self.model, self.graph_res.name_dict[layer_id])
+            # print("trying to prune for layer: {} \tID: {}".format(self.graph_res.name_dict[layer_id], layer_id))
             if layer is not None:
                 initial_filter_count = 0
                 if isinstance(layer, torch.nn.modules.conv.Conv2d):
@@ -247,7 +248,7 @@ class FilterPruner:
 
                 if len(filters_to_remove) > 0:
                     effect_applied = []
-                    next_id = self.graph[layer_id]
+                    next_id = self.graph_res.execution_graph[layer_id]
                     for sub_node_id in next_id.split(","):
                         if sub_node_id not in effect_applied:
                             self._apply_pruning_effect(sub_node_id, filters_to_remove, initial_filter_count, effect_applied)
@@ -260,11 +261,11 @@ class FilterPruner:
         
     """
     def _apply_pruning_effect(self, layer_id, removed_filter, initial_filter_count, effect_applied):
-        if layer_id not in self.name_dic:
+        if layer_id not in self.graph_res.name_dict:
             for sub_node_id in layer_id.split(","):
                 self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count)
             return
-        layer = get_node_in_model(self.model, self.name_dic[layer_id])
+        layer = get_node_in_model(self.model, self.graph_res.name_dict[layer_id])
 
         has_more = True
         if isinstance(layer, torch.nn.modules.conv.Conv2d):
@@ -280,21 +281,29 @@ class FilterPruner:
             effect_applied.append(layer_id)
             initial_filter_count = layer.num_features
         else:
-            if layer_id in self.special_op:
+            if layer_id in self.graph_res.special_op:
                 if layer_id not in self.special_ops_prune_apply_count.keys():
                     self.special_ops_prune_apply_count[layer_id] = 0
                 else:
 
                     size = self.special_ops_prune_apply_count[layer_id]
                     self.special_ops_prune_apply_count[layer_id] = size + 1
-                    if self.special_op[layer_id] == "Add":
+                    if self.graph_res.special_op[layer_id] == "Add":
                         has_more = False
-                    # TODO handle concat properly
-                    # elif self.special_op[layer_id] == "Concat":
-                    #     for
+                    elif self.graph_res.special_op[layer_id] == "Concat":
+
+                        if layer_id not in self.special_ops_prune_concat_offset.keys():
+                            self.special_ops_prune_concat_offset[layer_id] = len(removed_filter) + initial_filter_count
+                        else:
+                            concat_offset = self.special_ops_prune_concat_offset[layer_id]
+                            new_offset = len(removed_filter) + initial_filter_count + concat_offset
+                            self.special_ops_prune_concat_offset[layer_id] = new_offset
+                            for i, elem_to_remove in enumerate(removed_filter):
+                                removed_filter[i] = elem_to_remove + concat_offset
+
 
         if has_more:
-            next_id = self.graph[layer_id]
+            next_id = self.graph_res.execution_graph[layer_id]
             for sub_node_id in next_id.split(","):
                 if sub_node_id not in effect_applied:
                     self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count, effect_applied)
@@ -372,7 +381,7 @@ class FilterPruner:
         element_count = 0
         remain_sum = 0
         for layer_index, filter_index in pruning_dic.items():
-            layer_name = self.name_dic[layer_index]
+            layer_name = self.graph_res.name_dict[layer_index]
             if layer_name not in layers_pruned:
                 to_remove_count = len(pruning_dic[layer_index])
                 element_count = element_count + to_remove_count

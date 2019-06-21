@@ -17,6 +17,15 @@ def get_input_connection_count_per_entry(graph_edges, node, res):
     else:
         print("not in : {}".format(node))
 
+class GraphRes:
+    def __init__(self, execution_graph, name_dict, root, special_op, special_op_params, out_node):
+        self.execution_graph = execution_graph
+        self.name_dict = name_dict
+        self.root = root
+        self.special_op = special_op
+        self.special_op_params = special_op_params
+        self.out_node = out_node
+
 
 def generate_graph(model, args):
     execution_graph = {}
@@ -102,7 +111,12 @@ def generate_graph(model, args):
 
     execution_graph = clean_execution_graph(execution_graph, execution_shapes, id_name_dict)
     # print_exec_graph(execution_graph, id_name_dict)
-    return execution_graph, id_name_dict, root, special_op, special_op_params
+
+    for k, v in execution_graph.items():
+        if v == "":
+            out_node = k
+
+    return GraphRes(execution_graph, id_name_dict, root, special_op, special_op_params, out_node)
 
 
 def print_exec_graph(execution_graph, id_name_dict):

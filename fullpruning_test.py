@@ -90,7 +90,7 @@ def run_strategy_prune_compare(dataset_params):
     exec_param_w_prune_o = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
                                     pruner=ActivationMeanFilterPruner)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=None)
-    pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.3)
+    pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.2)
 
     multi_history = MultiHistory()
 
