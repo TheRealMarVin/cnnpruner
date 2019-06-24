@@ -13,10 +13,10 @@ from Pruner.FilterPruner import FilterPruner
 here we must support the case where we do have an addition of the residual followed by a split and a second residual
 block. In this case both branch must be considered for pruning.
 """
-class ActivationMeanFilterPrunerV2(FilterPruner):
+class ActivationMeanFilterPrunerV3(FilterPruner):
 
     def __init__(self, model, sample_run, force_forward_view=False):
-        super(ActivationMeanFilterPrunerV2, self).__init__(model, sample_run, force_forward_view)
+        super(ActivationMeanFilterPrunerV3, self).__init__(model, sample_run, force_forward_view)
         self.merged_results = {}
         # self.reasign_nodes = {}
         self.sets = []
@@ -50,7 +50,7 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
             for x in set_as_list[1:]:
                 sum += self.test_layer_activation[x]
 
-            divided = torch.div(sum, len(set_as_list))
+            divided = sum
             for x in set_as_list:
                 self.test_layer_activation[x] = divided
 

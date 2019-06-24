@@ -13,10 +13,10 @@ from Pruner.FilterPruner import FilterPruner
 here we must support the case where we do have an addition of the residual followed by a split and a second residual
 block. In this case both branch must be considered for pruning.
 """
-class ActivationMeanFilterPrunerV2(FilterPruner):
+class ActivationMeanFilterPrunerV4(FilterPruner):
 
     def __init__(self, model, sample_run, force_forward_view=False):
-        super(ActivationMeanFilterPrunerV2, self).__init__(model, sample_run, force_forward_view)
+        super(ActivationMeanFilterPrunerV4, self).__init__(model, sample_run, force_forward_view)
         self.merged_results = {}
         # self.reasign_nodes = {}
         self.sets = []
@@ -41,20 +41,21 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
         res = nsmallest(num, data, itemgetter(2))
         return res
 
-    def extract_filter_activation_mean(self, out):
-        for curr_set in self.sets:
-            if len(curr_set) <= 1:
-                continue
-            set_as_list = list(curr_set)
-            sum = self.test_layer_activation[set_as_list[0]]
-            for x in set_as_list[1:]:
-                sum += self.test_layer_activation[x]
-
-            divided = torch.div(sum, len(set_as_list))
-            for x in set_as_list:
-                self.test_layer_activation[x] = divided
-
-        super().extract_filter_activation_mean(out)
+    # def extract_filter_activation_mean(self, out):
+    #     for curr_set in self.sets:
+    #         if len(curr_set) <= 1:
+    #             continue
+    #         set_as_list = list(curr_set)
+    #         sum = self.test_layer_activation[set_as_list[0]]
+    #         for x in set_as_list[1:]:
+    #             sum += self.test_layer_activation[x]
+    #
+    #         divided = sum # TODO just a test
+    #         # divided = torch.div(sum, len(set_as_list))
+    #         for x in set_as_list:
+    #             self.test_layer_activation[x] = divided
+    #
+    #     super().extract_filter_activation_mean(out)
 
     def post_pruning_plan(self, filters_to_prune_per_layer):
         for curr_set in self.sets:

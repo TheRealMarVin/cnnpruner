@@ -10,6 +10,8 @@ from torchvision.transforms import transforms
 from POC import common_training_code, ExecParams, PruningParams, DatasetParams
 from Pruner.ActivationMeanFilterPruner import ActivationMeanFilterPruner
 from Pruner.ActivationMeanFilterPrunerV2 import ActivationMeanFilterPrunerV2
+from Pruner.ActivationMeanFilterPrunerV3 import ActivationMeanFilterPrunerV3
+from Pruner.ActivationMeanFilterPrunerV4 import ActivationMeanFilterPrunerV4
 from Pruner.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
 from deeplib_ext.CustomDeepLib import train, test, display_sample_data
 from FileHelper import load_obj, save_obj
@@ -85,12 +87,16 @@ def run_strategy_prune_compare(dataset_params):
                                      pruner=ActivationMeanFilterPrunerV2)
     exec_param_w_prune_2 = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
                                       pruner=ActivationMeanFilterPrunerV2)
+    exec_param_w_prune_3 = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
+                                      pruner=ActivationMeanFilterPrunerV3)
+    exec_param_w_prune_4 = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
+                                      pruner=ActivationMeanFilterPrunerV4)
     exec_param_w_prune_t = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
                                       pruner=TaylorExpensionFilterPruner)
     exec_param_w_prune_o = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
-                                    pruner=ActivationMeanFilterPruner)
+                                      pruner=ActivationMeanFilterPruner)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=None)
-    pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.2)
+    pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.15)
 
     multi_history = MultiHistory()
 
@@ -103,11 +109,21 @@ def run_strategy_prune_compare(dataset_params):
     #                   dataset_params=dataset_params, out_count=10)
     # multi_history.append_history(exec_name, h)
     # multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
-    exec_name = "Resnet 18-30-Complete_prune"
-    h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_2,
+    # exec_name = "Resnet 18-30-v2"
+    # h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_2,
+    #                   dataset_params=dataset_params, out_count=10)
+    # multi_history.append_history(exec_name, h)
+    # multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
+    exec_name = "Resnet 18-30-v3"
+    h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_3,
                       dataset_params=dataset_params, out_count=10)
     multi_history.append_history(exec_name, h)
     multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
+    # exec_name = "Resnet 18-30-v4"
+    # h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_4,
+    #                   dataset_params=dataset_params, out_count=10)
+    # multi_history.append_history(exec_name, h)
+    # multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
     # exec_name = "Resnet 18-30-Taylor"
     # h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_t,
     #                   dataset_params=dataset_params, out_count=10)
