@@ -1,5 +1,5 @@
 import copy
-import sys
+import random
 from heapq import nsmallest
 from operator import itemgetter
 
@@ -8,16 +8,13 @@ import torch
 from ModelHelper import get_node_in_model
 from Pruner.FilterPruner import FilterPruner
 
-#TODO change the algo so the next comment is working
-"""
-here we must support the case where we do have an addition of the residual followed by a split and a second residual
-block. In this case both branch must be considered for pruning.
-"""
-class ActivationMeanFilterPrunerV2(FilterPruner):
+
+class TaylorExpensionFilterPrunerv4(FilterPruner):
 
     def __init__(self, model, sample_run, force_forward_view=False):
-        super(ActivationMeanFilterPrunerV2, self).__init__(model, sample_run, force_forward_view)
-        self.merged_results = {}
+        super(TaylorExpensionFilterPrunerv4, self).__init__(model, sample_run, force_forward_view)
+        self.handles = {}
+
         self.sets = []
         self.ignore_list = []
 
@@ -25,33 +22,28 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
         self.conv_graph = copy.deepcopy(self.graph_res.execution_graph)
         self.compute_conv_graph()
 
-    def reset(self):
-        super().reset()
-
     def sort_filters(self, num):
         data = []
-
         for i in sorted(self.filter_ranks.keys()):
             for j in range(self.filter_ranks[i].size(0)):
                 data.append((i, j, self.filter_ranks[i][j]))
 
-        res = nsmallest(num, data, itemgetter(2))
-        return res
+        return nsmallest(num, data, itemgetter(2))
 
-    def extract_filter_activation_mean(self, out):
-        for curr_set in self.sets:
-            if len(curr_set) <= 1:
-                continue
-            set_as_list = list(curr_set)
-            sum = self.test_layer_activation[set_as_list[0]]
-            for x in set_as_list[1:]:
-                sum += self.test_layer_activation[x]
+    def handle_before_conv_in_forward(self, curr_module, node_id):
+        handle = curr_module.register_backward_hook(self.estimate_taylor)
+        self.handles[node_id] = handle
+        self.activation_to_layer[node_id] = curr_module
 
-            divided = torch.div(sum, len(set_as_list))
-            for x in set_as_list:
-                self.test_layer_activation[x] = divided
+    def handle_after_conv_in_forward(self, curr_module, node_id, out):
+        self.conv_layer[node_id] = curr_module
+        self.activations[node_id] = out
 
-        super().extract_filter_activation_mean(out)
+    def post_run_cleanup(self):
+        for _, handle in self.handles.items():
+            handle.remove()
+
+        self.handles = {}
 
     def post_pruning_plan(self, filters_to_prune_per_layer):
         for curr_set in self.sets:
@@ -61,28 +53,52 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
             set_as_list = list(curr_set)
             intersect_set = None
             for i, elem in enumerate(set_as_list):
-                if i == 0:
+                if elem not in filters_to_prune_per_layer:
+                    intersect_set = set()
+                elif i == 0:
                     intersect_set = set(filters_to_prune_per_layer[elem])
                 else:
                     intersect_set = intersect_set.intersection(set(filters_to_prune_per_layer[elem]))
 
-            if intersect_set is None:
+            if intersect_set is None or len(intersect_set) == 0:
                 for elem in set_as_list:
-                    del filters_to_prune_per_layer[elem]
+                    if elem in filters_to_prune_per_layer:
+                        del filters_to_prune_per_layer[elem]
             else:
                 for elem in set_as_list:
                     filters_to_prune_per_layer[elem] = list(intersect_set)
 
-    def handle_after_conv_in_forward(self, curr_module, node_id, out):
-        self.conv_layer[node_id] = curr_module
-        average_per_batch_item = torch.tensor([[curr.view(-1).mean() for curr in batch_item] for batch_item in out])
-        activation_average_sum = torch.sum(average_per_batch_item, dim=0)
+    # def extract_filter_activation_mean(self, out):
+    #     for curr_set in self.sets:
+    #         if len(curr_set) <= 1:
+    #             continue
+    #         set_as_list = list(curr_set)
+    #         sum = self.test_layer_activation[set_as_list[0]]
+    #         for x in set_as_list[1:]:
+    #             sum += self.test_layer_activation[x]
+    #
+    #         divided = torch.div(sum, len(set_as_list))
+    #         for x in set_as_list:
+    #             self.test_layer_activation[x] = divided
+    #
+    #     super().extract_filter_activation_mean(out)
 
-        val = activation_average_sum.cuda()
-        if node_id not in self.filter_ranks:
-            self.test_layer_activation[node_id] = val
-        else:
-            raise NotImplementedError
+    def estimate_taylor(self, module, grad_input, grad_output):
+        node_id = -1
+        for k, v in self.activation_to_layer.items():
+            if v == module:
+                node_id = k
+                break
+
+        if node_id == -1:
+            return
+        batch_size, _, filter_width, filter_height = self.activations[node_id].size()
+        param_count = batch_size * filter_width * filter_height
+
+        # we must ignore dim 1 because it is the input size
+        estimates = self.activations[node_id].mul_(grad_output[0]).sum(dim=3).sum(dim=2).sum(dim=0).div_(param_count)
+
+        self.test_layer_activation[node_id] = torch.abs(estimates) / torch.sqrt(torch.sum(estimates * estimates))
 
     def should_ignore_layer(self, layer_id):
         next_id = self.graph_res.execution_graph[layer_id]
@@ -183,5 +199,4 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
                 return True
 
         return False
-
 
