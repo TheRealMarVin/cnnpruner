@@ -7,10 +7,10 @@ from torchvision import models
 from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
-from Pruner.ActivationMeanFilterPruner import ActivationMeanFilterPruner
-from Pruner.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
+from Pruner.PartialPruning.ActivationMeanFilterPruner import ActivationMeanFilterPruner
+from Pruner.PartialPruning.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
 from deeplib_ext.CustomDeepLib import train, test, display_sample_data
-from FileHelper import load_obj, save_obj
+from FileHelper import save_obj
 # from ModelHelper import total_num_filters
 from deeplib_ext.MultiHistory import MultiHistory
 from deeplib_ext.history import History

@@ -1,4 +1,3 @@
-import os
 import torch
 import torchvision
 
@@ -8,22 +7,20 @@ from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
 from POC import common_training_code, ExecParams, PruningParams, DatasetParams
-from Pruner.ActivationMeanFilterPruner import ActivationMeanFilterPruner
+from Pruner.PartialPruning.ActivationMeanFilterPruner import ActivationMeanFilterPruner
 from Pruner.ActivationMeanFilterPrunerV2 import ActivationMeanFilterPrunerV2
 from Pruner.ActivationMeanFilterPrunerV3 import ActivationMeanFilterPrunerV3
 from Pruner.ActivationMeanFilterPrunerV4 import ActivationMeanFilterPrunerV4
-from Pruner.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
+from Pruner.PartialPruning.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
 from Pruner.TaylorExpensionFilterPrunerV2 import TaylorExpensionFilterPrunerv2
 from Pruner.TaylorExpensionFilterPrunerV3 import TaylorExpensionFilterPrunerv3
 from Pruner.TaylorExpensionFilterPrunerV4 import TaylorExpensionFilterPrunerv4
-from deeplib_ext.CustomDeepLib import train, test, display_sample_data
-from FileHelper import load_obj, save_obj
+from FileHelper import save_obj
 # from ModelHelper import total_num_filters
 from deeplib_ext.MultiHistory import MultiHistory
 from deeplib_ext.history import History
 from models.AlexNetSki import alexnetski
 
-from thop_ext.profile import profile
 
 # TODO check this one!!! https://towardsdatascience.com/how-to-visualize-convolutional-features-in-40-lines-of-code-70b7d87b0030
 # and this: https://github.com/fg91/visualizing-cnn-feature-maps/blob/master/Calculate_mean_activation_per_filter_in_specific_layer_given_an_image.ipynb

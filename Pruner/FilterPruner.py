@@ -145,14 +145,14 @@ class FilterPruner:
                 else:
                     self.filter_ranks[node_name] = self.filter_ranks[node_name] + self.test_layer_activation[node_name]
 
-    #TODO fix typo
-    def ramdom_filters(self, num):
-        data = []
-        for i in sorted(self.filter_ranks.keys()):
-            for j in range(self.filter_ranks[i].size(0)):
-                data.append((i, j, self.filter_ranks[i][j]))
-
-        return random.sample(data, num)
+    # #TODO fix typo
+    # def ramdom_filters(self, num):
+    #     data = []
+    #     for i in sorted(self.filter_ranks.keys()):
+    #         for j in range(self.filter_ranks[i].size(0)):
+    #             data.append((i, j, self.filter_ranks[i][j]))
+    #
+    #     return random.sample(data, num)
 
     def handle_before_conv_in_forward(self, curr_module, node_id):
         pass
@@ -163,7 +163,6 @@ class FilterPruner:
     def post_run_cleanup(self):
         pass
 
-    #TODO might not need this one
     def post_pruning_plan(self, filters_to_prune_per_layer):
         pass
 
@@ -171,6 +170,9 @@ class FilterPruner:
     #     pass
 
     def sort_filters(self, num):
+        raise NotImplementedError
+
+    def should_ignore_layer(self, layer_id):
         raise NotImplementedError
 
     """
@@ -186,26 +188,26 @@ class FilterPruner:
 
         return total_filter_count
 
-    #TODO we should change this method to only test the most restrictive case
-    def should_ignore_layer(self, layer_id):
-        next_id = self.graph_res.execution_graph[layer_id]
-        if next_id not in self.graph_res.name_dict:
-            return True
-
-        layer = get_node_in_model(self.model, self.graph_res.name_dict[next_id])
-
-        has_more = True
-        if isinstance(layer, torch.nn.modules.conv.Conv2d) or isinstance(layer, torch.nn.modules.Linear):
-            has_more = False
-
-        if has_more:
-            next_id = self.graph_res.execution_graph[next_id]
-            if next_id not in self.graph_res.name_dict:
-                return True
-            elif self.connection_count_copy[next_id] > 1:
-                return True
-            else:
-                return self.should_ignore_layer(next_id)
+    # #TODO we should change this method to only test the most restrictive case
+    # def should_ignore_layer(self, layer_id):
+    #     next_id = self.graph_res.execution_graph[layer_id]
+    #     if next_id not in self.graph_res.name_dict:
+    #         return True
+    #
+    #     layer = get_node_in_model(self.model, self.graph_res.name_dict[next_id])
+    #
+    #     has_more = True
+    #     if isinstance(layer, torch.nn.modules.conv.Conv2d) or isinstance(layer, torch.nn.modules.Linear):
+    #         has_more = False
+    #
+    #     if has_more:
+    #         next_id = self.graph_res.execution_graph[next_id]
+    #         if next_id not in self.graph_res.name_dict:
+    #             return True
+    #         elif self.connection_count_copy[next_id] > 1:
+    #             return True
+    #         else:
+    #             return self.should_ignore_layer(next_id)
 
     def normalize_layer(self):
         for i in self.filter_ranks:
@@ -222,7 +224,6 @@ class FilterPruner:
                 filters_to_prune_per_layer[node_id] = []
             filters_to_prune_per_layer[node_id].append(f)
 
-        # TODO test if we fully remove a layer
         for node_id in filters_to_prune_per_layer:
             layer_remove_count = len(filters_to_prune_per_layer[node_id])
             in_filter_in_layer = self.conv_layer[node_id].in_channels
@@ -236,7 +237,6 @@ class FilterPruner:
         self.post_pruning_plan(filters_to_prune_per_layer)
         return filters_to_prune_per_layer
 
-    # TODO here we should see what would happen if a layer is fully removed. this is quite annoying
     def prune(self, pruning_dic):
         for layer_id, filters_to_remove in pruning_dic.items():
             layer = get_node_in_model(self.model, self.graph_res.name_dict[layer_id])

@@ -3,10 +3,10 @@ from operator import itemgetter
 
 import torch
 
-from Pruner.FilterPruner import FilterPruner
+from Pruner.PartialPruning.PartialFilterPruner import PartialFilterPruner
 
 
-class ActivationMeanFilterPruner(FilterPruner):
+class ActivationMeanFilterPruner(PartialFilterPruner):
 
     def __init__(self, model, sample_run, force_forward_view=False):
         super(ActivationMeanFilterPruner, self).__init__(model, sample_run, force_forward_view)

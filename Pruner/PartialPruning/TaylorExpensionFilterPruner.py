@@ -1,13 +1,12 @@
-import random
 from heapq import nsmallest
 from operator import itemgetter
 
 import torch
 
-from Pruner.FilterPruner import FilterPruner
+from Pruner.PartialPruning.PartialFilterPruner import PartialFilterPruner
 
 
-class TaylorExpensionFilterPruner(FilterPruner):
+class TaylorExpensionFilterPruner(PartialFilterPruner):
 
     def __init__(self, model, sample_run, force_forward_view=False):
         super(TaylorExpensionFilterPruner, self).__init__(model, sample_run, force_forward_view)
