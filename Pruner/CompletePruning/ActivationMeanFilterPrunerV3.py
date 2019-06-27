@@ -6,6 +6,7 @@ from operator import itemgetter
 import torch
 
 from ModelHelper import get_node_in_model
+from Pruner.CompletePruning.CompleteFilterPruner import CompleteFilterPruner
 from Pruner.FilterPruner import FilterPruner
 
 #TODO change the algo so the next comment is working
@@ -13,13 +14,15 @@ from Pruner.FilterPruner import FilterPruner
 here we must support the case where we do have an addition of the residual followed by a split and a second residual
 block. In this case both branch must be considered for pruning.
 """
-class ActivationMeanFilterPrunerV2(FilterPruner):
+class ActivationMeanFilterPrunerV3(CompleteFilterPruner):
 
     def __init__(self, model, sample_run, force_forward_view=False):
-        super(ActivationMeanFilterPrunerV2, self).__init__(model, sample_run, force_forward_view)
+        super(ActivationMeanFilterPrunerV3, self).__init__(model, sample_run, force_forward_view)
         self.merged_results = {}
+        # self.reasign_nodes = {}
         self.sets = []
         self.ignore_list = []
+        # self.sets_processed = []
 
         self.reverse_conv_graph = {}
         self.conv_graph = copy.deepcopy(self.graph_res.execution_graph)
@@ -27,6 +30,7 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
 
     def reset(self):
         super().reset()
+        # self.sets_processed = []
 
     def sort_filters(self, num):
         data = []
@@ -47,7 +51,7 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
             for x in set_as_list[1:]:
                 sum += self.test_layer_activation[x]
 
-            divided = torch.div(sum, len(set_as_list))
+            divided = sum
             for x in set_as_list:
                 self.test_layer_activation[x] = divided
 
@@ -157,6 +161,18 @@ class ActivationMeanFilterPrunerV2(FilterPruner):
         if elem_to_del is not None:
             self.ignore_list = list(self.sets[elem_to_del])
             del self.sets[elem_to_del]
+
+        # print("sets:", self.sets)
+        # print("temp:", temp)
+        # to_remove = []
+        # for i, curr_set in enumerate(self.sets):
+        #     if len(curr_set.intersection(self.graph_res.out_node)) > 0:
+        #         to_remove.append(i)
+        #
+        # for elem_to_remove in to_remove:
+        #     del self.sets[elem_to_remove]
+
+        a = 0
 
     def _get_next_conv_id(self, conv_layers, node):
         res = []

@@ -6,13 +6,14 @@ from operator import itemgetter
 import torch
 
 from ModelHelper import get_node_in_model
+from Pruner.CompletePruning.CompleteFilterPruner import CompleteFilterPruner
 from Pruner.FilterPruner import FilterPruner
 
 
-class TaylorExpensionFilterPrunerv2(FilterPruner):
+class TaylorExpensionFilterPrunerv3(CompleteFilterPruner):
 
     def __init__(self, model, sample_run, force_forward_view=False):
-        super(TaylorExpensionFilterPrunerv2, self).__init__(model, sample_run, force_forward_view)
+        super(TaylorExpensionFilterPrunerv3, self).__init__(model, sample_run, force_forward_view)
         self.handles = {}
 
         self.sets = []
@@ -77,8 +78,7 @@ class TaylorExpensionFilterPrunerv2(FilterPruner):
             for x in set_as_list[1:]:
                 sum += self.test_layer_activation[x]
 
-            divided = sum
-            # divided = torch.div(sum, len(set_as_list))
+            divided = torch.div(sum, len(set_as_list))
             for x in set_as_list:
                 self.test_layer_activation[x] = divided
 

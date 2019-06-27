@@ -6,13 +6,14 @@ from operator import itemgetter
 import torch
 
 from ModelHelper import get_node_in_model
+from Pruner.CompletePruning.CompleteFilterPruner import CompleteFilterPruner
 from Pruner.FilterPruner import FilterPruner
 
 
-class TaylorExpensionFilterPrunerv4(FilterPruner):
+class TaylorExpensionFilterPrunerv2(CompleteFilterPruner):
 
     def __init__(self, model, sample_run, force_forward_view=False):
-        super(TaylorExpensionFilterPrunerv4, self).__init__(model, sample_run, force_forward_view)
+        super(TaylorExpensionFilterPrunerv2, self).__init__(model, sample_run, force_forward_view)
         self.handles = {}
 
         self.sets = []
@@ -68,20 +69,21 @@ class TaylorExpensionFilterPrunerv4(FilterPruner):
                 for elem in set_as_list:
                     filters_to_prune_per_layer[elem] = list(intersect_set)
 
-    # def extract_filter_activation_mean(self, out):
-    #     for curr_set in self.sets:
-    #         if len(curr_set) <= 1:
-    #             continue
-    #         set_as_list = list(curr_set)
-    #         sum = self.test_layer_activation[set_as_list[0]]
-    #         for x in set_as_list[1:]:
-    #             sum += self.test_layer_activation[x]
-    #
-    #         divided = torch.div(sum, len(set_as_list))
-    #         for x in set_as_list:
-    #             self.test_layer_activation[x] = divided
-    #
-    #     super().extract_filter_activation_mean(out)
+    def extract_filter_activation_mean(self, out):
+        for curr_set in self.sets:
+            if len(curr_set) <= 1:
+                continue
+            set_as_list = list(curr_set)
+            sum = self.test_layer_activation[set_as_list[0]]
+            for x in set_as_list[1:]:
+                sum += self.test_layer_activation[x]
+
+            divided = sum
+            # divided = torch.div(sum, len(set_as_list))
+            for x in set_as_list:
+                self.test_layer_activation[x] = divided
+
+        super().extract_filter_activation_mean(out)
 
     def estimate_taylor(self, module, grad_input, grad_output):
         node_id = -1
