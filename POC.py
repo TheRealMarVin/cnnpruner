@@ -94,6 +94,9 @@ def common_training_code(model,
             model.load_state_dict(torch.load(best_result_save_path))
             if not retrain_if_weight_loaded:
                 should_train = False
+                test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
+                print('Test:\n\tScore: {}'.format(test_score))
+
     if should_train and exec_params.n_pretrain_epoch > 0:
         local_history = train(model, optimizer, dataset_params.train_dataset, exec_params.n_pretrain_epoch,
                               exec_params.batch_size, use_gpu=use_gpu, criterion=criterion,
@@ -101,8 +104,8 @@ def common_training_code(model,
         history.append(local_history)
         n_epoch_total = n_epoch_total - exec_params.n_pretrain_epoch
 
-    test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
-    print('Test:\n\tScore: {}'.format(test_score))
+        test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
+        print('Test:\n\tScore: {}'.format(test_score))
 
     ###
     #TODO maybe put the loop content in a function that looks terrible now
@@ -161,8 +164,8 @@ def common_training_code(model,
             pruner.reset()
 
             print("Filters pruned {}%".format(100 * float(element_count) / initial_number_of_filters))
-            new_test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
-            print('Test:\n\tpost prune Score: {}'.format(new_test_score))
+            # new_test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
+            # print('Test:\n\tpost prune Score: {}'.format(new_test_score))
 
             # basedir = os.path.dirname(pruned_save_path)
             # if not os.path.exists(basedir):

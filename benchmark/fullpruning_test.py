@@ -96,14 +96,14 @@ def run_strategy_prune_compare_taylor(dataset_params):
                                       pruner=ActivationMeanFilterPruner)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=None)
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.075, prune_ratio=0.30)
-    pruning_param_w_prune2 = PruningParams(max_percent_per_iteration=0.04, prune_ratio=0.20)
+    pruning_param_w_prune2 = PruningParams(max_percent_per_iteration=0.04, prune_ratio=0.17)
 
     multi_history = MultiHistory()
 
-    exec_name = "Resnet 18-0"
-    h = exec_resnet18(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
-                      dataset_params=dataset_params, out_count=10)
-    multi_history.append_history(exec_name, h)
+    # exec_name = "Resnet 18-0"
+    # h = exec_resnet18(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_no_prune,
+    #                   dataset_params=dataset_params, out_count=10)
+    # multi_history.append_history(exec_name, h)
     # exec_name = "Resnet 18-30-Simple_prune"
     # h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_o,
     #                   dataset_params=dataset_params, out_count=10)
@@ -119,16 +119,21 @@ def run_strategy_prune_compare_taylor(dataset_params):
     #                   dataset_params=dataset_params, out_count=10)
     # multi_history.append_history(exec_name, h)
     # multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
+    exec_name = "Resnet 18-30-v3-2"
+    h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune2, exec_params=exec_param_w_prune_3,
+                      dataset_params=dataset_params, out_count=10)
+    multi_history.append_history(exec_name, h)
+    multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
     exec_name = "Resnet 18-30-v4-p1"
     h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_4,
                       dataset_params=dataset_params, out_count=10)
     multi_history.append_history(exec_name, h)
     multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
-    exec_name = "Resnet 18-30-v4-p2"
-    h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune2, exec_params=exec_param_w_prune_4,
-                      dataset_params=dataset_params, out_count=10)
-    multi_history.append_history(exec_name, h)
-    multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
+    # exec_name = "Resnet 18-30-v4-p2"
+    # h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune2, exec_params=exec_param_w_prune_4,
+    #                   dataset_params=dataset_params, out_count=10)
+    # multi_history.append_history(exec_name, h)
+    # multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
     exec_name = "Resnet 18-30-Taylor"
     h = exec_resnet18(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_t,
                       dataset_params=dataset_params, out_count=10)

@@ -46,28 +46,28 @@ class TaylorExpensionFilterPrunerv3(CompleteFilterPruner):
 
         self.handles = {}
 
-    def post_pruning_plan(self, filters_to_prune_per_layer):
-        for curr_set in self.sets:
-            if len(curr_set) <= 1:
-                continue
-
-            set_as_list = list(curr_set)
-            intersect_set = None
-            for i, elem in enumerate(set_as_list):
-                if elem not in filters_to_prune_per_layer:
-                    intersect_set = set()
-                elif i == 0:
-                    intersect_set = set(filters_to_prune_per_layer[elem])
-                else:
-                    intersect_set = intersect_set.intersection(set(filters_to_prune_per_layer[elem]))
-
-            if intersect_set is None or len(intersect_set) == 0:
-                for elem in set_as_list:
-                    if elem in filters_to_prune_per_layer:
-                        del filters_to_prune_per_layer[elem]
-            else:
-                for elem in set_as_list:
-                    filters_to_prune_per_layer[elem] = list(intersect_set)
+    # def post_pruning_plan(self, filters_to_prune_per_layer):
+    #     for curr_set in self.sets:
+    #         if len(curr_set) <= 1:
+    #             continue
+    #
+    #         set_as_list = list(curr_set)
+    #         intersect_set = None
+    #         for i, elem in enumerate(set_as_list):
+    #             if elem not in filters_to_prune_per_layer:
+    #                 intersect_set = set()
+    #             elif i == 0:
+    #                 intersect_set = set(filters_to_prune_per_layer[elem])
+    #             else:
+    #                 intersect_set = intersect_set.intersection(set(filters_to_prune_per_layer[elem]))
+    #
+    #         if intersect_set is None or len(intersect_set) == 0:
+    #             for elem in set_as_list:
+    #                 if elem in filters_to_prune_per_layer:
+    #                     del filters_to_prune_per_layer[elem]
+    #         else:
+    #             for elem in set_as_list:
+    #                 filters_to_prune_per_layer[elem] = list(intersect_set)
 
     def extract_filter_activation_mean(self, out):
         for curr_set in self.sets:
