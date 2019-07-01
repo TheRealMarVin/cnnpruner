@@ -10,10 +10,10 @@ from Pruner.CompletePruning.CompleteFilterPruner import CompleteFilterPruner
 from Pruner.FilterPruner import FilterPruner
 
 
-class TaylorExpensionFilterPrunerv3(CompleteFilterPruner):
+class TaylorExpensionFilterPrunerv4(CompleteFilterPruner):
 
     def __init__(self, model, sample_run, force_forward_view=False):
-        super(TaylorExpensionFilterPrunerv3, self).__init__(model, sample_run, force_forward_view)
+        super(TaylorExpensionFilterPrunerv4, self).__init__(model, sample_run, force_forward_view)
         self.handles = {}
 
         self.sets = []
@@ -47,7 +47,8 @@ class TaylorExpensionFilterPrunerv3(CompleteFilterPruner):
         self.handles = {}
 
     # def post_pruning_plan(self, filters_to_prune_per_layer):
-    #     for curr_set in self.sets:
+    #     to_display = {}
+    #     for i, curr_set in enumerate(self.sets):
     #         if len(curr_set) <= 1:
     #             continue
     #
@@ -61,28 +62,31 @@ class TaylorExpensionFilterPrunerv3(CompleteFilterPruner):
     #             else:
     #                 intersect_set = intersect_set.intersection(set(filters_to_prune_per_layer[elem]))
     #
+    #         to_display[i] = len(intersect_set)
     #         if intersect_set is None or len(intersect_set) == 0:
     #             for elem in set_as_list:
     #                 if elem in filters_to_prune_per_layer:
     #                     del filters_to_prune_per_layer[elem]
     #         else:
+    #             to_display[i] = len(intersect_set)
     #             for elem in set_as_list:
     #                 filters_to_prune_per_layer[elem] = list(intersect_set)
-
-    def extract_filter_activation_mean(self, out):
-        for curr_set in self.sets:
-            if len(curr_set) <= 1:
-                continue
-            set_as_list = list(curr_set)
-            sum = self.test_layer_activation[set_as_list[0]]
-            for x in set_as_list[1:]:
-                sum += self.test_layer_activation[x]
-
-            divided = torch.div(sum, len(set_as_list))
-            for x in set_as_list:
-                self.test_layer_activation[x] = divided
-
-        super().extract_filter_activation_mean(out)
+    #
+    #     print("junction pruning size:", to_display)
+    # def extract_filter_activation_mean(self, out):
+    #     for curr_set in self.sets:
+    #         if len(curr_set) <= 1:
+    #             continue
+    #         set_as_list = list(curr_set)
+    #         sum = self.test_layer_activation[set_as_list[0]]
+    #         for x in set_as_list[1:]:
+    #             sum += self.test_layer_activation[x]
+    #
+    #         divided = torch.div(sum, len(set_as_list))
+    #         for x in set_as_list:
+    #             self.test_layer_activation[x] = divided
+    #
+    #     super().extract_filter_activation_mean(out)
 
     def estimate_taylor(self, module, grad_input, grad_output):
         node_id = -1

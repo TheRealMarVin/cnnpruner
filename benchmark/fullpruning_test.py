@@ -13,8 +13,8 @@ from Pruner.CompletePruning.CompleteActivationMeanFilterPruner import Activation
 from Pruner.CompletePruning.Alt.CompleteActivationMeanFilterPrunerV4 import ActivationMeanFilterPrunerV4
 from Pruner.PartialPruning.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
 from Pruner.CompletePruning.Alt.CompleteTaylorExpensionFilterPrunerV2 import TaylorExpensionFilterPrunerv2
-from Pruner.CompletePruning.Alt.CompleteTaylorExpensionFilterPrunerV3 import TaylorExpensionFilterPrunerv3
-from Pruner.CompletePruning.CompleteTaylorExpensionFilterPruner import TaylorExpensionFilterPrunerv4
+from Pruner.CompletePruning.CompleteTaylorExpensionFilterPruner import TaylorExpensionFilterPruner
+from Pruner.CompletePruning.Alt.CompleteTaylorExpensionFilterPrunerV4 import TaylorExpensionFilterPrunerv4
 from FileHelper import save_obj
 # from ModelHelper import total_num_filters
 from deeplib_ext.MultiHistory import MultiHistory
@@ -87,7 +87,7 @@ def run_strategy_prune_compare_taylor(dataset_params):
     exec_param_w_prune_2 = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
                                       pruner=TaylorExpensionFilterPrunerv2)
     exec_param_w_prune_3 = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
-                                      pruner=TaylorExpensionFilterPrunerv3)
+                                      pruner=TaylorExpensionFilterPruner)
     exec_param_w_prune_4 = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
                                       pruner=TaylorExpensionFilterPrunerv4)
     exec_param_w_prune_t = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
