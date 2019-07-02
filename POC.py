@@ -30,7 +30,8 @@ class ExecParams:
                  batch_size=64,
                  learning_rate=0.01,
                  pruner=TaylorExpensionFilterPruner,
-                 force_forward_view=False):
+                 force_forward_view=False,
+                 ignore_last_conv=False):
         self.n_pretrain_epoch = n_pretrain_epoch
         self.n_epoch_retrain = n_epoch_retrain
         self.n_epoch_total = n_epoch_total
@@ -38,6 +39,7 @@ class ExecParams:
         self.learning_rate = learning_rate
         self.pruner = pruner
         self.force_forward_view = force_forward_view
+        self.ignore_last_conv = ignore_last_conv
 
 
 class PruningParams:
@@ -110,7 +112,10 @@ def common_training_code(model,
     ###
     #TODO maybe put the loop content in a function that looks terrible now
     if pruning_params.prune_ratio is not None:
-        pruner = exec_params.pruner(model, sample_run, exec_params.force_forward_view)
+        pruner = exec_params.pruner(model,
+                                    sample_run,
+                                    exec_params.force_forward_view,
+                                    exec_params.ignore_last_conv)
 
         # prune_targets = None
         # if reuse_cut_filter:

@@ -12,9 +12,14 @@ from ModelHelper import get_node_in_model
 
 
 class FilterPruner:
-    def __init__(self, model, sample_run, force_forward_view=False):
+    def __init__(self,
+                 model,
+                 sample_run,
+                 force_forward_view=False,
+                 ignore_last_conv=False):
         self.model = model
         self.force_forward_view = force_forward_view;
+        self.ignore_last_conv = ignore_last_conv
         self.activations = {} #TODO remove?
         self.gradients = []
         self.grad_index = 0 # TODO remove
@@ -28,6 +33,7 @@ class FilterPruner:
         self.connection_count_copy = {}
         self.features = []
         self.special_ops_prune_apply_count = {}
+        self.special_ops_prune_concat_offset = {}
         self.reset()
         model.cpu()
         self.graph_res = generate_graph(model, sample_run)
@@ -49,6 +55,7 @@ class FilterPruner:
         self.connection_count_copy = {}
         self.test_layer_activation = {} #TODO rename
         self.special_ops_prune_apply_count = {}
+        self.special_ops_prune_concat_offset = {}
 
     def parse(self, node_id):
         node_name = self.graph_res.name_dict[node_id]
@@ -239,6 +246,7 @@ class FilterPruner:
 
     def prune(self, pruning_dic):
         for layer_id, filters_to_remove in pruning_dic.items():
+            # print("pruning layer_id:", layer_id)
             layer = get_node_in_model(self.model, self.graph_res.name_dict[layer_id])
             # print("trying to prune for layer: {} \tID: {}".format(self.graph_res.name_dict[layer_id], layer_id))
             if layer is not None:
@@ -284,6 +292,9 @@ class FilterPruner:
             if layer_id in self.graph_res.special_op:
                 if layer_id not in self.special_ops_prune_apply_count.keys():
                     self.special_ops_prune_apply_count[layer_id] = 0
+                    if layer_id not in self.special_ops_prune_concat_offset.keys():
+                        # print("concat for layer_id:", layer_id)
+                        self.special_ops_prune_concat_offset[layer_id] = initial_filter_count - len(removed_filter)
                 else:
 
                     size = self.special_ops_prune_apply_count[layer_id]
@@ -291,22 +302,21 @@ class FilterPruner:
                     if self.graph_res.special_op[layer_id] == "Add":
                         has_more = False
                     elif self.graph_res.special_op[layer_id] == "Concat":
+                        # print("concat for layer_id:", layer_id)
+                        concat_offset = self.special_ops_prune_concat_offset[layer_id]
+                        new_offset = initial_filter_count - len(removed_filter) + concat_offset
+                        self.special_ops_prune_concat_offset[layer_id] = new_offset
+                        for i, elem_to_remove in enumerate(removed_filter):
+                            removed_filter[i] = elem_to_remove + concat_offset
 
-                        if layer_id not in self.special_ops_prune_concat_offset.keys():
-                            self.special_ops_prune_concat_offset[layer_id] = len(removed_filter) + initial_filter_count
-                        else:
-                            concat_offset = self.special_ops_prune_concat_offset[layer_id]
-                            new_offset = len(removed_filter) + initial_filter_count + concat_offset
-                            self.special_ops_prune_concat_offset[layer_id] = new_offset
-                            for i, elem_to_remove in enumerate(removed_filter):
-                                removed_filter[i] = elem_to_remove + concat_offset
 
 
         if has_more:
             next_id = self.graph_res.execution_graph[layer_id]
-            for sub_node_id in next_id.split(","):
-                if sub_node_id not in effect_applied:
-                    self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count, effect_applied)
+            if len(next_id) > 0:
+                for sub_node_id in next_id.split(","):
+                    if sub_node_id not in effect_applied:
+                        self._apply_pruning_effect(sub_node_id, removed_filter, initial_filter_count, effect_applied)
 
     def _prune_conv_output_filters(self, conv, filters_to_remove):
         initial_filter_count = conv.out_channels

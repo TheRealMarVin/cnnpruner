@@ -12,8 +12,14 @@ from Pruner.FilterPruner import FilterPruner
 
 class TaylorExpensionFilterPrunerv4(CompleteFilterPruner):
 
-    def __init__(self, model, sample_run, force_forward_view=False):
-        super(TaylorExpensionFilterPrunerv4, self).__init__(model, sample_run, force_forward_view)
+    def __init__(self, model,
+                 sample_run,
+                 force_forward_view=False,
+                 ignore_last_conv=False):
+        super(TaylorExpensionFilterPrunerv4, self).__init__(model,
+                                                            sample_run,
+                                                            force_forward_view,
+                                                            ignore_last_conv)
         self.handles = {}
 
         self.sets = []
@@ -134,7 +140,7 @@ class TaylorExpensionFilterPrunerv4(CompleteFilterPruner):
             new_next = []
             if next != "":
                 for elem in next.split(","):
-                    res = self._get_next_conv_id(conv_layers, elem)
+                    res, is_last_conv = self._get_next_conv_id(conv_layers, elem)
                     new_next.extend(res)
 
             self.conv_graph[key] = ",".join(new_next)

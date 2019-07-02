@@ -10,10 +10,17 @@ from Pruner.CompletePruning.CompleteFilterPruner import CompleteFilterPruner
 from Pruner.FilterPruner import FilterPruner
 
 
-class TaylorExpensionFilterPruner(CompleteFilterPruner):
+class CompleteTaylorExpensionFilterPruner(CompleteFilterPruner):
 
-    def __init__(self, model, sample_run, force_forward_view=False):
-        super(TaylorExpensionFilterPruner, self).__init__(model, sample_run, force_forward_view)
+    def __init__(self,
+                 model,
+                 sample_run,
+                 force_forward_view=False,
+                 ignore_last_conv=False):
+        super(CompleteTaylorExpensionFilterPruner, self).__init__(model,
+                                                                  sample_run,
+                                                                  force_forward_view,
+                                                                  ignore_last_conv)
         self.handles = {}
 
         self.sets = []
@@ -45,29 +52,6 @@ class TaylorExpensionFilterPruner(CompleteFilterPruner):
             handle.remove()
 
         self.handles = {}
-
-    # def post_pruning_plan(self, filters_to_prune_per_layer):
-    #     for curr_set in self.sets:
-    #         if len(curr_set) <= 1:
-    #             continue
-    #
-    #         set_as_list = list(curr_set)
-    #         intersect_set = None
-    #         for i, elem in enumerate(set_as_list):
-    #             if elem not in filters_to_prune_per_layer:
-    #                 intersect_set = set()
-    #             elif i == 0:
-    #                 intersect_set = set(filters_to_prune_per_layer[elem])
-    #             else:
-    #                 intersect_set = intersect_set.intersection(set(filters_to_prune_per_layer[elem]))
-    #
-    #         if intersect_set is None or len(intersect_set) == 0:
-    #             for elem in set_as_list:
-    #                 if elem in filters_to_prune_per_layer:
-    #                     del filters_to_prune_per_layer[elem]
-    #         else:
-    #             for elem in set_as_list:
-    #                 filters_to_prune_per_layer[elem] = list(intersect_set)
 
     def extract_filter_activation_mean(self, out):
         for curr_set in self.sets:
@@ -109,12 +93,13 @@ class TaylorExpensionFilterPruner(CompleteFilterPruner):
         if layer_id in self.ignore_list:
             return True
 
-        # TODO we should do more test like reusing a layer
         return False
 
     def compute_conv_graph(self):
         conv_layers = []
         to_delete = []
+
+        # find all the convolution layer
         for key, val in self.conv_graph.items():
             module = get_node_in_model(self.model, self.graph_res.name_dict[key])
             if isinstance(module, torch.nn.modules.conv.Conv2d):
@@ -124,16 +109,20 @@ class TaylorExpensionFilterPruner(CompleteFilterPruner):
             else:
                 to_delete.append(key)
 
+        # find the id of the next convolution layer
         for key in conv_layers:
             next = self.conv_graph[key]
-            self.conv_graph[key] = ""
+            # self.conv_graph[key] = ""
             new_next = []
             if next != "":
                 for elem in next.split(","):
-                    res = self._get_next_conv_id(conv_layers, elem)
+                    res, is_last_conv = self._get_next_conv_id(conv_layers, elem)
+                    if is_last_conv and self.ignore_last_conv:
+                        self.ignore_list.append(key)
                     new_next.extend(res)
 
-            self.conv_graph[key] = ",".join(new_next)
+            if len(new_next) > 1:
+                self.conv_graph[key] = ",".join(new_next)
 
         for key in to_delete:
             self.conv_graph.pop(key, None)
@@ -146,8 +135,6 @@ class TaylorExpensionFilterPruner(CompleteFilterPruner):
                 else:
                     self.reverse_conv_graph[x].append(key)
 
-        #TODO ca c'est ce qu'on va vouloir garder dans notre classe
-        temp = {}
         self.sets = []
         elem_to_del = None
         for key, val in self.reverse_conv_graph.items():
@@ -161,13 +148,11 @@ class TaylorExpensionFilterPruner(CompleteFilterPruner):
                     self.sets[i] = array_as_set.union(j)
                     if key == self.graph_res.out_node:
                         elem_to_del = i
-                    temp[key] = i
                     found = True
                     break
 
             if not found:
                 self.sets.append(array_as_set)
-                temp[key] = len(self.sets) - 1
                 if key == self.graph_res.out_node:
                     elem_to_del = len(self.sets) - 1
 
@@ -178,14 +163,21 @@ class TaylorExpensionFilterPruner(CompleteFilterPruner):
     def _get_next_conv_id(self, conv_layers, node):
         res = []
         next = self.conv_graph[node]
+        is_last_conv = False
         if next != "":
             for elem in next.split(","):
+                if elem in self.graph_res.special_op.keys() and self.graph_res.special_op[elem] == "Concat":
+                    # if we reach a concat we don't want the next conv layer
+                    continue
                 if elem in conv_layers:
                     res.append(elem)
                 else:
-                    res.extend(self._get_next_conv_id(conv_layers, elem))
+                    temp_res, is_last_conv = self._get_next_conv_id(conv_layers, elem)
+                    res.extend(temp_res)
+        else:
+            is_last_conv = True
 
-        return res
+        return res, is_last_conv
 
     def _get_set_for_node(self, node_id):
         for x in self.sets:

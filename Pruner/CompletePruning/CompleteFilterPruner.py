@@ -2,8 +2,15 @@ from Pruner.FilterPruner import FilterPruner
 
 
 class CompleteFilterPruner(FilterPruner):
-    def __init__(self, model, sample_run, force_forward_view=False):
-        super(CompleteFilterPruner, self).__init__(model, sample_run, force_forward_view)
+    def __init__(self,
+                 model,
+                 sample_run,
+                 force_forward_view=False,
+                 ignore_last_conv=False):
+        super(CompleteFilterPruner, self).__init__(model,
+                                                   sample_run,
+                                                   force_forward_view,
+                                                   ignore_last_conv)
 
     def post_pruning_plan(self, filters_to_prune_per_layer):
         to_display = {}
