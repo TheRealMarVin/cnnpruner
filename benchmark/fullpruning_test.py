@@ -115,12 +115,12 @@ def run_strategy_prune_compare_taylor(dataset_params):
                                       pruner=ActivationMeanFilterPruner)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=None)
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.075, prune_ratio=0.30)
-    pruning_param_w_prune2 = PruningParams(max_percent_per_iteration=0.04, prune_ratio=0.17)
+    pruning_param_w_prune2 = PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.15)
 
     multi_history = MultiHistory()
 
     exec_name = "Squeeze - 30 full"
-    h = exec_squeeze_net(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_4,
+    h = exec_squeeze_net(exec_name, pruning_params=pruning_param_w_prune2, exec_params=exec_param_w_prune_4,
                          dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
     multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
