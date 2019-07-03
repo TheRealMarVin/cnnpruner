@@ -10,13 +10,13 @@ from Pruner.CompletePruning.CompleteFilterPruner import CompleteFilterPruner
 from Pruner.FilterPruner import FilterPruner
 
 
-class TaylorExpensionFilterPrunerv4(CompleteFilterPruner):
+class TaylorExpansionFilterPrunerV4(CompleteFilterPruner):
 
     def __init__(self, model,
                  sample_run,
                  force_forward_view=False,
                  ignore_last_conv=False):
-        super(TaylorExpensionFilterPrunerv4, self).__init__(model,
+        super(TaylorExpansionFilterPrunerV4, self).__init__(model,
                                                             sample_run,
                                                             force_forward_view,
                                                             ignore_last_conv)

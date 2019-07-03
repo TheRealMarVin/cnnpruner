@@ -6,7 +6,7 @@ from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
 from Pruner.PartialPruning.ActivationMeanFilterPruner import ActivationMeanFilterPruner
-from Pruner.PartialPruning.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
+from Pruner.PartialPruning.TaylorExpansionFilterPruner import TaylorExpansionFilterPruner
 from deeplib_ext.CustomDeepLib import train, test, display_sample_data
 from FileHelper import save_obj
 from deeplib_ext.MultiHistory import MultiHistory
@@ -25,11 +25,11 @@ class ExecParams:
                  n_epoch_total=20,
                  batch_size=64,
                  learning_rate=0.01,
-                 pruner=TaylorExpensionFilterPruner,
+                 pruner=TaylorExpansionFilterPruner,
                  force_forward_view=False,
                  ignore_last_conv=False,
                  best_result_save_path=None,
-                 retrain_if_weight_loaded=False,):
+                 retrain_if_weight_loaded=False, ):
         self.n_pretrain_epoch = n_pretrain_epoch
         self.n_epoch_retrain = n_epoch_retrain
         self.n_epoch_total = n_epoch_total

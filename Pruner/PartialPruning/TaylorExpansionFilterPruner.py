@@ -6,10 +6,10 @@ import torch
 from Pruner.PartialPruning.PartialFilterPruner import PartialFilterPruner
 
 
-class TaylorExpensionFilterPruner(PartialFilterPruner):
+class TaylorExpansionFilterPruner(PartialFilterPruner):
 
     def __init__(self, model, sample_run, force_forward_view=False, ignore_last_conv=False):
-        super(TaylorExpensionFilterPruner, self).__init__(model, sample_run, force_forward_view, ignore_last_conv)
+        super(TaylorExpansionFilterPruner, self).__init__(model, sample_run, force_forward_view, ignore_last_conv)
         self.handles = {}
 
     def sort_filters(self, num):
