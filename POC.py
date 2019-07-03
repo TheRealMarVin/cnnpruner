@@ -2,19 +2,17 @@ import os
 import torch
 import torchvision
 
-from torch import nn
-from torchvision import models
 from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
 from Pruner.PartialPruning.ActivationMeanFilterPruner import ActivationMeanFilterPruner
 from Pruner.PartialPruning.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
+from benchmark.BenchmarkHelper import exec_squeeze_net, exec_dense_net, exec_resnet50, exec_vgg16, exec_resnet18, \
+    exec_alexnet
 from deeplib_ext.CustomDeepLib import train, test, display_sample_data
 from FileHelper import save_obj
-# from ModelHelper import total_num_filters
 from deeplib_ext.MultiHistory import MultiHistory
 from deeplib_ext.history import History
-from models.AlexNetSki import alexnetski
 
 from thop_ext.profile import profile
 
@@ -109,9 +107,7 @@ def common_training_code(model,
         test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
         print('Test:\n\tScore: {}'.format(test_score))
 
-    ###
-    #TODO maybe put the loop content in a function that looks terrible now
-    if pruning_params.prune_ratio is not None:
+    if pruning_params.prune_ratio is not None and exec_params.pruner is not None:
         pruner = exec_params.pruner(model,
                                     sample_run,
                                     exec_params.force_forward_view,
@@ -213,121 +209,6 @@ def common_training_code(model,
     test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
     print('Final Test:\n\tScore: {}'.format(test_score))
 
-    return history
-
-
-def exec_alexnet(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
-    print("*** ", exec_name)
-    model = alexnetski(pretrained=True)
-    model.cuda()
-
-    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
-
-    return history
-
-
-def exec_squeeze_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
-    print("*** ", exec_name)
-
-    model = models.squeezenet1_1(pretrained=True)
-    model.cuda()
-
-    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
-    return history
-
-
-def exec_dense_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
-    print("*** ", exec_name)
-
-    model = models.densenet121(pretrained=True)
-    model.cuda()
-
-    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
-    return history
-
-
-def exec_vgg16(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
-    print("*** ", exec_name)
-
-    model = models.vgg16(pretrained=True)
-    model.cuda()
-
-    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
-    return history
-
-
-def exec_resnet18(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
-    print("*** ", exec_name)
-
-    model = models.resnet18(pretrained=True)
-    if model.fc.out_features != out_count:
-        num_ftrs = model.fc.in_features
-        model.fc = nn.Linear(num_ftrs, 10)
-
-    model.cuda()
-
-    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
-    return history
-
-
-def exec_resnet34(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
-    print("*** ", exec_name)
-
-    model = models.resnet34(pretrained=True)
-    num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 10)
-
-    model.cuda()
-
-    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
-    return history
-
-
-def exec_resnet50(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
-    print("*** ", exec_name)
-
-    model = models.resnet50(pretrained=True)
-    num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 10)
-
-    model.cuda()
-
-    history = common_training_code(model, pruned_save_path="saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
     return history
 
 
