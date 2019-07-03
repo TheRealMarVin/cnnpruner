@@ -135,6 +135,24 @@ class CompleteTaylorExpensionFilterPruner(CompleteFilterPruner):
                 else:
                     self.reverse_conv_graph[x].append(key)
 
+        # TODO see if we have some impact of before split
+        # for k, v in self.conv_graph.items():
+        #     if len(v.split(",")) > 1 and k not in self.ignore_list:
+        #         self.ignore_list.append(k)
+        # TODO see if we have some impact of before merge
+        # temp = {}
+        # for key, val in self.reverse_conv_graph.items():
+        #     for x in val:
+        #         if x not in temp:
+        #             temp[x] = [key]
+        #         else:
+        #             temp[x].append(key)
+        #
+        # for key, val in temp.items():
+        #     if len(val) > 1:
+        #         self.ignore_list.append(key)
+        #end temp section
+
         self.sets = []
         elem_to_del = None
         for key, val in self.reverse_conv_graph.items():

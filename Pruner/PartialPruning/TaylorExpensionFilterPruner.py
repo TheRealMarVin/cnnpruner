@@ -8,8 +8,8 @@ from Pruner.PartialPruning.PartialFilterPruner import PartialFilterPruner
 
 class TaylorExpensionFilterPruner(PartialFilterPruner):
 
-    def __init__(self, model, sample_run, force_forward_view=False):
-        super(TaylorExpensionFilterPruner, self).__init__(model, sample_run, force_forward_view)
+    def __init__(self, model, sample_run, force_forward_view=False, ignore_last_conv=False):
+        super(TaylorExpensionFilterPruner, self).__init__(model, sample_run, force_forward_view, ignore_last_conv)
         self.handles = {}
 
     def sort_filters(self, num):

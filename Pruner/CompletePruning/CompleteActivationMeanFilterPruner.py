@@ -16,8 +16,8 @@ block. In this case both branch must be considered for pruning.
 """
 class ActivationMeanFilterPrunerV3(CompleteFilterPruner):
 
-    def __init__(self, model, sample_run, force_forward_view=False):
-        super(ActivationMeanFilterPrunerV3, self).__init__(model, sample_run, force_forward_view)
+    def __init__(self, model, sample_run, force_forward_view=False, ignore_last_conv=False):
+        super(ActivationMeanFilterPrunerV3, self).__init__(model, sample_run, force_forward_view, ignore_last_conv)
         self.merged_results = {}
         # self.reasign_nodes = {}
         self.sets = []

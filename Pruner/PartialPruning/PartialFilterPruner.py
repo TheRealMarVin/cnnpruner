@@ -5,8 +5,9 @@ from Pruner.FilterPruner import FilterPruner
 
 
 class PartialFilterPruner(FilterPruner):
-    def __init__(self, model, sample_run, force_forward_view=False):
-        super(PartialFilterPruner, self).__init__(model, sample_run, force_forward_view)
+    def __init__(self, model, sample_run, force_forward_view=False,
+                 ignore_last_conv=False):
+        super(PartialFilterPruner, self).__init__(model, sample_run, force_forward_view, ignore_last_conv)
 
     def should_ignore_layer(self, layer_id):
         next_id = self.graph_res.execution_graph[layer_id]

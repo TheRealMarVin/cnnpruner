@@ -6,8 +6,8 @@ from Pruner.PartialPruning.PartialFilterPruner import PartialFilterPruner
 
 class RandomFilterPruner(PartialFilterPruner):
 
-    def __init__(self, model, sample_run, force_forward_view=False):
-        super(RandomFilterPruner, self).__init__(model, sample_run, force_forward_view)
+    def __init__(self, model, sample_run, force_forward_view=False, ignore_last_conv=False):
+        super(RandomFilterPruner, self).__init__(model, sample_run, force_forward_view, ignore_last_conv)
 
     def sort_filters(self, num):
         data = []
