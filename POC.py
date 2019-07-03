@@ -29,7 +29,9 @@ class ExecParams:
                  learning_rate=0.01,
                  pruner=TaylorExpensionFilterPruner,
                  force_forward_view=False,
-                 ignore_last_conv=False):
+                 ignore_last_conv=False,
+                 best_result_save_path=None,
+                 retrain_if_weight_loaded=False,):
         self.n_pretrain_epoch = n_pretrain_epoch
         self.n_epoch_retrain = n_epoch_retrain
         self.n_epoch_total = n_epoch_total
@@ -38,6 +40,8 @@ class ExecParams:
         self.pruner = pruner
         self.force_forward_view = force_forward_view
         self.ignore_last_conv = ignore_last_conv
+        self.best_result_save_path = best_result_save_path
+        self.retrain_if_weight_loaded = retrain_if_weight_loaded
 
 
 class PruningParams:
@@ -64,9 +68,7 @@ class DebugHelper:
 #TODO some needs to be cleaned or are no longer used
 def common_training_code(model,
                          pruned_save_path=None,
-                         best_result_save_path=None,
                          pruned_best_result_save_path=None,
-                         retrain_if_weight_loaded=False,
                          sample_run=None,
                          # reuse_cut_filter=False,
                          pruning_params=None,
@@ -89,10 +91,10 @@ def common_training_code(model,
 
     #
     should_train = True
-    if best_result_save_path is not None:
-        if os.path.isfile(best_result_save_path):
-            model.load_state_dict(torch.load(best_result_save_path))
-            if not retrain_if_weight_loaded:
+    if exec_params.best_result_save_path is not None:
+        if os.path.isfile(exec_params.best_result_save_path):
+            model.load_state_dict(torch.load(exec_params.best_result_save_path))
+            if not exec_params.retrain_if_weight_loaded:
                 should_train = False
                 test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
                 print('Test:\n\tScore: {}'.format(test_score))
@@ -100,7 +102,7 @@ def common_training_code(model,
     if should_train and exec_params.n_pretrain_epoch > 0:
         local_history = train(model, optimizer, dataset_params.train_dataset, exec_params.n_pretrain_epoch,
                               exec_params.batch_size, use_gpu=use_gpu, criterion=criterion,
-                              scheduler=scheduler, best_result_save_path=best_result_save_path)
+                              scheduler=scheduler, best_result_save_path=exec_params.best_result_save_path)
         history.append(local_history)
         n_epoch_total = n_epoch_total - exec_params.n_pretrain_epoch
 
