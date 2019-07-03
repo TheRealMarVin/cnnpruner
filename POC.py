@@ -87,16 +87,16 @@ def common_training_code(model,
     # scheduler = StepLR(optimizer, step_size=15, gamma=0.5)
 
     #
-    should_train = True
-    if exec_params.best_result_save_path is not None:
-        if os.path.isfile(exec_params.best_result_save_path):
-            model.load_state_dict(torch.load(exec_params.best_result_save_path))
-            if not exec_params.retrain_if_weight_loaded:
-                should_train = False
-                test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
-                print('Test:\n\tScore: {}'.format(test_score))
+    # should_train = True
+    # if exec_params.best_result_save_path is not None:
+    #     if os.path.isfile(exec_params.best_result_save_path):
+    #         model.load_state_dict(torch.load(exec_params.best_result_save_path))
+    #         if not exec_params.retrain_if_weight_loaded:
+    #             should_train = False
+    #             test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
+    #             print('Test:\n\tScore: {}'.format(test_score))
 
-    if should_train and exec_params.n_pretrain_epoch > 0:
+    if exec_params.n_pretrain_epoch > 0:
         local_history = train(model, optimizer, dataset_params.train_dataset, exec_params.n_pretrain_epoch,
                               exec_params.batch_size, use_gpu=use_gpu, criterion=criterion,
                               scheduler=scheduler, best_result_save_path=exec_params.best_result_save_path)
