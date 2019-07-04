@@ -147,7 +147,7 @@ def run_compare_pruning(dataset_params):
     display_graphs(score, all_scores)
 
     exec_name = "ResNet50-degrad"
-    multi_history_local = MultiHistory()
+    score = []
     exec_param.best_result_save_path = "../saved/ResNet50-base/Pruned.pth".format(exec_name)
     exec_param.retrain_if_weight_loaded = True
     for i in range(0, 11):
