@@ -208,5 +208,5 @@ def common_training_code(model,
     test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
     print('Final Test:\n\tScore: {}'.format(test_score))
 
-    return history
+    return history, test_score
 

@@ -17,12 +17,13 @@ def exec_alexnet(exec_name, pruning_params=None, exec_params=None, dataset_param
 
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
+    history, test_score = common_training_code(model,
+                                               pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
+                                               pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
+                                               sample_run=torch.zeros([1, 3, 224, 224]),
+                                               pruning_params=pruning_params,
+                                               exec_params=exec_params,
+                                               dataset_params=dataset_params)
 
     return history
 
@@ -40,12 +41,13 @@ def exec_resnet18(exec_name, pruning_params=None, exec_params=None, dataset_para
 
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
+    history, test_score = common_training_code(model,
+                                               pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
+                                               pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
+                                               sample_run=torch.zeros([1, 3, 224, 224]),
+                                               pruning_params=pruning_params,
+                                               exec_params=exec_params,
+                                               dataset_params=dataset_params)
     return history
 
 
@@ -61,12 +63,13 @@ def exec_resnet34(exec_name, pruning_params=None, exec_params=None, dataset_para
 
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
+    history, test_score = common_training_code(model,
+                                               pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
+                                               pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
+                                               sample_run=torch.zeros([1, 3, 224, 224]),
+                                               pruning_params=pruning_params,
+                                               exec_params=exec_params,
+                                               dataset_params=dataset_params)
     return history
 
 
@@ -82,12 +85,13 @@ def exec_resnet50(exec_name, pruning_params=None, exec_params=None, dataset_para
 
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
+    history, test_score = common_training_code(model,
+                                               pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
+                                               pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
+                                               sample_run=torch.zeros([1, 3, 224, 224]),
+                                               pruning_params=pruning_params,
+                                               exec_params=exec_params,
+                                               dataset_params=dataset_params)
     return history
 
 
@@ -105,12 +109,13 @@ def exec_squeeze_net(exec_name, pruning_params=None, exec_params=None, dataset_p
         exec_params.force_forward_view = True
         exec_params.ignore_last_conv = True
 
-    history = common_training_code(model, pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
+    history, test_score = common_training_code(model,
+                                               pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
+                                               pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
+                                               sample_run=torch.zeros([1, 3, 224, 224]),
+                                               pruning_params=pruning_params,
+                                               exec_params=exec_params,
+                                               dataset_params=dataset_params)
     return history
 
 
@@ -124,12 +129,13 @@ def exec_dense_net(exec_name, pruning_params=None, exec_params=None, dataset_par
 
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
+    history, test_score = common_training_code(model,
+                                               pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
+                                               pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
+                                               sample_run=torch.zeros([1, 3, 224, 224]),
+                                               pruning_params=pruning_params,
+                                               exec_params=exec_params,
+                                               dataset_params=dataset_params)
     return history
 
 
@@ -143,11 +149,12 @@ def exec_vgg16(exec_name, pruning_params=None, exec_params=None, dataset_params=
 
     model.cuda()
 
-    history = common_training_code(model, pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
-                                   pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
-                                   sample_run=torch.zeros([1, 3, 224, 224]),
-                                   pruning_params=pruning_params,
-                                   exec_params=exec_params,
-                                   dataset_params=dataset_params)
+    history, test_score = common_training_code(model,
+                                               pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
+                                               pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
+                                               sample_run=torch.zeros([1, 3, 224, 224]),
+                                               pruning_params=pruning_params,
+                                               exec_params=exec_params,
+                                               dataset_params=dataset_params)
     return history
 
