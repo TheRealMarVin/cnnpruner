@@ -1,8 +1,5 @@
-import torch
 import torchvision
 
-from torch import nn
-from torchvision import models
 from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
@@ -11,37 +8,29 @@ from Pruner.PartialPruning.ActivationMeanFilterPruner import ActivationMeanFilte
 from Pruner.CompletePruning.Alt.CompleteActivationMeanFilterPrunerV2 import ActivationMeanFilterPrunerV2
 from Pruner.CompletePruning.CompleteActivationMeanFilterPruner import ActivationMeanFilterPrunerV3
 from Pruner.CompletePruning.Alt.CompleteActivationMeanFilterPrunerV4 import ActivationMeanFilterPrunerV4
-from Pruner.PartialPruning.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
-from Pruner.CompletePruning.Alt.CompleteTaylorExpensionFilterPrunerV2 import TaylorExpensionFilterPrunerv2
-from Pruner.CompletePruning.CompleteTaylorExpensionFilterPruner import CompleteTaylorExpensionFilterPruner
-from Pruner.CompletePruning.Alt.CompleteTaylorExpensionFilterPrunerV4 import TaylorExpensionFilterPrunerv4
+from Pruner.PartialPruning.TaylorExpansionFilterPruner import TaylorExpansionFilterPruner
+from Pruner.CompletePruning.Alt.CompleteTaylorExpensionFilterPrunerV2 import TaylorExpansionFilterPrunerV2
+from Pruner.CompletePruning.CompleteTaylorExpansionFilterPruner import CompleteTaylorExpansionFilterPruner
 from FileHelper import save_obj
-# from ModelHelper import total_num_filters
+
 from benchmark.BenchmarkHelper import exec_squeeze_net, exec_resnet18, exec_alexnet
 from deeplib_ext.MultiHistory import MultiHistory
 from deeplib_ext.history import History
-from models.AlexNetSki import alexnetski
 
 
 # TODO check this one!!! https://towardsdatascience.com/how-to-visualize-convolutional-features-in-40-lines-of-code-70b7d87b0030
 # and this: https://github.com/fg91/visualizing-cnn-feature-maps/blob/master/Calculate_mean_activation_per_filter_in_specific_layer_given_an_image.ipynb
-
-
-
-
-
-
 def run_strategy_prune_compare_taylor(dataset_params):
     exec_param_no_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15, batch_size=64,
                                      pruner=ActivationMeanFilterPrunerV2)
     exec_param_w_prune_2 = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
-                                      pruner=TaylorExpensionFilterPrunerv2)
+                                      pruner=TaylorExpansionFilterPrunerV2)
     exec_param_w_prune_3 = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
-                                      pruner=CompleteTaylorExpensionFilterPruner)
+                                      pruner=CompleteTaylorExpansionFilterPruner)
     exec_param_w_prune_4 = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
-                                      pruner=CompleteTaylorExpensionFilterPruner)
+                                      pruner=CompleteTaylorExpansionFilterPruner)
     exec_param_w_prune_t = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
-                                      pruner=TaylorExpensionFilterPruner)
+                                      pruner=TaylorExpansionFilterPruner)
     exec_param_w_prune_o = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
                                       pruner=ActivationMeanFilterPruner)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=None)
@@ -123,7 +112,7 @@ def run_strategy_prune_compare_activation_mean(dataset_params):
     exec_param_w_prune_4 = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
                                       pruner=ActivationMeanFilterPrunerV4)
     exec_param_w_prune_t = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
-                                      pruner=CompleteTaylorExpensionFilterPruner)
+                                      pruner=CompleteTaylorExpansionFilterPruner)
     exec_param_w_prune_o = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
                                       pruner=ActivationMeanFilterPruner)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=None)
@@ -201,7 +190,7 @@ def run_test_using_image_net():
     exec_param_w_prune = ExecParams(n_pretrain_epoch=10,
                                     n_epoch_retrain=3,
                                     n_epoch_total=20,
-                                    pruner=CompleteTaylorExpensionFilterPruner)
+                                    pruner=CompleteTaylorExpansionFilterPruner)
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.2,
                                           prune_ratio=0.2)
 

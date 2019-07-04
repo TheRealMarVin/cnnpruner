@@ -7,7 +7,7 @@ from torchvision.transforms import transforms
 
 from POC import ExecParams, PruningParams, DatasetParams
 from Pruner.PartialPruning.ActivationMeanFilterPruner import ActivationMeanFilterPruner
-from Pruner.PartialPruning.TaylorExpensionFilterPruner import TaylorExpensionFilterPruner
+from Pruner.PartialPruning.TaylorExpansionFilterPruner import TaylorExpansionFilterPruner
 from benchmark.BenchmarkHelper import exec_squeeze_net, exec_dense_net, exec_resnet50, exec_vgg16, exec_resnet18, \
     exec_alexnet
 from deeplib_ext.CustomDeepLib import train, test, display_sample_data
@@ -19,19 +19,19 @@ from thop_ext.profile import profile
 
 def run_strategy_prune_compare(dataset_params):
     exec_param_no_prune_large = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15, batch_size=16,
-                                           pruner=TaylorExpensionFilterPruner)
+                                           pruner=TaylorExpansionFilterPruner)
     exec_param_no_prune_medium = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15, batch_size=32,
-                                            pruner=TaylorExpensionFilterPruner)
+                                            pruner=TaylorExpansionFilterPruner)
     exec_param_w_prune_large = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=16,
-                                          pruner=TaylorExpensionFilterPruner)
+                                          pruner=TaylorExpansionFilterPruner)
     exec_param_w_prune_medium = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=32,
-                                           pruner=TaylorExpensionFilterPruner)
+                                           pruner=TaylorExpansionFilterPruner)
     exec_param_no_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15, batch_size=64,
-                                     pruner=TaylorExpensionFilterPruner)
+                                     pruner=TaylorExpansionFilterPruner)
     exec_param_w_prune = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
-                                    pruner=TaylorExpensionFilterPruner)
+                                    pruner=TaylorExpansionFilterPruner)
     exec_param_w_prune_squeeze = ExecParams(n_pretrain_epoch=5, n_epoch_retrain=1, n_epoch_total=15, batch_size=64,
-                                            pruner=TaylorExpensionFilterPruner, force_forward_view=True)
+                                            pruner=TaylorExpansionFilterPruner, force_forward_view=True)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=None)
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.05, prune_ratio=0.3)
 
@@ -108,9 +108,9 @@ def run_strategy_prune_compare(dataset_params):
 
 def run_alex_prune_compare_rough(dataset_params):
     multi_history = MultiHistory()
-    exec_param = ExecParams(n_pretrain_epoch=3, n_epoch_retrain=3, n_epoch_total=15, pruner=TaylorExpensionFilterPruner)
+    exec_param = ExecParams(n_pretrain_epoch=3, n_epoch_retrain=3, n_epoch_total=15, pruner=TaylorExpansionFilterPruner)
     exec_param_no_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15,
-                                     pruner=TaylorExpensionFilterPruner)
+                                     pruner=TaylorExpansionFilterPruner)
 
     exec_name = "Alexnet 0%"
     h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.0, prune_ratio=None),
@@ -142,9 +142,9 @@ def run_alex_prune_compare_rough(dataset_params):
 
 def run_alex_prune_compare_midway(dataset_params):
     multi_history = MultiHistory()
-    exec_param = ExecParams(n_pretrain_epoch=3, n_epoch_retrain=2, n_epoch_total=15, pruner=TaylorExpensionFilterPruner)
+    exec_param = ExecParams(n_pretrain_epoch=3, n_epoch_retrain=2, n_epoch_total=15, pruner=TaylorExpansionFilterPruner)
     exec_param_no_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15,
-                                     pruner=TaylorExpensionFilterPruner)
+                                     pruner=TaylorExpansionFilterPruner)
 
     exec_name = "Alexnet 0%"
     h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.0, prune_ratio=None),
@@ -176,9 +176,9 @@ def run_alex_prune_compare_midway(dataset_params):
 
 def run_alex_prune_compare_soft(dataset_params):
     multi_history = MultiHistory()
-    exec_param = ExecParams(n_pretrain_epoch=3, n_epoch_retrain=1, n_epoch_total=15, pruner=TaylorExpensionFilterPruner)
+    exec_param = ExecParams(n_pretrain_epoch=3, n_epoch_retrain=1, n_epoch_total=15, pruner=TaylorExpansionFilterPruner)
     exec_param_no_prune = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=0, n_epoch_total=15,
-                                     pruner=TaylorExpensionFilterPruner)
+                                     pruner=TaylorExpansionFilterPruner)
 
     exec_name = "Alexnet 0%"
     h = exec_alexnet(exec_name, PruningParams(max_percent_per_iteration=0.0, prune_ratio=None),
@@ -238,7 +238,7 @@ def run_test_using_image_net():
     exec_param_w_prune = ExecParams(n_pretrain_epoch=10,
                                     n_epoch_retrain=3,
                                     n_epoch_total=20,
-                                    pruner=TaylorExpensionFilterPruner)
+                                    pruner=TaylorExpansionFilterPruner)
     pruning_param_w_prune = PruningParams(max_percent_per_iteration=0.2,
                                           prune_ratio=0.2)
 
