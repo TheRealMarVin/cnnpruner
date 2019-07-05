@@ -25,7 +25,7 @@ def exec_alexnet(exec_name, pruning_params=None, exec_params=None, dataset_param
                                                exec_params=exec_params,
                                                dataset_params=dataset_params)
 
-    return history
+    return history, test_score
 
 
 def exec_resnet18(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
@@ -48,7 +48,7 @@ def exec_resnet18(exec_name, pruning_params=None, exec_params=None, dataset_para
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
                                                dataset_params=dataset_params)
-    return history
+    return history, test_score
 
 
 def exec_resnet34(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
@@ -70,7 +70,7 @@ def exec_resnet34(exec_name, pruning_params=None, exec_params=None, dataset_para
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
                                                dataset_params=dataset_params)
-    return history
+    return history, test_score
 
 
 def exec_resnet50(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
@@ -92,7 +92,7 @@ def exec_resnet50(exec_name, pruning_params=None, exec_params=None, dataset_para
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
                                                dataset_params=dataset_params)
-    return history
+    return history, test_score
 
 
 def exec_squeeze_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
@@ -116,7 +116,7 @@ def exec_squeeze_net(exec_name, pruning_params=None, exec_params=None, dataset_p
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
                                                dataset_params=dataset_params)
-    return history
+    return history, test_score
 
 
 def exec_dense_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
@@ -136,7 +136,7 @@ def exec_dense_net(exec_name, pruning_params=None, exec_params=None, dataset_par
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
                                                dataset_params=dataset_params)
-    return history
+    return history, test_score
 
 
 def exec_vgg16(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
@@ -156,5 +156,5 @@ def exec_vgg16(exec_name, pruning_params=None, exec_params=None, dataset_params=
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
                                                dataset_params=dataset_params)
-    return history
+    return history, test_score
 
