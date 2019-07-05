@@ -246,9 +246,8 @@ class FilterPruner:
 
     def prune(self, pruning_dic):
         for layer_id, filters_to_remove in pruning_dic.items():
-            # print("pruning layer_id:", layer_id)
             layer = get_node_in_model(self.model, self.graph_res.name_dict[layer_id])
-            # print("trying to prune for layer: {} \tID: {}".format(self.graph_res.name_dict[layer_id], layer_id))
+
             if layer is not None:
                 initial_filter_count = 0
                 if isinstance(layer, torch.nn.modules.conv.Conv2d):
@@ -293,23 +292,18 @@ class FilterPruner:
                 if layer_id not in self.special_ops_prune_apply_count.keys():
                     self.special_ops_prune_apply_count[layer_id] = 0
                     if layer_id not in self.special_ops_prune_concat_offset.keys():
-                        # print("concat for layer_id:", layer_id)
                         self.special_ops_prune_concat_offset[layer_id] = initial_filter_count - len(removed_filter)
                 else:
-
                     size = self.special_ops_prune_apply_count[layer_id]
                     self.special_ops_prune_apply_count[layer_id] = size + 1
                     if self.graph_res.special_op[layer_id] == "Add":
                         has_more = False
                     elif self.graph_res.special_op[layer_id] == "Concat":
-                        # print("concat for layer_id:", layer_id)
                         concat_offset = self.special_ops_prune_concat_offset[layer_id]
                         new_offset = initial_filter_count - len(removed_filter) + concat_offset
                         self.special_ops_prune_concat_offset[layer_id] = new_offset
                         for i, elem_to_remove in enumerate(removed_filter):
                             removed_filter[i] = elem_to_remove + concat_offset
-
-
 
         if has_more:
             next_id = self.graph_res.execution_graph[layer_id]
