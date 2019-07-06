@@ -41,12 +41,12 @@ def run_strategy_prune_compare_taylor(dataset_params):
 
     exec_name = "Squeeze - 30 full"
     h, s = exec_squeeze_net(exec_name, pruning_params=pruning_param_w_prune2, exec_params=exec_param_w_prune_4,
-                         dataset_params=dataset_params)
+                            dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
     multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
     exec_name = "Squeeze - 30 Simple"
     h, s = exec_squeeze_net(exec_name, pruning_params=pruning_param_w_prune, exec_params=exec_param_w_prune_o,
-                         dataset_params=dataset_params)
+                            dataset_params=dataset_params)
     multi_history.append_history(exec_name, h)
     multi_history.display_single_key(History.VAL_ACC_KEY, title="Comparing Models at 30% Pruning")
 
