@@ -140,7 +140,7 @@ class TaylorExpansionFilterPrunerV4(CompleteFilterPruner):
             new_next = []
             if next != "":
                 for elem in next.split(","):
-                    res, is_last_conv = self._get_next_conv_id(conv_layers, elem)
+                    res = self._get_next_conv_id(conv_layers, elem)
                     new_next.extend(res)
 
             self.conv_graph[key] = ",".join(new_next)

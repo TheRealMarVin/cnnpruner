@@ -5,6 +5,7 @@ from torchvision.transforms import transforms
 import matplotlib.pyplot as plt
 
 from POC import DatasetParams, PruningParams, ExecParams
+from Pruner.CompletePruning.Alt.CompleteTaylorExpensionFilterPrunerV4 import TaylorExpansionFilterPrunerV4
 from Pruner.CompletePruning.CompleteTaylorExpansionFilterPruner import CompleteTaylorExpansionFilterPruner
 from benchmark.BenchmarkHelper import exec_squeeze_net, exec_alexnet, exec_resnet18, exec_resnet34, exec_resnet50, \
     exec_dense_net, exec_vgg16
@@ -64,8 +65,8 @@ def train_models(dataset_params):
 
 def run_compare_pruning(dataset_params):
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=0.0)
-    exec_param = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=2, n_epoch_total=2, batch_size=32,
-                            pruner=CompleteTaylorExpansionFilterPruner)
+    exec_param = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=3, n_epoch_total=3, batch_size=32,
+                            pruner=TaylorExpansionFilterPrunerV4)
 
     all_scores = {}
     exec_name = "AlexNet-degrad"
