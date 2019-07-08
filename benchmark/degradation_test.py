@@ -65,8 +65,8 @@ def train_models(dataset_params):
 
 def run_compare_pruning(dataset_params):
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=0.0)
-    exec_param = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=3, n_epoch_total=3, batch_size=32,
-                            pruner=TaylorExpansionFilterPrunerV4)
+    exec_param = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=5, n_epoch_total=5, batch_size=32,
+                            pruner=CompleteTaylorExpansionFilterPruner)
 
     all_scores = {}
     exec_name = "AlexNet-degrad"
@@ -196,8 +196,8 @@ def run_compare_pruning(dataset_params):
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
-        h, s = exec_vgg16(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                          dataset_params=dataset_params)
+        h, s = exec_squeeze_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
+                                dataset_params=dataset_params)
         score.append(s)
 
     all_scores["Squeeze"] = score
@@ -215,7 +215,7 @@ def display_graphs(current_score, all_scores, name):
     plt.xlabel("Pruning Percent")
     plt.ylabel("Test Score")
     for k, v in all_scores.items():
-        pruning = [x * 0.05 for x in range(0, len(v))]
+        pruning = [x * 5 for x in range(0, len(v))]
         plt.plot(pruning, v, label=k)
     plt.legend()
     plt.show()
