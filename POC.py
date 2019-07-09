@@ -60,8 +60,8 @@ class DatasetParams:
 
 
 class DebugHelper:
-    def __init__(self, transform, train_dataset, test_dataset):
-        pass
+    def __init__(self, only_test_end):
+        self.only_test_end = only_test_end
 
 #TODO some needs to be cleaned or are no longer used
 def common_training_code(model,
@@ -70,7 +70,8 @@ def common_training_code(model,
                          sample_run=None,
                          pruning_params=None,
                          exec_params=None,
-                         dataset_params=None):
+                         dataset_params=None,
+                         debug_params=None):
     model.cuda()
 
     flops, params = profile(model, input_size=(1, 3, 224, 224))
@@ -180,8 +181,9 @@ def common_training_code(model,
             n_epoch_total = n_epoch_total - exec_params.n_epoch_retrain
             history.append(local_history)
             # local_history.display()
-            test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
-            print('Test pruning iteration :{}\n\tScore: {}'.format(iteration_idx, test_score))
+            if debug_params is not None and debug_params.only_test_end == False:
+                test_score = test(model, dataset_params.test_dataset, exec_params.batch_size, use_gpu=use_gpu)
+                print('Test pruning iteration :{}\n\tScore: {}'.format(iteration_idx, test_score))
 
             if iteration_idx < iterations - 1:
                 pruner.reset()
@@ -200,7 +202,8 @@ def common_training_code(model,
         os.makedirs(basedir)
     torch.save(model, pruned_save_path)
 
-    history.display()
+    # history.display()
+
     end_flops, end_params = profile(model, input_size=(1, 3, 224, 224))
     print("end number of flops: {} \tnumber of params: {}".format(end_flops, end_params))
     print("diff number of flops: {} \tdiff number of params: {}".format((flops - end_flops)/flops, (params - end_params)/params))

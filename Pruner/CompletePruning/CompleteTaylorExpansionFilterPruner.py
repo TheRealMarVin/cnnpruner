@@ -95,6 +95,7 @@ class CompleteTaylorExpansionFilterPruner(CompleteFilterPruner):
 
         return False
 
+    # TODO test for is last conv is now useless we can just pick the last element in the list
     def compute_conv_graph(self):
         conv_layers = []
         to_delete = []
@@ -121,7 +122,7 @@ class CompleteTaylorExpansionFilterPruner(CompleteFilterPruner):
                         self.ignore_list.append(key)
                     new_next.extend(res)
 
-            if len(new_next) > 1:
+            if len(new_next) >= 1:
                 self.conv_graph[key] = ",".join(new_next)
 
         for key in to_delete:
@@ -175,7 +176,7 @@ class CompleteTaylorExpansionFilterPruner(CompleteFilterPruner):
                     elem_to_del = len(self.sets) - 1
 
         if elem_to_del is not None:
-            self.ignore_list = list(self.sets[elem_to_del])
+            self.ignore_list.extend(list(self.sets[elem_to_del]))
             del self.sets[elem_to_del]
 
     def _get_next_conv_id(self, conv_layers, node):

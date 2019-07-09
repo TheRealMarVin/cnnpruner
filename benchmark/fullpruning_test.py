@@ -3,7 +3,7 @@ import torchvision
 from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
-from POC import common_training_code, ExecParams, PruningParams, DatasetParams
+from POC import ExecParams, PruningParams, DatasetParams
 from Pruner.PartialPruning.ActivationMeanFilterPruner import ActivationMeanFilterPruner
 from Pruner.CompletePruning.Alt.CompleteActivationMeanFilterPrunerV2 import ActivationMeanFilterPrunerV2
 from Pruner.CompletePruning.CompleteActivationMeanFilterPruner import ActivationMeanFilterPrunerV3

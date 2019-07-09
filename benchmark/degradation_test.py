@@ -4,7 +4,7 @@ from torchvision.transforms import transforms
 
 import matplotlib.pyplot as plt
 
-from POC import DatasetParams, PruningParams, ExecParams
+from POC import DatasetParams, PruningParams, ExecParams, DebugHelper
 from Pruner.CompletePruning.Alt.CompleteTaylorExpensionFilterPrunerV4 import TaylorExpansionFilterPrunerV4
 from Pruner.CompletePruning.CompleteTaylorExpansionFilterPruner import CompleteTaylorExpansionFilterPruner
 from benchmark.BenchmarkHelper import exec_squeeze_net, exec_alexnet, exec_resnet18, exec_resnet34, exec_resnet50, \
@@ -63,9 +63,10 @@ def train_models(dataset_params):
     multi_history.display_single_key(History.VAL_ACC_KEY, title="Models training without pruning")
 
 
-def run_compare_pruning(dataset_params):
+def run_compare_pruning(dataset_params, retrain, total, split_ratio=1.0):
+    debug_params = DebugHelper(only_test_end=True)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=0.0)
-    exec_param = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=5, n_epoch_total=5, batch_size=32,
+    exec_param = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=retrain, n_epoch_total=total, batch_size=32,
                             pruner=CompleteTaylorExpansionFilterPruner)
 
     all_scores = {}
@@ -76,13 +77,13 @@ def run_compare_pruning(dataset_params):
     for i in range(0, 11):
         desired_pruning = (5.0 * i)/100.0
         if desired_pruning != 0.0:
-            pruning_param_no_prune.max_percent_per_iteration = desired_pruning
+            pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
             pruning_param_no_prune.prune_ratio = desired_pruning
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
         h, s = exec_alexnet(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                             dataset_params=dataset_params)
+                             dataset_params=dataset_params, debug_params=debug_params)
         score.append(s)
 
     all_scores["AlexNet"] = score
@@ -96,13 +97,13 @@ def run_compare_pruning(dataset_params):
     for i in range(0, 11):
         desired_pruning = (5.0 * i)/100.0
         if desired_pruning != 0.0:
-            pruning_param_no_prune.max_percent_per_iteration = desired_pruning
+            pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
             pruning_param_no_prune.prune_ratio = desired_pruning
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
         h, s = exec_resnet18(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                             dataset_params=dataset_params)
+                             dataset_params=dataset_params, debug_params=debug_params)
         score.append(s)
 
     all_scores["ResNet18"] = score
@@ -115,13 +116,13 @@ def run_compare_pruning(dataset_params):
     for i in range(0, 11):
         desired_pruning = (5.0 * i)/100.0
         if desired_pruning != 0.0:
-            pruning_param_no_prune.max_percent_per_iteration = desired_pruning
+            pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
             pruning_param_no_prune.prune_ratio = desired_pruning
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
         h, s = exec_resnet34(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                             dataset_params=dataset_params)
+                             dataset_params=dataset_params, debug_params=debug_params)
         score.append(s)
 
     all_scores["ResNet34"] = score
@@ -134,13 +135,13 @@ def run_compare_pruning(dataset_params):
     for i in range(0, 11):
         desired_pruning = (5.0 * i)/100.0
         if desired_pruning != 0.0:
-            pruning_param_no_prune.max_percent_per_iteration = desired_pruning
+            pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
             pruning_param_no_prune.prune_ratio = desired_pruning
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
         h, s = exec_resnet50(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                             dataset_params=dataset_params)
+                             dataset_params=dataset_params, debug_params=debug_params)
         score.append(s)
 
     all_scores["ResNet50"] = score
@@ -153,13 +154,13 @@ def run_compare_pruning(dataset_params):
     for i in range(0, 11):
         desired_pruning = (5.0 * i)/100.0
         if desired_pruning != 0.0:
-            pruning_param_no_prune.max_percent_per_iteration = desired_pruning
+            pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
             pruning_param_no_prune.prune_ratio = desired_pruning
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
         h, s = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                              dataset_params=dataset_params)
+                              dataset_params=dataset_params, debug_params=debug_params)
         score.append(s)
 
     all_scores["DenseNet121"] = score
@@ -172,13 +173,13 @@ def run_compare_pruning(dataset_params):
     for i in range(0, 11):
         desired_pruning = (5.0 * i)/100.0
         if desired_pruning != 0.0:
-            pruning_param_no_prune.max_percent_per_iteration = desired_pruning
+            pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
             pruning_param_no_prune.prune_ratio = desired_pruning
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
         h, s = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                              dataset_params=dataset_params)
+                              dataset_params=dataset_params, debug_params=debug_params)
         score.append(s)
 
     all_scores["VGG16"] = score
@@ -191,13 +192,13 @@ def run_compare_pruning(dataset_params):
     for i in range(0, 11):
         desired_pruning = (5.0 * i) / 100.0
         if desired_pruning != 0.0:
-            pruning_param_no_prune.max_percent_per_iteration = desired_pruning
+            pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
             pruning_param_no_prune.prune_ratio = desired_pruning
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
         h, s = exec_squeeze_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                                dataset_params=dataset_params)
+                                dataset_params=dataset_params, debug_params=debug_params)
         score.append(s)
 
     all_scores["Squeeze"] = score
@@ -231,4 +232,6 @@ if __name__ == '__main__':
     dataset_params = DatasetParams(transform, train_dataset, test_dataset)
 
     # train_models(dataset_params)
-    run_compare_pruning(dataset_params)
+    run_compare_pruning(dataset_params=dataset_params, retrain=0, total=1, split_ratio=1.0)
+    run_compare_pruning(dataset_params=dataset_params, retrain=1, total=5, split_ratio=1.0)
+    run_compare_pruning(dataset_params=dataset_params, retrain=1, total=5, split_ratio=0.34)

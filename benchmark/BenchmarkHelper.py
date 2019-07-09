@@ -8,7 +8,7 @@ from POC import common_training_code
 from models.AlexNetSki import alexnetski
 
 
-def exec_alexnet(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
+def exec_alexnet(exec_name, pruning_params=None, exec_params=None, dataset_params=None, debug_params=None):
     print("*** ", exec_name)
     if exec_params.best_result_save_path is not None and os.path.isfile(exec_params.best_result_save_path):
         model = torch.load(exec_params.best_result_save_path)
@@ -23,12 +23,13 @@ def exec_alexnet(exec_name, pruning_params=None, exec_params=None, dataset_param
                                                sample_run=torch.zeros([1, 3, 224, 224]),
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
-                                               dataset_params=dataset_params)
+                                               dataset_params=dataset_params,
+                                               debug_params=debug_params)
 
     return history, test_score
 
 
-def exec_resnet18(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
+def exec_resnet18(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000, debug_params=None):
     print("*** ", exec_name)
 
     if exec_params.best_result_save_path is not None and os.path.isfile(exec_params.best_result_save_path):
@@ -47,11 +48,12 @@ def exec_resnet18(exec_name, pruning_params=None, exec_params=None, dataset_para
                                                sample_run=torch.zeros([1, 3, 224, 224]),
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
-                                               dataset_params=dataset_params)
+                                               dataset_params=dataset_params,
+                                               debug_params=debug_params)
     return history, test_score
 
 
-def exec_resnet34(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
+def exec_resnet34(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000, debug_params=None):
     print("*** ", exec_name)
 
     if exec_params.best_result_save_path is not None and os.path.isfile(exec_params.best_result_save_path):
@@ -69,11 +71,12 @@ def exec_resnet34(exec_name, pruning_params=None, exec_params=None, dataset_para
                                                sample_run=torch.zeros([1, 3, 224, 224]),
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
-                                               dataset_params=dataset_params)
+                                               dataset_params=dataset_params,
+                                               debug_params=debug_params)
     return history, test_score
 
 
-def exec_resnet50(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000):
+def exec_resnet50(exec_name, pruning_params=None, exec_params=None, dataset_params=None, out_count=1000, debug_params=None):
     print("*** ", exec_name)
 
     if exec_params.best_result_save_path is not None and os.path.isfile(exec_params.best_result_save_path):
@@ -91,11 +94,12 @@ def exec_resnet50(exec_name, pruning_params=None, exec_params=None, dataset_para
                                                sample_run=torch.zeros([1, 3, 224, 224]),
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
-                                               dataset_params=dataset_params)
+                                               dataset_params=dataset_params,
+                                               debug_params=debug_params)
     return history, test_score
 
 
-def exec_squeeze_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
+def exec_squeeze_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None, debug_params=None):
     print("*** ", exec_name)
 
     if exec_params.best_result_save_path is not None and os.path.isfile(exec_params.best_result_save_path):
@@ -115,11 +119,12 @@ def exec_squeeze_net(exec_name, pruning_params=None, exec_params=None, dataset_p
                                                sample_run=torch.zeros([1, 3, 224, 224]),
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
-                                               dataset_params=dataset_params)
+                                               dataset_params=dataset_params,
+                                               debug_params=debug_params)
     return history, test_score
 
 
-def exec_dense_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
+def exec_dense_net(exec_name, pruning_params=None, exec_params=None, dataset_params=None, debug_params=None):
     print("*** ", exec_name)
 
     if exec_params.best_result_save_path is not None and os.path.isfile(exec_params.best_result_save_path):
@@ -135,11 +140,12 @@ def exec_dense_net(exec_name, pruning_params=None, exec_params=None, dataset_par
                                                sample_run=torch.zeros([1, 3, 224, 224]),
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
-                                               dataset_params=dataset_params)
+                                               dataset_params=dataset_params,
+                                               debug_params=debug_params)
     return history, test_score
 
 
-def exec_vgg16(exec_name, pruning_params=None, exec_params=None, dataset_params=None):
+def exec_vgg16(exec_name, pruning_params=None, exec_params=None, dataset_params=None, debug_params=None):
     print("*** ", exec_name)
 
     if exec_params.best_result_save_path is not None and os.path.isfile(exec_params.best_result_save_path):
@@ -155,6 +161,7 @@ def exec_vgg16(exec_name, pruning_params=None, exec_params=None, dataset_params=
                                                sample_run=torch.zeros([1, 3, 224, 224]),
                                                pruning_params=pruning_params,
                                                exec_params=exec_params,
-                                               dataset_params=dataset_params)
+                                               dataset_params=dataset_params,
+                                               debug_params=debug_params)
     return history, test_score
 
