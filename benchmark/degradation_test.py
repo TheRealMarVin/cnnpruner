@@ -109,43 +109,62 @@ def run_compare_pruning(dataset_params, retrain, total, split_ratio=1.0):
     all_scores["ResNet18"] = score
     display_graphs(score, all_scores, "ResNet18")
 
-    exec_name = "ResNet34-degrad"
+    # exec_name = "ResNet34-degrad"
+    # score = []
+    # exec_param.best_result_save_path = "../saved/ResNet34-base/Pruned.pth".format(exec_name)
+    # exec_param.retrain_if_weight_loaded = True
+    # for i in range(0, 11):
+    #     desired_pruning = (5.0 * i)/100.0
+    #     if desired_pruning != 0.0:
+    #         pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
+    #         pruning_param_no_prune.prune_ratio = desired_pruning
+    #     else:
+    #         pruning_param_no_prune.max_percent_per_iteration = None
+    #         pruning_param_no_prune.prune_ratio = None
+    #     h, s = exec_resnet34(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
+    #                          dataset_params=dataset_params, debug_params=debug_params)
+    #     score.append(s)
+    #
+    # all_scores["ResNet34"] = score
+    # display_graphs(score, all_scores, "ResNet34")
+    #
+    # exec_name = "ResNet50-degrad"
+    # score = []
+    # exec_param.best_result_save_path = "../saved/ResNet50-base/Pruned.pth".format(exec_name)
+    # exec_param.retrain_if_weight_loaded = True
+    # for i in range(0, 11):
+    #     desired_pruning = (5.0 * i)/100.0
+    #     if desired_pruning != 0.0:
+    #         pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
+    #         pruning_param_no_prune.prune_ratio = desired_pruning
+    #     else:
+    #         pruning_param_no_prune.max_percent_per_iteration = None
+    #         pruning_param_no_prune.prune_ratio = None
+    #     h, s = exec_resnet50(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
+    #                          dataset_params=dataset_params, debug_params=debug_params)
+    #     score.append(s)
+    #
+    # all_scores["ResNet50"] = score
+    # display_graphs(score, all_scores, "ResNet50")
+
+    exec_name = "VGG16-degrad"
     score = []
-    exec_param.best_result_save_path = "../saved/ResNet34-base/Pruned.pth".format(exec_name)
+    exec_param.best_result_save_path = "../saved/VGG16-base/Pruned.pth".format(exec_name)
     exec_param.retrain_if_weight_loaded = True
     for i in range(0, 11):
-        desired_pruning = (5.0 * i)/100.0
+        desired_pruning = (5.0 * i) / 100.0
         if desired_pruning != 0.0:
             pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
             pruning_param_no_prune.prune_ratio = desired_pruning
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
-        h, s = exec_resnet34(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                             dataset_params=dataset_params, debug_params=debug_params)
+        h, s = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
+                              dataset_params=dataset_params, debug_params=debug_params)
         score.append(s)
 
-    all_scores["ResNet34"] = score
-    display_graphs(score, all_scores, "ResNet34")
-
-    exec_name = "ResNet50-degrad"
-    score = []
-    exec_param.best_result_save_path = "../saved/ResNet50-base/Pruned.pth".format(exec_name)
-    exec_param.retrain_if_weight_loaded = True
-    for i in range(0, 11):
-        desired_pruning = (5.0 * i)/100.0
-        if desired_pruning != 0.0:
-            pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
-            pruning_param_no_prune.prune_ratio = desired_pruning
-        else:
-            pruning_param_no_prune.max_percent_per_iteration = None
-            pruning_param_no_prune.prune_ratio = None
-        h, s = exec_resnet50(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                             dataset_params=dataset_params, debug_params=debug_params)
-        score.append(s)
-
-    all_scores["ResNet50"] = score
-    display_graphs(score, all_scores, "ResNet50")
+    all_scores["VGG16"] = score
+    display_graphs(score, all_scores, "VGG16")
 
     exec_name = "DenseNet121-degrad"
     score = []
@@ -165,25 +184,6 @@ def run_compare_pruning(dataset_params, retrain, total, split_ratio=1.0):
 
     all_scores["DenseNet121"] = score
     display_graphs(score, all_scores, "DenseNet121")
-
-    exec_name = "VGG16-degrad"
-    score = []
-    exec_param.best_result_save_path = "../saved/VGG16-base/Pruned.pth".format(exec_name)
-    exec_param.retrain_if_weight_loaded = True
-    for i in range(0, 11):
-        desired_pruning = (5.0 * i)/100.0
-        if desired_pruning != 0.0:
-            pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
-            pruning_param_no_prune.prune_ratio = desired_pruning
-        else:
-            pruning_param_no_prune.max_percent_per_iteration = None
-            pruning_param_no_prune.prune_ratio = None
-        h, s = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                              dataset_params=dataset_params, debug_params=debug_params)
-        score.append(s)
-
-    all_scores["VGG16"] = score
-    display_graphs(score, all_scores, "VGG16")
 
     exec_name = "Squeeze-degrad"
     score = []
@@ -231,7 +231,12 @@ if __name__ == '__main__':
     test_dataset = CIFAR10("C:/dev/data/cifar10/", train=False, transform=transform, download=True)
     dataset_params = DatasetParams(transform, train_dataset, test_dataset)
 
+    # print("Start Training")
     # train_models(dataset_params)
-    run_compare_pruning(dataset_params=dataset_params, retrain=0, total=1, split_ratio=1.0)
-    run_compare_pruning(dataset_params=dataset_params, retrain=1, total=5, split_ratio=1.0)
+    # print("Start simple degrad")
+    # run_compare_pruning(dataset_params=dataset_params, retrain=0, total=1, split_ratio=1.0)
+    print("Start complex degrad")
     run_compare_pruning(dataset_params=dataset_params, retrain=1, total=5, split_ratio=0.34)
+    print("Start simple degrad+retrain")
+    run_compare_pruning(dataset_params=dataset_params, retrain=1, total=5, split_ratio=1.0)
+

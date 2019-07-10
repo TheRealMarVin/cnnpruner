@@ -134,6 +134,10 @@ def exec_dense_net(exec_name, pruning_params=None, exec_params=None, dataset_par
 
     model.cuda()
 
+    if exec_params is not None:
+        exec_params.force_forward_view = True
+        exec_params.ignore_last_conv = True
+
     history, test_score = common_training_code(model,
                                                pruned_save_path="../saved/{}/Pruned.pth".format(exec_name),
                                                pruned_best_result_save_path="../saved/{}/pruned_best.pth".format(exec_name),
