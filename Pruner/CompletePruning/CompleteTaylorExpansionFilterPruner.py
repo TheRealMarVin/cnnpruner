@@ -55,7 +55,7 @@ class CompleteTaylorExpansionFilterPruner(CompleteFilterPruner):
 
     def extract_filter_activation_mean(self, out):
         for curr_set in self.sets:
-            if len(curr_set) <= 1:
+            if len(curr_set) <= 1 or curr_set not in self.ignore_list:
                 continue
             set_as_list = list(curr_set)
             sum = self.test_layer_activation[set_as_list[0]]
@@ -95,7 +95,6 @@ class CompleteTaylorExpansionFilterPruner(CompleteFilterPruner):
 
         return False
 
-    # TODO test for is last conv is now useless we can just pick the last element in the list
     def compute_conv_graph(self):
         conv_layers = []
         to_delete = []
@@ -175,6 +174,9 @@ class CompleteTaylorExpansionFilterPruner(CompleteFilterPruner):
                 if key == self.graph_res.out_node:
                     elem_to_del = len(self.sets) - 1
 
+        if self.ignore_last_conv and self.graph_res.out_node in self.reverse_conv_graph.keys():
+            self.ignore_list.extend(self.reverse_conv_graph[self.graph_res.out_node])
+
         if elem_to_del is not None:
             self.ignore_list.extend(list(self.sets[elem_to_del]))
             del self.sets[elem_to_del]
@@ -185,9 +187,9 @@ class CompleteTaylorExpansionFilterPruner(CompleteFilterPruner):
         is_last_conv = False
         if next != "":
             for elem in next.split(","):
-                if elem in self.graph_res.special_op.keys() and self.graph_res.special_op[elem] == "Concat":
-                    # if we reach a concat we don't want the next conv layer
-                    continue
+                # if elem in self.graph_res.special_op.keys() and self.graph_res.special_op[elem] == "Concat":
+                #     # if we reach a concat we don't want the next conv layer
+                #     continue
                 if elem in conv_layers:
                     res.append(elem)
                 else:

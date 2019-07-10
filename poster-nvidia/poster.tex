@@ -50,15 +50,7 @@
 \begin{columns}
 \column{.4}
 \block{Introduction}{%
-We explore how reducing network expressivity can affect performance in Convolution Neural Network (CNN). The idea is to take a network that can handle a more complex task and remove filters that are the least important for the new task.
-
-\vspace{5mm}
-\textbf{Motivations:}
-\begin{itemize}
-  \item \colorbold{Reduce} network size and execution time.
-  % \item Goldberg (2017) emphasizes this fact for NLP tasks such as part of speech tagging (POS) or named entity recognition (NER).
-  \item \colorbold{Run} network on less demanding hardware with similar accuracy.
-\end{itemize}
+We explore how it would be possible to use Convolution Pruning to reduce size of popular model and see how it affects performance of these network based on pruning. This should allow to run  more complexe solution on smaller hardware.
 
 \vspace{15mm}
 \textbf{Related work:}

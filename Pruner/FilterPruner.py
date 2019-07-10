@@ -246,6 +246,7 @@ class FilterPruner:
 
     def prune(self, pruning_dic):
         for layer_id, filters_to_remove in pruning_dic.items():
+            # print("apply pruning on node: {}-{}".format(layer_id, self.graph_res.name_dict[layer_id]))
             layer = get_node_in_model(self.model, self.graph_res.name_dict[layer_id])
 
             if layer is not None:
@@ -274,6 +275,7 @@ class FilterPruner:
             return
         layer = get_node_in_model(self.model, self.graph_res.name_dict[layer_id])
 
+        # print("\tapply effect on node: {}-{}".format(layer_id, self.graph_res.name_dict[layer_id]))
         has_more = True
         if isinstance(layer, torch.nn.modules.conv.Conv2d):
             self._prune_conv_input_filters(layer, removed_filter, initial_filter_count)
