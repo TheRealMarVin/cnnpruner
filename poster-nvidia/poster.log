@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  11 JUL 2019 21:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  12 JUL 2019 07:01
 entering extended mode
 **./poster.tex
 (poster.tex
@@ -1098,6 +1098,17 @@ Package: multicol 2018/11/09 v1.8u multicolumn formatting (FMi)
 \colbreak@box=\box99
 \mc@col@check@num=\count147
 )
+("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/tools\tabularx.sty
+"
+Package: tabularx 2016/02/03 v2.11b `tabularx' package (DPC)
+\TX@col@width=\dimen340
+\TX@old@table=\dimen341
+\TX@old@col=\dimen342
+\TX@target=\dimen343
+\TX@delta=\dimen344
+\TX@cols=\count148
+\TX@ftn=\toks36
+)
 
 LaTeX Warning: Unused global option(s):
     [total={35in, 44in}].
@@ -1105,26 +1116,26 @@ LaTeX Warning: Unused global option(s):
 (poster.aux)
 \openout1 = `poster.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 47.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 47.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 48.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 48.
 
 ("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\ts1cmr.fd"
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Try loading font information for T1+yvt on input line 47.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Try loading font information for T1+yvt on input line 48.
 
 ("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/venturis\t1yvt.fd"
 File: t1yvt.fd 2010/07/03 Fontinst v1.933 font definitions for T1/yvt.
@@ -1132,17 +1143,17 @@ File: t1yvt.fd 2010/07/03 Fontinst v1.933 font definitions for T1/yvt.
 ("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/context/base\supp-pdf.mk
 ii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count148
-\scratchdimen=\dimen340
+\scratchcounter=\count149
+\scratchdimen=\dimen345
 \scratchbox=\box100
-\nofMPsegments=\count149
-\nofMParguments=\count150
-\everyMPshowfont=\toks36
-\MPscratchCnt=\count151
-\MPscratchDim=\dimen341
-\MPnumerator=\count152
-\makeMPintoPDFobject=\count153
-\everyMPtoPDFconversion=\toks37
+\nofMPsegments=\count150
+\nofMParguments=\count151
+\everyMPshowfont=\toks37
+\MPscratchCnt=\count152
+\MPscratchDim=\dimen346
+\MPnumerator=\count153
+\makeMPintoPDFobject=\count154
+\everyMPtoPDFconversion=\toks38
 )
 ("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\epstopdf-
 base.sty"
@@ -1231,104 +1242,100 @@ G,.JBIG2,.JB2,.eps]
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Info: Redefining \degres on input line 47.
-LaTeX Info: Redefining \dots on input line 47.
+LaTeX Info: Redefining \degres on input line 48.
+LaTeX Info: Redefining \dots on input line 48.
 Package french.ldf Info: Setting StandardItemizeEnv=true for
 (french.ldf)             compatibility with enumitem package,
-(french.ldf)             reported on input line 47.
+(french.ldf)             reported on input line 48.
 Package french.ldf Info: Setting StandardEnumerateEnv=true for
 (french.ldf)             compatibility with enumitem package,
-(french.ldf)             reported on input line 47.
+(french.ldf)             reported on input line 48.
 Missing character: There is no  in font nullfont!
-LaTeX Info: Redefining \up on input line 47.
+LaTeX Info: Redefining \up on input line 48.
 Missing character: There is no . in font nullfont!
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no = in font nullfont!
 Missing character: There is no 1 in font nullfont!
-LaTeX Font Info:    Calculating math sizes for size <25> on input line 49.
+LaTeX Font Info:    Calculating math sizes for size <25> on input line 50.
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <12.5> not available
-(Font)              size <12> substituted on input line 49.
+(Font)              size <12> substituted on input line 50.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <12.5> not available
-(Font)              size <12> substituted on input line 49.
+(Font)              size <12> substituted on input line 50.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <12.5> not available
-(Font)              size <12> substituted on input line 49.
+(Font)              size <12> substituted on input line 50.
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 49.
+LaTeX Font Info:    Try loading font information for U+msa on input line 50.
 ("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 49.
+LaTeX Font Info:    Try loading font information for U+msb on input line 50.
 ("C:\Users\naked\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <25> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 49.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 50.
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <61.92> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 49.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 50.
 <figures/ul.pdf, id=28, 313.17pt x 129.48375pt>
 File: figures/ul.pdf Graphic file (type pdf)
 <use figures/ul.pdf>
-Package pdftex.def Info: figures/ul.pdf  used on input line 49.
+Package pdftex.def Info: figures/ul.pdf  used on input line 50.
 (pdftex.def)             Requested size: 582.90495pt x 241.04272pt.
 
-Overfull \hbox (39.88322pt too wide) in paragraph at lines 49--49
+Overfull \hbox (39.88322pt too wide) in paragraph at lines 50--50
 [][]
  []
 
 File: figures/ul.pdf Graphic file (type pdf)
 <use figures/ul.pdf>
-Package pdftex.def Info: figures/ul.pdf  used on input line 49.
+Package pdftex.def Info: figures/ul.pdf  used on input line 50.
 (pdftex.def)             Requested size: 582.90495pt x 241.04272pt.
 
-Overfull \hbox (39.88322pt too wide) in paragraph at lines 49--49
+Overfull \hbox (39.88322pt too wide) in paragraph at lines 50--50
 [][]
  []
 
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <24.88> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 69.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 70.
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <43> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 69.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 70.
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <29.86> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 69.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 70.
 <figures/simple-degrad.png, id=29, 722.7pt x 421.575pt>
 File: figures/simple-degrad.png Graphic file (type png)
 <use figures/simple-degrad.png>
-Package pdftex.def Info: figures/simple-degrad.png  used on input line 133.
+Package pdftex.def Info: figures/simple-degrad.png  used on input line 120.
 (pdftex.def)             Requested size: 932.2925pt x 543.84044pt.
 <figures/pruneand5retry.png, id=31, 724.20563pt x 421.575pt>
 File: figures/pruneand5retry.png Graphic file (type png)
 <use figures/pruneand5retry.png>
-Package pdftex.def Info: figures/pruneand5retry.png  used on input line 133.
+Package pdftex.def Info: figures/pruneand5retry.png  used on input line 120.
 (pdftex.def)             Requested size: 932.2925pt x 542.7147pt.
-<figures/2pruneand5retry.png, id=32, 724.20563pt x 421.575pt>
-File: figures/2pruneand5retry.png Graphic file (type png)
-<use figures/2pruneand5retry.png>
-Package pdftex.def Info: figures/2pruneand5retry.png  used on input line 133.
-(pdftex.def)             Requested size: 932.2925pt x 542.7147pt.
-
-Overfull \vbox (58.66339pt too high) detected at line 133
- []
-
+<figures/3pruneand5retry.png, id=32, 725.71124pt x 420.06938pt>
+File: figures/3pruneand5retry.png Graphic file (type png)
+<use figures/3pruneand5retry.png>
+Package pdftex.def Info: figures/3pruneand5retry.png  used on input line 120.
+(pdftex.def)             Requested size: 932.2925pt x 539.66118pt.
 [1
 
 {C:/Users/naked/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./figures/u
 l.pdf> <./figures/simple-degrad.png> <./figures/pruneand5retry.png> <./figures/
-2pruneand5retry.png>] (poster.aux)
+3pruneand5retry.png>] (poster.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.5pt have occurred.
 
  ) 
 Here is how much of TeX's memory you used:
- 20763 strings out of 492946
- 440274 string characters out of 3126267
- 547264 words of memory out of 3000000
- 24177 multiletter control sequences out of 15000+200000
+ 20810 strings out of 492946
+ 440893 string characters out of 3126267
+ 547359 words of memory out of 3000000
+ 24221 multiletter control sequences out of 15000+200000
  98091 words of font info for 93 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  62i,17n,85p,791b,1211s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1337,9 +1344,9 @@ Here is how much of TeX's memory you used:
 /type1/public/amsfonts/symbols/msam10.pfb><C:/Users/naked/AppData/Local/Program
 s/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtb8a.pfb><C:/Users/naked/AppData/L
 ocal/Programs/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtr8a.pfb>
-Output written on poster.pdf (1 page, 141706 bytes).
+Output written on poster.pdf (1 page, 142421 bytes).
 PDF statistics:
- 56 PDF objects out of 1000 (max. 8388607)
+ 55 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  129 words of extra memory for PDF output out of 10000 (max. 10000000)
 

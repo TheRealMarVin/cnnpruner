@@ -7,6 +7,7 @@
 \usepackage{array}
 \usepackage{multirow}
 \usepackage{multicol}
+\usepackage{tabularx}
 %\usepackage[table,xcdraw]{xcolor}
 
 \definecolor{PaleBlue}{rgb}{0,.55,.9}
@@ -90,7 +91,7 @@ It was shown in P.Molchanov et al. that it was possible to prune a convolution n
 
 \column{0.30}
 \block{Settings}{
-	\vspace{2.5cm}
+	\vspace{0.5cm}
 \begin{itemize}
 	\item \textbf{Dataset}: Cifar10
 	\item \textbf{Optimizer}: Stochastic Gradient Descent
@@ -99,8 +100,10 @@ It was shown in P.Molchanov et al. that it was possible to prune a convolution n
 	\item \textbf{Nesterov}: False
 	\item \textbf{Batch Size}: 64
 	\item \textbf{Use GPU}: Of course!
+	\item \textbf{Total Epoch Trained}: 15
+	\item \textbf{Pruning at Epoch}: [15], [10], [10,11,12]
 \end{itemize}
-\vspace{2.7cm}
+\vspace{1.2cm}
 
 }
 \end{columns}
@@ -111,24 +114,8 @@ It was shown in P.Molchanov et al. that it was possible to prune a convolution n
 
 \begin{center}
 	\begin{tabular}{ccc}
-		\includegraphics[width=0.30\linewidth]{figures/simple-degrad} & \includegraphics[width=0.30\linewidth]{figures/pruneand5retry} & \includegraphics[width=0.30\linewidth]{figures/2pruneand5retry}  \\ 
+		\includegraphics[width=0.30\linewidth]{figures/simple-degrad} & \includegraphics[width=0.30\linewidth]{figures/pruneand5retry} & \includegraphics[width=0.30\linewidth]{figures/3pruneand5retry}  \\ 
 	\end{tabular}
-
-\begin{tabular}[width=1.00\linewidth]{ccc}
-	\multirow{3}{*}{\parbox{0.25\linewidth}
-		{The first thing we realize is that if we wait until the end to start our pruning we may expect a greater degradation of our results. Also we see that the result contains some spikes. This seems to indicate that one training after the pruning is not always enough to stabilise the model.}} 
-	& 
-	\multirow{3}{*}{\parbox{0.25\linewidth}
-		{When doing 1 step of pruning once the model start to stabilize will produce consistently higher results. Also the difference between model is a lot less important across the range.}} 
-	& 
-	\multirow{3}{*}{\parbox{0.25\linewidth}
-		{This is a very long line of text}}  \\ 
-\end{tabular} 
-	
-
-
-	
-
 \end{center}
 }
 \end{columns}
@@ -139,10 +126,9 @@ It was shown in P.Molchanov et al. that it was possible to prune a convolution n
   \block{Observations}
   {
   	\begin{itemize}
-   \item Not all convolutional layer can be pruned. Pruning layers before a residual connection is dangerous because both side of the residual connection must have the same side.
+   \item Pruning convolutions preceding an add operation must prune the same elements. 
   \item When pruning in a convolution layer it is important to propagate to the following layers so the next layers have the right input size. This apply to convolution, linear and batchnorm layers..
   \item It is been seen that algorith leave only one filter on a layer. When this happen it reduce the quality of the results.
-  \item When pruning it is important to reset optimizer.
   \end{itemize}
 \vspace{0.5cm}
   }
@@ -162,7 +148,6 @@ It was shown in P.Molchanov et al. that it was possible to prune a convolution n
         \item  Would be possible to use different criteria to sort filters.
         \item  Experiments were made on Cifar10. It would be interesting to try on various datasets.
     \end{itemize}
-    \vspace{1.6cm}
   }
 \end{columns}
 
