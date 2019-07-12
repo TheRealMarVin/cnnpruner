@@ -66,8 +66,10 @@ def train_models(dataset_params):
 def run_compare_pruning(dataset_params, retrain, total, split_ratio=1.0):
     debug_params = DebugHelper(only_test_end=True)
     pruning_param_no_prune = PruningParams(max_percent_per_iteration=0.0, prune_ratio=0.0)
-    exec_param = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=retrain, n_epoch_total=total, batch_size=32,
+    exec_param = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=retrain, n_epoch_total=total, batch_size=64,
                             pruner=CompleteTaylorExpansionFilterPruner)
+    exec_param_large = ExecParams(n_pretrain_epoch=0, n_epoch_retrain=retrain, n_epoch_total=total, batch_size=32,
+                                  pruner=CompleteTaylorExpansionFilterPruner)
 
     all_scores = {}
     exec_name = "AlexNet-degrad"
@@ -159,7 +161,7 @@ def run_compare_pruning(dataset_params, retrain, total, split_ratio=1.0):
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
-        h, s = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
+        h, s = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_large,
                               dataset_params=dataset_params, debug_params=debug_params)
         score.append(s)
 
@@ -178,31 +180,31 @@ def run_compare_pruning(dataset_params, retrain, total, split_ratio=1.0):
         else:
             pruning_param_no_prune.max_percent_per_iteration = None
             pruning_param_no_prune.prune_ratio = None
-        h, s = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
+        h, s = exec_dense_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param_large,
                               dataset_params=dataset_params, debug_params=debug_params)
         score.append(s)
 
     all_scores["DenseNet121"] = score
     display_graphs(score, all_scores, "DenseNet121")
 
-    exec_name = "Squeeze-degrad"
-    score = []
-    exec_param.best_result_save_path = "../saved/Squeeze-base/Pruned.pth".format(exec_name)
-    exec_param.retrain_if_weight_loaded = True
-    for i in range(0, 11):
-        desired_pruning = (5.0 * i) / 100.0
-        if desired_pruning != 0.0:
-            pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
-            pruning_param_no_prune.prune_ratio = desired_pruning
-        else:
-            pruning_param_no_prune.max_percent_per_iteration = None
-            pruning_param_no_prune.prune_ratio = None
-        h, s = exec_squeeze_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
-                                dataset_params=dataset_params, debug_params=debug_params)
-        score.append(s)
-
-    all_scores["Squeeze"] = score
-    display_graphs(score, all_scores, "Squeeze")
+    # exec_name = "Squeeze-degrad"
+    # score = []
+    # exec_param.best_result_save_path = "../saved/Squeeze-base/Pruned.pth".format(exec_name)
+    # exec_param.retrain_if_weight_loaded = True
+    # for i in range(0, 11):
+    #     desired_pruning = (5.0 * i) / 100.0
+    #     if desired_pruning != 0.0:
+    #         pruning_param_no_prune.max_percent_per_iteration = desired_pruning * split_ratio
+    #         pruning_param_no_prune.prune_ratio = desired_pruning
+    #     else:
+    #         pruning_param_no_prune.max_percent_per_iteration = None
+    #         pruning_param_no_prune.prune_ratio = None
+    #     h, s = exec_squeeze_net(exec_name, pruning_params=pruning_param_no_prune, exec_params=exec_param,
+    #                             dataset_params=dataset_params, debug_params=debug_params)
+    #     score.append(s)
+    #
+    # all_scores["Squeeze"] = score
+    # display_graphs(score, all_scores, "Squeeze")
 
 
 def display_graphs(current_score, all_scores, name):
@@ -235,8 +237,9 @@ if __name__ == '__main__':
     # train_models(dataset_params)
     # print("Start simple degrad")
     # run_compare_pruning(dataset_params=dataset_params, retrain=0, total=1, split_ratio=1.0)
+    # print("Start simple degrad+retrain")
+    # run_compare_pruning(dataset_params=dataset_params, retrain=1, total=5, split_ratio=1.0)
     print("Start complex degrad")
-    run_compare_pruning(dataset_params=dataset_params, retrain=1, total=5, split_ratio=0.34)
-    print("Start simple degrad+retrain")
-    run_compare_pruning(dataset_params=dataset_params, retrain=1, total=5, split_ratio=1.0)
+    run_compare_pruning(dataset_params=dataset_params, retrain=1, total=5, split_ratio=1.0/3.0)
+
 
