@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  9 JUL 2019 14:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.2.3)  11 JUL 2019 21:50
 entering extended mode
 **./poster.tex
 (poster.tex
@@ -1290,67 +1290,56 @@ Overfull \hbox (39.88322pt too wide) in paragraph at lines 49--49
  []
 
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <24.88> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 68.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 69.
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <43> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 68.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 69.
 LaTeX Font Info:    Font shape `T1/yvt/bx/n' in size <29.86> not available
-(Font)              Font shape `T1/yvt/b/n' tried instead on input line 68.
-<figures/prune_ratio.png, id=29, 481.8pt x 361.35pt>
-File: figures/prune_ratio.png Graphic file (type png)
-<use figures/prune_ratio.png>
-Package pdftex.def Info: figures/prune_ratio.png  used on input line 80.
-(pdftex.def)             Requested size: 711.384pt x 426.79733pt.
-<figures/various_models.png, id=31, 442.65375pt x 361.35pt>
-File: figures/various_models.png Graphic file (type png)
-<use figures/various_models.png>
-Package pdftex.def Info: figures/various_models.png  used on input line 92.
-(pdftex.def)             Requested size: 711.36069pt x 426.79733pt.
-<figures/Alexnet_origin.png, id=32, 769.37437pt x 404.26031pt>
-File: figures/Alexnet_origin.png Graphic file (type png)
-<use figures/Alexnet_origin.png>
-Package pdftex.def Info: figures/Alexnet_origin.png  used on input line 104.
-(pdftex.def)             Requested size: 769.3725pt x 404.25932pt.
-<figures/Alexnet_30.png, id=33, 774.64406pt x 421.575pt>
-File: figures/Alexnet_30.png Graphic file (type png)
-<use figures/Alexnet_30.png>
-Package pdftex.def Info: figures/Alexnet_30.png  used on input line 104.
-(pdftex.def)             Requested size: 774.64217pt x 421.57396pt.
+(Font)              Font shape `T1/yvt/b/n' tried instead on input line 69.
+<figures/simple-degrad.png, id=29, 722.7pt x 421.575pt>
+File: figures/simple-degrad.png Graphic file (type png)
+<use figures/simple-degrad.png>
+Package pdftex.def Info: figures/simple-degrad.png  used on input line 133.
+(pdftex.def)             Requested size: 932.2925pt x 543.84044pt.
+<figures/pruneand5retry.png, id=31, 724.20563pt x 421.575pt>
+File: figures/pruneand5retry.png Graphic file (type png)
+<use figures/pruneand5retry.png>
+Package pdftex.def Info: figures/pruneand5retry.png  used on input line 133.
+(pdftex.def)             Requested size: 932.2925pt x 542.7147pt.
+<figures/2pruneand5retry.png, id=32, 724.20563pt x 421.575pt>
+File: figures/2pruneand5retry.png Graphic file (type png)
+<use figures/2pruneand5retry.png>
+Package pdftex.def Info: figures/2pruneand5retry.png  used on input line 133.
+(pdftex.def)             Requested size: 932.2925pt x 542.7147pt.
 
-Overfull \hbox (41.68681pt too wide) in paragraph at lines 104--104
-[][] [] 
- []
-
-
-Overfull \hbox (56.89297pt too wide) in paragraph at lines 179--179
- [] 
+Overfull \vbox (58.66339pt too high) detected at line 133
  []
 
 [1
 
 {C:/Users/naked/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./figures/u
-l.pdf> <./figures/prune_ratio.png> <./figures/various_models.png> <./figures/Al
-exnet_origin.png> <./figures/Alexnet_30.png>] (poster.aux)
+l.pdf> <./figures/simple-degrad.png> <./figures/pruneand5retry.png> <./figures/
+2pruneand5retry.png>] (poster.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.5pt have occurred.
 
  ) 
 Here is how much of TeX's memory you used:
- 20768 strings out of 492946
- 440377 string characters out of 3126267
- 557263 words of memory out of 3000000
- 24180 multiletter control sequences out of 15000+200000
- 103618 words of font info for 95 fonts, out of 3000000 for 9000
+ 20763 strings out of 492946
+ 440274 string characters out of 3126267
+ 547264 words of memory out of 3000000
+ 24177 multiletter control sequences out of 15000+200000
+ 98091 words of font info for 93 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 62i,17n,85p,791b,1207s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 62i,17n,85p,791b,1211s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/venturisadf
 /t1-f_f-venturisadf.enc}<C:/Users/naked/AppData/Local/Programs/MiKTeX 2.9/fonts
 /type1/public/amsfonts/symbols/msam10.pfb><C:/Users/naked/AppData/Local/Program
 s/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtb8a.pfb><C:/Users/naked/AppData/L
 ocal/Programs/MiKTeX 2.9/fonts/type1/arkandis/venturis/yvtr8a.pfb>
-Output written on poster.pdf (1 page, 237549 bytes).
+Output written on poster.pdf (1 page, 141706 bytes).
 PDF statistics:
- 58 PDF objects out of 1000 (max. 8388607)
+ 56 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 134 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 129 words of extra memory for PDF output out of 10000 (max. 10000000)
 
