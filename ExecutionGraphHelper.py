@@ -17,6 +17,7 @@ def get_input_connection_count_per_entry(graph_edges, node, res):
     else:
         print("not in : {}".format(node))
 
+
 class GraphRes:
     def __init__(self, execution_graph, name_dict, root, special_op, special_op_params, out_node):
         self.execution_graph = execution_graph
@@ -101,6 +102,7 @@ def generate_graph(model, args):
                         curr_name = new_name
                 elif op == "onnx::Concat" and intersect_as_string not in special_op.keys():
                     special_op[intersect_as_string] = "Concat"
+                    special_op_params[intersect_as_string] = get_concat_element(torch_node)
                 elif op == "onnx::AveragePool" and intersect_as_string not in special_op.keys():
                     curr_name = "AveragePool"
                     special_op[intersect_as_string] = "AveragePool"
@@ -222,4 +224,18 @@ def get_shape(torch_node):
     else:
         shape = None
     return shape
+
+def get_concat_element(torch_node):
+    res = None
+    as_string = str(next(torch_node.outputs()))
+    pos = as_string.find("[axis=")
+    if pos >= 0:
+        start_pos = as_string.find("(", pos)
+        end_pos = as_string.find(")", pos)
+        if end_pos > start_pos >= 0:
+            sub_string = as_string[start_pos + 1: end_pos]
+            sub_string = sub_string.replace("%", "")
+            res = sub_string.replace(" ", "")
+
+    return res
 
